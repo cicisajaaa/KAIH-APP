@@ -8,3 +8,4 @@ class AngketHarian extends Model
 {
     //
 }
+ 
