@@ -42,7 +42,7 @@ public function create()
 {
     $request->validate([
         'nama_kelas' => 'required',
-        'jurusan_id' => 'nullable'
+        'jurusan_id' => 'nullable|exists:jurusans,id'
     ]);
 
     Kelas::create([

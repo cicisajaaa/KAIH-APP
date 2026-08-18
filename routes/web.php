@@ -10,7 +10,7 @@ use App\Http\Controllers\Admin\KelasController;
 use App\Http\Controllers\Admin\SiswaController;
 use App\Http\Controllers\Admin\OrangTuaController;
 use App\Http\Controllers\OrangTua\DashboardController as OrangTuaDashboardController;
-
+use App\Http\Controllers\Admin\LaporanController;
 
 /*
 |--------------------------------------------------------------------------
@@ -89,9 +89,17 @@ Route::middleware(['auth', 'role:admin'])
         */
 
         Route::get('/dashboard', [AdminDashboardController::class, 'index'])
-            ->name('admin.dashboard');
+        ->name('admin.dashboard');
 
 
+        Route::get('/laporan',
+            [LaporanController::class, 'index']
+        )->name('laporan.index');
+
+
+        Route::get('/laporan/export',
+            [LaporanController::class, 'export']
+        )->name('laporan.export');
         /*
         |--------------------------------------------------------------------------
         | Jurusan
@@ -217,6 +225,7 @@ Route::middleware('auth')->group(function () {
     Route::delete('/profile', [ProfileController::class, 'destroy'])
         ->name('profile.destroy');
 });
+
 
 
 /*

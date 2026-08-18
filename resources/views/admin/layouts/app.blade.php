@@ -25,42 +25,46 @@
             </div>
 
             <nav class="mt-5">
+            <!-- Dashboard -->
+            <a href="{{ route('admin.dashboard') }}"
+            class="block px-6 py-3 hover:bg-indigo-700 transition">
+                🏠 Dashboard
+            </a>
 
-                <!-- Dashboard -->
-                <a href="{{ route('admin.dashboard') }}"
-                   class="block px-6 py-3 hover:bg-indigo-700 transition">
-                    🏠 Dashboard
-                </a>
 
-                <!-- Jurusan -->
-                <a href="{{ route('jurusan.index') }}"
-                   class="block px-6 py-3 hover:bg-indigo-700 transition">
-                    🏫 Jurusan
-                </a>
+            <!-- Jurusan -->
+            <a href="{{ route('jurusan.index') }}"
+            class="block px-6 py-3 hover:bg-indigo-700 transition">
+                🏫 Jurusan
+            </a>
 
-                <!-- Kelas -->
-                <a href="{{ route('kelas.index') }}"
-                   class="block px-6 py-3 hover:bg-indigo-700 transition">
-                    📚 Kelas
-                </a>
 
-                <!-- Siswa -->
-                <a href="{{ route('siswa.index') }}"
-                   class="block px-6 py-3 hover:bg-indigo-700 transition">
-                    👨‍🎓 Siswa
-                </a>
+            <!-- Kelas -->
+            <a href="{{ route('kelas.index') }}"
+            class="block px-6 py-3 hover:bg-indigo-700 transition">
+                📚 Kelas
+            </a>
 
-                <!-- Orang Tua -->
-                <a href="{{ route('orangtua.index') }}"
-                    class="block px-6 py-3 hover:bg-indigo-700 transition">
-                     👨‍👩‍👧 Orang Tua
-                </a>
 
-                <!-- Laporan -->
-                <a href="#"
-                   class="block px-6 py-3 hover:bg-indigo-700 transition">
-                    📄 Laporan
-                </a>
+            <!-- Siswa -->
+            <a href="{{ route('siswa.index') }}"
+            class="block px-6 py-3 hover:bg-indigo-700 transition">
+                👨‍🎓 Siswa
+            </a>
+
+
+            <!-- Orang Tua -->
+            <a href="{{ route('orangtua.index') }}"
+            class="block px-6 py-3 hover:bg-indigo-700 transition">
+                👨‍👩‍👧 Orang Tua
+            </a>
+
+
+            <!-- Laporan -->
+            <a href="{{ route('laporan.index') }}"
+            class="block px-6 py-3 hover:bg-indigo-700 transition">
+                📄 Laporan
+            </a>
 
                 <!-- Logout -->
                 <form method="POST"

@@ -28,4 +28,9 @@ class OrangTua extends Model
     {
         return $this->hasOne(User::class, 'orang_tua_id');
     }
+
+    public function angketHarian()
+    {
+        return $this->hasMany(AngketHarian::class, 'orang_tua_id');
+    }
 }

@@ -14,9 +14,11 @@ class DashboardController extends Controller
         if (!$user || $user->role !== 'orang_tua') {
             abort(403, 'Akses hanya untuk orang tua.');
         }
-
         $orangTua = $user->orangTua()
-            ->with('siswa.kelas')
+            ->with([
+                'siswa.kelas.jurusan',
+                'angketHarian'
+            ])
             ->first();
 
         if (!$orangTua) {
