@@ -27,6 +27,9 @@ return new class extends Migration
             // Tanggal angket
             $table->date('tanggal');
 
+            // Waktu pengisian angket oleh orang tua
+            $table->dateTime('tanggal_pengisian')->nullable();
+
             // 1. Bangun pagi
             $table->time('bangun_pagi')->nullable();
 

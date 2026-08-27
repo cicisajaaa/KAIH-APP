@@ -2,118 +2,157 @@
 
 namespace App\Imports;
 
-use App\Models\OrangTua;
+
 use App\Models\Siswa;
-use App\Models\User;
-use Illuminate\Support\Facades\Hash;
+use App\Models\OrangTua;
+//use App\Models\User;
+
 use Illuminate\Support\Collection;
+//use Illuminate\Support\Facades\Hash;
+
 use Maatwebsite\Excel\Concerns\ToCollection;
 use Maatwebsite\Excel\Concerns\WithHeadingRow;
 
+
+
 class OrangTuaImport implements ToCollection, WithHeadingRow
 {
+
+
     public function collection(Collection $rows)
     {
-        foreach ($rows as $row) {
 
-            $nis = trim((string) ($row['nis'] ?? ''));
 
-            if ($nis === '') {
+        foreach($rows as $row)
+        {
+
+
+            $nis = trim(
+                (string)($row['nis'] ?? '')
+            );
+
+
+            if(!$nis){
                 continue;
             }
 
 
-            $siswa = Siswa::where('nis', $nis)->first();
+
+            $siswa = Siswa::where(
+                'nis',
+                $nis
+            )->first();
 
 
-            if (!$siswa) {
+
+            if(!$siswa){
                 continue;
             }
 
 
 
-            /*
-            |--------------------------------------------------------------------------
-            | AYAH
-            |--------------------------------------------------------------------------
-            */
+            $this->buatOrangTua(
 
-            if (!empty($row['nama_ayah'])) {
+                $siswa,
 
-                $ayah = OrangTua::updateOrCreate(
-                    [
-                        'siswa_id' => $siswa->id,
-                        'hubungan' => 'Ayah',
-                    ],
-                    [
-                        'nama_orang_tua' => $row['nama_ayah'],
-                        'pekerjaan' => $row['pekerjaan_ayah'] ?? null,
-                        'no_hp' => null,
-                    ]
-                );
+                $row['nama_ayah'] ?? null,
 
+                'Ayah',
 
-                User::updateOrCreate(
-                    [
-                        'orang_tua_id' => $ayah->id,
-                    ],
-                    [
-                        'name' => $ayah->nama_orang_tua,
-                        'email' => strtolower(str_replace(' ', '', $ayah->nama_orang_tua))
-                            . $ayah->id
-                            . '@kaih.app',
+                $row['pekerjaan_ayah'] ?? null,
 
-                        'password' => Hash::make('orangtua123'),
+                $row['no_hp_ayah'] ?? null
 
-                        'role' => 'orang_tua',
-                    ]
-                );
-
-            }
+            );
 
 
 
+            $this->buatOrangTua(
 
-            /*
-            |--------------------------------------------------------------------------
-            | IBU
-            |--------------------------------------------------------------------------
-            */
+                $siswa,
 
-            if (!empty($row['nama_ibu'])) {
+                $row['nama_ibu'] ?? null,
 
-                $ibu = OrangTua::updateOrCreate(
-                    [
-                        'siswa_id' => $siswa->id,
-                        'hubungan' => 'Ibu',
-                    ],
-                    [
-                        'nama_orang_tua' => $row['nama_ibu'],
-                        'pekerjaan' => $row['pekerjaan_ibu'] ?? null,
-                        'no_hp' => null,
-                    ]
-                );
+                'Ibu',
 
+                $row['pekerjaan_ibu'] ?? null,
 
-                User::updateOrCreate(
-                    [
-                        'orang_tua_id' => $ibu->id,
-                    ],
-                    [
-                        'name' => $ibu->nama_orang_tua,
+                $row['no_hp_ibu'] ?? null
 
-                        'email' => strtolower(str_replace(' ', '', $ibu->nama_orang_tua))
-                            . $ibu->id
-                            . '@kaih.app',
-
-                        'password' => Hash::make('orangtua123'),
-
-                        'role' => 'orang_tua',
-                    ]
-                );
-
-            }
+            );
 
         }
+
     }
+
+
+
+
+    private function buatOrangTua(
+        $siswa,
+        $nama,
+        $hubungan,
+        $pekerjaan,
+        $hp
+    ){
+
+        if(!$nama){
+            return;
+        }
+
+
+
+        // $orangTua = OrangTua::updateOrCreate(
+
+        //     [
+
+        //         'siswa_id'=>$siswa->id,
+        //         'hubungan'=>$hubungan
+
+        //     ],
+
+        //     [
+
+        //         'nama_orang_tua'=>trim($nama),
+
+        //         'pekerjaan'=>$pekerjaan,
+
+        //         'no_hp'=>$hp
+
+        //     ]
+
+        // );
+
+
+
+
+        User::updateOrCreate(
+
+            [
+                'orang_tua_id'=>$orangTua->id
+            ],
+
+            [
+
+                'name'=>$orangTua->nama_orang_tua,
+
+
+                'email'=>
+                    Str::slug($orangTua->nama_orang_tua)
+                    .$orangTua->id
+                    .'@kaih.app',
+
+
+                'password'=>
+                    Hash::make('orangtua123'),
+
+
+                'role'=>'orang_tua'
+
+            ]
+
+        );
+
+    }
+
 }

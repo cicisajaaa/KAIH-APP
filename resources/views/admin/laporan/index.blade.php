@@ -1,356 +1,937 @@
 @extends('admin.layouts.app')
 
-@section('title','Laporan')
-@section('page-title','Laporan')
+
+@section('title','Laporan Monitoring')
+
 
 @section('content')
 
 
-<div class="space-y-6">
-
-
-    {{-- HEADER --}}
-    <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
-
-        <div>
-            <h2 class="text-2xl font-bold text-gray-900">
-                Laporan Sistem KAIH
-            </h2>
-
-            <p class="text-gray-500 mt-1">
-                Rekap data siswa dan aktivitas angket harian.
-            </p>
-        </div>
-
-
-        <a href="{{ route('laporan.export') }}"
-           class="inline-flex items-center gap-2
-                  bg-green-600
-                  hover:bg-green-700
-                  text-white
-                  font-semibold
-                  px-5 py-3
-                  rounded-xl
-                  transition">
-
-            📤 Export Excel
-
-        </a>
-
-    </div>
-{{-- FILTER TANGGAL ANGKET --}}
-
-<div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-6">
-
-
-    <form method="GET"
-          action="{{ route('laporan.index') }}"
-          class="flex flex-col md:flex-row gap-4 items-end">
-
-
-        <div>
-
-            <label class="block text-sm font-semibold text-gray-700 mb-1">
-                Dari Tanggal
-            </label>
-
-            <input
-                type="date"
-                name="tanggal_mulai"
-                value="{{ $tanggalMulai ?? '' }}"
-                class="border border-gray-300 rounded-lg px-4 py-2"
-            >
-
-        </div>
+<div class="space-y-8">
 
 
 
-        <div>
-
-            <label class="block text-sm font-semibold text-gray-700 mb-1">
-                Sampai Tanggal
-            </label>
-
-            <input
-                type="date"
-                name="tanggal_akhir"
-                value="{{ $tanggalAkhir ?? '' }}"
-                class="border border-gray-300 rounded-lg px-4 py-2"
-            >
-
-        </div>
 
 
-
-        <button
-            type="submit"
-            class="bg-indigo-600
-                   hover:bg-indigo-700
-                   text-white
-                   font-semibold
-                   px-5 py-2.5
-                   rounded-lg">
-
-            🔍 Filter
-
-        </button>
+{{-- HEADER --}}
 
 
-        <a href="{{ route('laporan.index') }}"
-           class="bg-gray-500
-                  hover:bg-gray-600
-                  text-white
-                  font-semibold
-                  px-5 py-2.5
-                  rounded-lg">
-
-            Reset
-
-        </a>
+<div class="
+bg-white
+rounded-2xl
+border
+p-7
+">
 
 
-    </form>
+<div class="flex justify-between items-center">
+
+
+<div>
+
+
+<h2 class="
+text-2xl
+font-bold
+text-slate-800
+">
+
+Laporan Monitoring Siswa
+
+</h2>
+
+
+<p class="
+text-slate-500
+mt-2
+">
+
+Rekap aktivitas harian siswa melalui pengisian angket KAIH.
+
+</p>
 
 
 </div>
 
 
-    {{-- LAPORAN SISWA --}}
 
-    <div class="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
 
+<div class="
+text-right
+hidden md:block
+">
 
-        <div class="px-6 py-5 border-b">
 
-            <h3 class="text-xl font-bold text-gray-800">
-                Laporan Data Siswa
-            </h3>
+<p class="
+text-sm
+text-slate-400
+">
 
-            <p class="text-sm text-gray-500 mt-1">
-                Total {{ $siswas->count() }} siswa.
-            </p>
+Periode Monitoring
 
-        </div>
+</p>
 
 
+<p class="
+font-semibold
+text-slate-700
+">
 
-        <div class="overflow-x-auto">
 
-            <table class="w-full">
+@if($tanggalMulai && $tanggalAkhir)
 
+{{ $tanggalMulai }}
+s/d
+{{ $tanggalAkhir }}
 
-                <thead class="bg-gray-50">
+@else
 
-                    <tr>
+Hari Ini
 
-                        <th class="px-6 py-4 text-left text-sm">
-                            NIS
-                        </th>
+@endif
 
-                        <th class="px-6 py-4 text-left text-sm">
-                            Nama Siswa
-                        </th>
 
-                        <th class="px-6 py-4 text-left text-sm">
-                            Kelas
-                        </th>
+</p>
 
-                        <th class="px-6 py-4 text-left text-sm">
-                            Jurusan
-                        </th>
 
-                    </tr>
+</div>
 
-                </thead>
 
 
-                <tbody>
+</div>
 
 
-                @forelse($siswas as $siswa)
+</div>
 
 
-                    <tr class="border-t hover:bg-gray-50">
 
 
-                        <td class="px-6 py-4">
-                            {{ $siswa->nis }}
-                        </td>
 
 
-                        <td class="px-6 py-4 font-semibold">
-                            {{ $siswa->nama_siswa }}
-                        </td>
 
 
-                        <td class="px-6 py-4">
-                            {{ $siswa->kelas->nama_kelas ?? '-' }}
-                        </td>
 
+{{-- SUMMARY --}}
 
-                        <td class="px-6 py-4">
-                            {{ $siswa->kelas->jurusan->nama_jurusan ?? '-' }}
-                        </td>
 
 
-                    </tr>
+<div class="
+grid
+grid-cols-1
+md:grid-cols-4
+gap-5
+">
 
 
-                @empty
 
 
-                    <tr>
 
-                        <td colspan="4"
-                            class="px-6 py-10 text-center text-gray-500">
+<div class="
+bg-white
+rounded-2xl
+border
+p-6
+">
 
-                            Belum ada data siswa.
 
-                        </td>
+<p class="text-sm text-slate-500">
 
-                    </tr>
+Total Siswa
 
+</p>
 
-                @endforelse
 
+<div class="flex items-center justify-between mt-4">
 
-                </tbody>
 
+<h2 class="
+text-4xl
+font-bold
+text-blue-600
+">
 
-            </table>
+{{ $totalSiswa }}
 
-        </div>
+</h2>
 
 
-    </div>
+<div class="
+w-10
+h-10
+rounded-xl
+bg-blue-50
+flex
+items-center
+justify-center
+text-blue-600
+">
 
+👤
 
+</div>
 
 
-    {{-- LAPORAN ANGKET --}}
+</div>
 
 
-    <div class="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
+</div>
 
 
-        <div class="px-6 py-5 border-b">
 
-            <h3 class="text-xl font-bold text-gray-800">
-                Laporan Angket Harian
-            </h3>
 
-            <p class="text-sm text-gray-500 mt-1">
-                Rekap aktivitas harian siswa.
-            </p>
 
-        </div>
 
 
 
-        <div class="overflow-x-auto">
+<div class="
+bg-white
+rounded-2xl
+border
+p-6
+">
 
 
-            <table class="w-full">
+<p class="text-sm text-slate-500">
 
+Sudah Isi
 
-                <thead class="bg-gray-50">
+</p>
 
-                    <tr>
 
+<div class="flex items-center justify-between mt-4">
 
-                        <th class="px-6 py-4 text-left">
-                            Tanggal
-                        </th>
 
+<h2 class="
+text-4xl
+font-bold
+text-emerald-600
+">
 
-                        <th class="px-6 py-4 text-left">
-                            Siswa
-                        </th>
+{{ $sudahIsi }}
 
+</h2>
 
-                        <th class="px-6 py-4 text-left">
-                            Belajar
-                        </th>
 
+<div class="
+w-10
+h-10
+rounded-xl
+bg-emerald-50
+flex
+items-center
+justify-center
+text-emerald-600
+">
 
-                        <th class="px-6 py-4 text-left">
-                            Sholat Subuh
-                        </th>
+✓
 
+</div>
 
-                    </tr>
 
+</div>
 
-                </thead>
 
+</div>
 
 
-                <tbody>
 
 
-                @forelse($angketHarian as $angket)
 
 
-                    <tr class="border-t hover:bg-gray-50">
 
 
-                        <td class="px-6 py-4">
-                            {{ $angket->tanggal }}
-                        </td>
+<div class="
+bg-white
+rounded-2xl
+border
+p-6
+">
 
 
-                        <td class="px-6 py-4 font-semibold">
+<p class="text-sm text-slate-500">
 
-                            {{ $angket->siswa->nama_siswa ?? '-' }}
+Belum Isi
 
-                        </td>
+</p>
 
 
-                        <td class="px-6 py-4">
+<div class="flex items-center justify-between mt-4">
 
-                            {{ $angket->belajar ? 'Ya' : 'Tidak' }}
 
-                        </td>
+<h2 class="
+text-4xl
+font-bold
+text-red-500
+">
 
+{{ $belumIsi }}
 
-                        <td class="px-6 py-4">
+</h2>
 
-                            {{ $angket->sholat_subuh ? 'Ya' : 'Tidak' }}
 
-                        </td>
+<div class="
+w-10
+h-10
+rounded-xl
+bg-red-50
+flex
+items-center
+justify-center
+text-red-600
+">
 
+!
 
-                    </tr>
+</div>
 
 
-                @empty
+</div>
 
 
-                    <tr>
+</div>
 
-                        <td colspan="4"
-                            class="px-6 py-10 text-center text-gray-500">
 
-                            Belum ada data angket harian.
 
-                        </td>
 
-                    </tr>
 
 
-                @endforelse
 
 
-                </tbody>
+<div class="
+bg-white
+rounded-2xl
+border
+p-6
+">
 
 
-            </table>
+<p class="text-sm text-slate-500">
 
+Kepatuhan
 
-        </div>
+</p>
 
 
-    </div>
+
+<div class="flex justify-between mt-4">
+
+
+<h2 class="
+text-4xl
+font-bold
+text-indigo-600
+">
+
+{{ $persentasePengisian }}%
+
+</h2>
+
+
+
+</div>
+
+
+
+
+<div class="
+mt-4
+h-2
+bg-slate-100
+rounded-full
+">
+
+
+<div
+
+class="
+h-2
+bg-indigo-600
+rounded-full
+"
+
+style="
+width:{{ $persentasePengisian }}%
+">
+
+</div>
+
+
+</div>
+
+
+</div>
+
+
+
+
+</div>
+
+
+
+
+
+
+
+
+
+{{-- FILTER --}}
+
+
+
+<div class="
+bg-white
+rounded-2xl
+border
+p-6
+">
+
+
+
+<div class="
+flex
+justify-between
+items-center
+mb-6
+">
+
+
+<div>
+
+
+<h3 class="
+font-semibold
+text-lg
+">
+
+Pencarian Data
+
+</h3>
+
+
+<p class="
+text-sm
+text-slate-400
+">
+
+Gunakan filter untuk melihat data tertentu.
+
+</p>
+
+
+</div>
+
+
+
+
+<a href="{{ route('laporan.index') }}"
+
+class="
+text-sm
+text-slate-500
+hover:text-indigo-600
+">
+
+Reset
+
+</a>
+
+
+
+</div>
+
+
+
+
+
+
+
+<form method="GET">
+
+
+<div class="
+grid
+md:grid-cols-4
+gap-5
+">
+
+
+
+<div>
+
+<label class="text-sm font-medium">
+
+Kelas
+
+</label>
+
+
+<select
+
+name="kelas_id"
+
+class="
+mt-2
+w-full
+rounded-xl
+border
+px-4
+py-3
+">
+
+
+<option value="">
+
+Semua Kelas
+
+</option>
+
+
+
+@foreach($kelas as $item)
+
+
+<option value="{{ $item->id }}"
+
+{{ $kelasId==$item->id?'selected':'' }}
+
+>
+
+{{ $item->nama_kelas }}
+
+</option>
+
+
+@endforeach
+
+
+</select>
+
+
+</div>
+
+
+
+
+
+
+<div>
+
+<label class="text-sm font-medium">
+
+Tanggal Awal
+
+</label>
+
+
+<input
+
+type="date"
+
+name="tanggal_mulai"
+
+value="{{ $tanggalMulai }}"
+
+class="
+mt-2
+w-full
+rounded-xl
+border
+px-4
+py-3
+">
+
+
+</div>
+
+
+
+
+
+
+
+<div>
+
+<label class="text-sm font-medium">
+
+Tanggal Akhir
+
+</label>
+
+
+<input
+
+type="date"
+
+name="tanggal_selesai"
+
+value="{{ $tanggalAkhir }}"
+
+class="
+mt-2
+w-full
+rounded-xl
+border
+px-4
+py-3
+">
+
+
+</div>
+
+
+
+
+
+
+
+<div class="flex items-end">
+
+
+<button
+
+class="
+w-full
+bg-indigo-600
+hover:bg-indigo-700
+text-white
+rounded-xl
+py-3
+font-semibold
+">
+
+Tampilkan Data
+
+</button>
+
+
+</div>
+
+
+</div>
+
+
+
+</form>
+
+
+
+</div>
+
+
+
+
+
+
+
+
+
+{{-- TABLE --}}
+
+
+
+<div class="
+bg-white
+rounded-2xl
+border
+overflow-hidden
+">
+
+
+
+<div class="
+px-6
+py-5
+border-b
+">
+
+
+<h3 class="
+font-semibold
+text-lg
+">
+
+Detail Aktivitas Siswa
+
+</h3>
+
+
+<p class="
+text-sm
+text-slate-400
+">
+
+Status pengisian dan perkembangan aktivitas harian.
+
+</p>
+
+
+</div>
+
+
+
+
+
+
+<div class="overflow-x-auto">
+
+
+<table class="w-full">
+
+
+<thead class="bg-slate-50">
+
+
+<tr>
+
+
+<th class="px-6 py-4 text-left text-sm">
+
+Siswa
+
+</th>
+
+
+<th class="px-6 py-4 text-left text-sm">
+
+Kelas
+
+</th>
+
+
+<th class="px-6 py-4 text-left text-sm">
+
+Status
+
+</th>
+
+
+<th class="px-6 py-4 text-left text-sm">
+
+Ibadah
+
+</th>
+
+
+<th class="px-6 py-4 text-left text-sm">
+
+Belajar
+
+</th>
+
+
+<th class="px-6 py-4 text-left text-sm">
+
+Waktu Isi
+
+</th>
+
+
+</tr>
+
+
+</thead>
+
+
+
+
+
+<tbody>
+
+
+
+@foreach($siswas as $siswa)
+
+
+<tr class="
+border-b
+hover:bg-slate-50
+transition
+">
+
+
+
+<td class="px-6 py-4">
+
+
+<p class="
+font-semibold
+">
+
+{{ $siswa->nama_siswa }}
+
+</p>
+
+
+<p class="
+text-xs
+text-slate-400
+">
+
+NIS {{ $siswa->nis }}
+
+</p>
+
+
+</td>
+
+
+
+
+
+<td class="px-6 py-4">
+
+{{ $siswa->kelas->nama_kelas ?? '-' }}
+
+</td>
+
+
+
+
+
+
+
+<td class="px-6 py-4">
+
+
+@if($siswa->angketHariIni)
+
+
+<span class="
+px-3
+py-1
+rounded-full
+bg-emerald-50
+text-emerald-600
+text-xs
+font-semibold
+">
+
+Selesai
+
+</span>
+
+
+@else
+
+
+<span class="
+px-3
+py-1
+rounded-full
+bg-red-50
+text-red-600
+text-xs
+font-semibold
+">
+
+Belum
+
+</span>
+
+
+@endif
+
+
+</td>
+
+
+
+
+
+
+
+<td class="px-6 py-4">
+
+
+@if($siswa->angketHariIni)
+
+
+{{ 
+$siswa->angketHariIni->sholat_subuh+
+$siswa->angketHariIni->sholat_dzuhur+
+$siswa->angketHariIni->sholat_ashar+
+$siswa->angketHariIni->sholat_magrib+
+$siswa->angketHariIni->sholat_isya
+}} / 5
+
+
+@else
+
+-
+
+@endif
+
+
+</td>
+
+
+
+
+
+
+
+<td class="px-6 py-4">
+
+
+@if($siswa->angketHariIni)
+
+{{ $siswa->angketHariIni->belajar?'Ya':'Tidak' }}
+
+@else
+
+-
+
+@endif
+
+
+</td>
+
+
+
+
+
+
+
+<td class="px-6 py-4 text-sm">
+
+
+@if($siswa->angketHariIni)
+
+{{ $siswa->angketHariIni->tanggal_pengisian }}
+
+@else
+
+-
+
+@endif
+
+
+</td>
+
+
+
+
+</tr>
+
+
+@endforeach
+
+
+
+</tbody>
+
+
+
+</table>
+
+
+</div>
+
+
+
+</div>
+
+
 
 
 

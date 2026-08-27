@@ -4,14 +4,19 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
+
 use App\Models\Siswa;
 use App\Models\Kelas;
+
 use App\Imports\SiswaImport;
 use App\Exports\SiswaExport;
+
 use Maatwebsite\Excel\Facades\Excel;
+
 
 class SiswaController extends Controller
 {
+
     /**
      * Menampilkan data siswa
      */
@@ -21,8 +26,13 @@ class SiswaController extends Controller
             ->orderBy('nama_siswa')
             ->get();
 
-        return view('admin.siswa.index', compact('siswas'));
+        return view(
+            'admin.siswa.index',
+            compact('siswas')
+        );
     }
+
+
 
 
     /**
@@ -30,10 +40,16 @@ class SiswaController extends Controller
      */
     public function create()
     {
-        $kelas = Kelas::orderBy('nama_kelas')->get();
+        $kelas = Kelas::orderBy('nama_kelas')
+            ->get();
 
-        return view('admin.siswa.create', compact('kelas'));
+        return view(
+            'admin.siswa.create',
+            compact('kelas')
+        );
     }
+
+
 
 
     /**
@@ -41,27 +57,64 @@ class SiswaController extends Controller
      */
     public function store(Request $request)
     {
+
         $validated = $request->validate([
-            'nis' => 'required|string|max:50|unique:siswas,nis',
-            'nama_siswa' => 'required|string|max:255',
-            'jenis_kelamin' => 'required|in:L,P',
-            'kelas_id' => 'required|exists:kelas,id',
-        ], [
-            'nis.required' => 'NIS wajib diisi.',
-            'nis.unique' => 'NIS tersebut sudah terdaftar.',
-            'nama_siswa.required' => 'Nama siswa wajib diisi.',
-            'jenis_kelamin.required' => 'Jenis kelamin wajib dipilih.',
-            'jenis_kelamin.in' => 'Jenis kelamin harus L atau P.',
-            'kelas_id.required' => 'Kelas wajib dipilih.',
-            'kelas_id.exists' => 'Kelas yang dipilih tidak ditemukan.',
+
+            'nis' => 
+                'required|string|max:50|unique:siswas,nis',
+
+            'nama_siswa' =>
+                'required|string|max:255',
+
+            'jenis_kelamin' =>
+                'required|in:L,P',
+
+            'kelas_id' =>
+                'required|exists:kelas,id',
+
+        ],[
+
+            'nis.required' =>
+                'NIS wajib diisi.',
+
+            'nis.unique' =>
+                'NIS tersebut sudah terdaftar.',
+
+            'nama_siswa.required' =>
+                'Nama siswa wajib diisi.',
+
+            'jenis_kelamin.required' =>
+                'Jenis kelamin wajib dipilih.',
+
+            'jenis_kelamin.in' =>
+                'Jenis kelamin harus L atau P.',
+
+            'kelas_id.required' =>
+                'Kelas wajib dipilih.',
+
+            'kelas_id.exists' =>
+                'Kelas yang dipilih tidak ditemukan.',
+
         ]);
+
+
 
         Siswa::create($validated);
 
+
+
         return redirect()
             ->route('siswa.index')
-            ->with('success', 'Data siswa berhasil ditambahkan.');
+            ->with(
+                'success',
+                'Data siswa berhasil ditambahkan.'
+            );
+
     }
+
+
+
+
 
 
     /**
@@ -69,22 +122,56 @@ class SiswaController extends Controller
      */
     public function import(Request $request)
     {
+
         $request->validate([
-            'file' => 'required|mimes:xlsx,xls',
-        ], [
-            'file.required' => 'File Excel wajib dipilih.',
-            'file.mimes' => 'File harus berformat XLS atau XLSX.',
+
+            'file' =>
+                'required|mimes:xlsx,xls',
+
+        ],[
+
+            'file.required' =>
+                'File Excel wajib dipilih.',
+
+            'file.mimes' =>
+                'File harus berformat XLS atau XLSX.',
+
         ]);
 
+
+
+
         Excel::import(
-            new SiswaImport,
+
+            new SiswaImport(
+                $request->file('file')
+            ),
+
             $request->file('file')
+
         );
 
+
+
+
         return redirect()
+
             ->route('siswa.index')
-            ->with('success', 'Data siswa berhasil diimport.');
+
+            ->with(
+
+                'success',
+
+                'Data siswa berhasil diimport.'
+
+            );
+
     }
+
+
+
+
+
 
 
     /**
@@ -92,11 +179,22 @@ class SiswaController extends Controller
      */
     public function export()
     {
+
         return Excel::download(
+
             new SiswaExport,
+
             'data-siswa.xlsx'
+
         );
+
     }
+
+
+
+
+
+
 
 
     /**
@@ -104,15 +202,32 @@ class SiswaController extends Controller
      */
     public function edit($id)
     {
+
         $siswa = Siswa::findOrFail($id);
 
-        $kelas = Kelas::orderBy('nama_kelas')->get();
+
+        $kelas = Kelas::orderBy('nama_kelas')
+            ->get();
+
+
 
         return view(
+
             'admin.siswa.edit',
-            compact('siswa', 'kelas')
+
+            compact(
+                'siswa',
+                'kelas'
+            )
+
         );
+
     }
+
+
+
+
+
 
 
     /**
@@ -120,29 +235,92 @@ class SiswaController extends Controller
      */
     public function update(Request $request, $id)
     {
+
         $siswa = Siswa::findOrFail($id);
 
+
+
         $validated = $request->validate([
-            'nis' => 'required|string|max:50|unique:siswas,nis,' . $siswa->id,
-            'nama_siswa' => 'required|string|max:255',
-            'jenis_kelamin' => 'required|in:L,P',
-            'kelas_id' => 'required|exists:kelas,id',
-        ], [
-            'nis.required' => 'NIS wajib diisi.',
-            'nis.unique' => 'NIS tersebut sudah digunakan oleh siswa lain.',
-            'nama_siswa.required' => 'Nama siswa wajib diisi.',
-            'jenis_kelamin.required' => 'Jenis kelamin wajib dipilih.',
-            'jenis_kelamin.in' => 'Jenis kelamin harus L atau P.',
-            'kelas_id.required' => 'Kelas wajib dipilih.',
-            'kelas_id.exists' => 'Kelas yang dipilih tidak ditemukan.',
+
+
+            'nis' =>
+                'required|string|max:50|unique:siswas,nis,' . $siswa->id,
+
+
+            'nama_siswa' =>
+                'required|string|max:255',
+
+
+            'jenis_kelamin' =>
+                'required|in:L,P',
+
+
+            'kelas_id' =>
+                'required|exists:kelas,id',
+
+
+        ],[
+
+
+            'nis.required' =>
+                'NIS wajib diisi.',
+
+
+            'nis.unique' =>
+                'NIS tersebut sudah digunakan oleh siswa lain.',
+
+
+            'nama_siswa.required' =>
+                'Nama siswa wajib diisi.',
+
+
+            'jenis_kelamin.required' =>
+                'Jenis kelamin wajib dipilih.',
+
+
+            'jenis_kelamin.in' =>
+                'Jenis kelamin harus L atau P.',
+
+
+            'kelas_id.required' =>
+                'Kelas wajib dipilih.',
+
+
+            'kelas_id.exists' =>
+                'Kelas yang dipilih tidak ditemukan.',
+
+
         ]);
+
+
+
+
 
         $siswa->update($validated);
 
+
+
+
+
         return redirect()
+
             ->route('siswa.index')
-            ->with('success', 'Data siswa berhasil diperbarui.');
+
+            ->with(
+
+                'success',
+
+                'Data siswa berhasil diperbarui.'
+
+            );
+
     }
+
+
+
+
+
+
 
 
     /**
@@ -150,12 +328,29 @@ class SiswaController extends Controller
      */
     public function destroy($id)
     {
+
         $siswa = Siswa::findOrFail($id);
+
+
 
         $siswa->delete();
 
+
+
+
         return redirect()
+
             ->route('siswa.index')
-            ->with('success', 'Data siswa berhasil dihapus.');
+
+            ->with(
+
+                'success',
+
+                'Data siswa berhasil dihapus.'
+
+            );
+
     }
+
+
 }
