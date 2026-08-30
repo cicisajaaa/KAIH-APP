@@ -148,14 +148,17 @@ class SiswaSheetImport implements ToCollection, WithHeadingRow
 
             [
 
-                'nama_kelas'=>trim(
-                    str_replace(
-                        'NEW',
-                        '',
-                        strtoupper($this->sheetName)
-                    )
-                )
-
+'nama_kelas'=>preg_replace(
+    '/\s+/',
+    ' ',
+    trim(
+        str_replace(
+            'NEW',
+            '',
+            strtoupper($this->sheetName)
+        )
+    )
+)
             ]
 
         );

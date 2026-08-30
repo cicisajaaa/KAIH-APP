@@ -22,10 +22,11 @@ class CheckPasswordChange
 
 
 
-        if(
-            $user &&
-            $user->must_change_password
-        ){
+if(
+    $user &&
+    $user->role === 'orang_tua' &&
+    $user->must_change_password
+){
 
             if(
                 !$request->routeIs('orangtua.password.edit')

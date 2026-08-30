@@ -64,8 +64,6 @@ Kelola akun login orang tua berdasarkan data siswa yang telah diinput.
 
 
 
-
-
 <div class="flex gap-3">
 
 
@@ -94,12 +92,51 @@ transition
 ">
 
 
-⚡
-
-Generate Akun
+⚡ Generate Akun
 
 
 </a>
+
+
+
+
+
+<form action="{{ route('admin.akun.orangtua.reset.semua') }}"
+method="POST">
+
+
+@csrf
+
+
+<button
+
+onclick="
+return confirm(
+'Reset password SEMUA akun orang tua?'
+)
+"
+
+class="
+inline-flex
+items-center
+gap-2
+bg-red-600
+hover:bg-red-700
+text-white
+px-5
+py-3
+rounded-xl
+font-semibold
+text-sm
+transition
+">
+
+🔑 Reset Semua Password
+
+</button>
+
+
+</form>
 
 
 

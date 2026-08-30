@@ -149,21 +149,18 @@ class User extends Authenticatable
 
 
 
+protected function casts(): array
+{
 
-    protected function casts(): array
-    {
+    return [
 
-        return [
+        'email_verified_at' => 'datetime',
 
-            'email_verified_at' => 'datetime',
+        'must_change_password' => 'boolean',
 
-            'password' => 'hashed',
+    ];
 
-            'must_change_password' => 'boolean',
-
-        ];
-
-    }
+}
 
 
 }

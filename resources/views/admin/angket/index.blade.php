@@ -18,24 +18,45 @@
 {{-- HEADER --}}
 
 
-<div class="bg-white rounded-2xl shadow-sm border p-6">
+<div class="
+bg-white
+border
+rounded-2xl
+p-6
+shadow-sm
+">
 
 
-<div class="flex justify-between items-center">
+<div class="
+flex
+flex-col
+md:flex-row
+md:justify-between
+md:items-center
+gap-4
+">
 
 
 <div>
 
-<h2 class="text-2xl font-bold text-gray-800">
+<h2 class="
+text-2xl
+font-bold
+text-slate-800
+">
 
 Monitoring Angket Harian
 
 </h2>
 
 
-<p class="text-gray-500 mt-1">
+<p class="
+text-sm
+text-slate-500
+mt-2
+">
 
-Rekap aktivitas harian siswa yang diisi oleh orang tua.
+Pemantauan aktivitas harian siswa yang diisi oleh orang tua.
 
 </p>
 
@@ -45,28 +66,205 @@ Rekap aktivitas harian siswa yang diisi oleh orang tua.
 
 
 
-<div>
 
-<span class="
+<div class="
 bg-indigo-50
 text-indigo-700
-px-4
-py-2
+px-5
+py-3
 rounded-xl
 font-semibold
+text-sm
 ">
 
-Total :
+
+Total Pengisian :
+
 {{ $angket->count() }}
 
-</span>
-
 
 </div>
 
 
 
 </div>
+
+
+</div>
+
+
+
+
+
+
+
+
+
+{{-- STATISTIK --}}
+
+
+<div class="
+grid
+grid-cols-1
+md:grid-cols-4
+gap-5
+">
+
+
+
+<div class="
+bg-white
+border
+rounded-2xl
+p-5
+">
+
+<p class="text-sm text-gray-500">
+
+Total Angket
+
+</p>
+
+<h3 class="
+text-3xl
+font-bold
+text-indigo-600
+mt-2
+">
+
+{{ $angket->count() }}
+
+</h3>
+
+</div>
+
+
+
+
+
+
+
+<div class="
+bg-white
+border
+rounded-2xl
+p-5
+">
+
+
+<p class="text-sm text-gray-500">
+
+Siswa Terdata
+
+</p>
+
+
+<h3 class="
+text-3xl
+font-bold
+text-blue-600
+mt-2
+">
+
+{{ $angket->pluck('siswa_id')->unique()->count() }}
+
+</h3>
+
+
+</div>
+
+
+
+
+
+
+
+<div class="
+bg-green-50
+border
+border-green-100
+rounded-2xl
+p-5
+">
+
+
+<p class="text-sm text-green-700">
+
+Tepat Waktu
+
+</p>
+
+
+<h3 class="
+text-3xl
+font-bold
+text-green-700
+mt-2
+">
+
+
+{{ 
+
+$angket->filter(function($item){
+
+return $item->tanggal == $item->tanggal_pengisian;
+
+})->count()
+
+}}
+
+
+</h3>
+
+
+</div>
+
+
+
+
+
+
+
+<div class="
+bg-yellow-50
+border
+border-yellow-100
+rounded-2xl
+p-5
+">
+
+
+<p class="text-sm text-yellow-700">
+
+Telat Isi
+
+</p>
+
+
+<h3 class="
+text-3xl
+font-bold
+text-yellow-700
+mt-2
+">
+
+
+{{ 
+
+$angket->filter(function($item){
+
+return $item->tanggal != $item->tanggal_pengisian;
+
+})->count()
+
+}}
+
+
+</h3>
+
+
+</div>
+
 
 
 </div>
@@ -82,81 +280,121 @@ Total :
 {{-- TABLE --}}
 
 
+
 <div class="
 bg-white
+border
 rounded-2xl
 shadow-sm
-border
 overflow-hidden
 ">
+
+
+
+<div class="
+px-6
+py-5
+border-b
+">
+
+
+<h3 class="
+font-bold
+text-slate-800
+">
+
+Daftar Aktivitas Siswa
+
+</h3>
+
+
+<p class="
+text-sm
+text-gray-500
+mt-1
+">
+
+Riwayat pengisian angket oleh orang tua.
+
+</p>
+
+
+</div>
+
+
+
+
 
 
 
 <div class="overflow-x-auto">
 
 
-<table class="w-full">
+<table class="
+w-full
+text-sm
+">
 
 
-
-<thead class="bg-gray-50">
+<thead class="bg-slate-50">
 
 
 <tr>
 
 
-<th class="px-6 py-4 text-left text-xs uppercase text-gray-500">
+<th class="px-6 py-4 text-left text-xs text-gray-500 uppercase">
+
 No
+
 </th>
 
 
-<th class="px-6 py-4 text-left text-xs uppercase text-gray-500">
+<th class="px-6 py-4 text-left text-xs text-gray-500 uppercase">
+
 Siswa
+
 </th>
 
 
-<th class="px-6 py-4 text-left text-xs uppercase text-gray-500">
-Kelas
-</th>
+<th class="px-6 py-4 text-left text-xs text-gray-500 uppercase">
 
-
-<th class="px-6 py-4 text-left text-xs uppercase text-gray-500">
 Orang Tua
+
 </th>
 
 
-<th class="px-6 py-4 text-left text-xs uppercase text-gray-500">
-Tanggal Aktivitas
+<th class="px-6 py-4 text-left text-xs text-gray-500 uppercase">
+
+Tanggal
+
 </th>
 
 
-<th class="px-6 py-4 text-left text-xs uppercase text-gray-500">
-Tanggal Isi
+<th class="px-6 py-4 text-left text-xs text-gray-500 uppercase">
+
+Skor
+
 </th>
 
 
-<th class="px-6 py-4 text-left text-xs uppercase text-gray-500">
-Ibadah
+<th class="px-6 py-4 text-left text-xs text-gray-500 uppercase">
+
+Kategori
+
 </th>
 
 
-<th class="px-6 py-4 text-left text-xs uppercase text-gray-500">
-Belajar
-</th>
+<th class="px-6 py-4 text-left text-xs text-gray-500 uppercase">
 
-
-<th class="px-6 py-4 text-left text-xs uppercase text-gray-500">
-Kegiatan
-</th>
-
-
-<th class="px-6 py-4 text-left text-xs uppercase text-gray-500">
 Status
+
 </th>
 
 
-<th class="px-6 py-4 text-left text-xs uppercase text-gray-500">
+<th class="px-6 py-4 text-center text-xs text-gray-500 uppercase">
+
 Aksi
+
 </th>
 
 
@@ -164,7 +402,6 @@ Aksi
 
 
 </thead>
-
 
 
 
@@ -180,7 +417,7 @@ Aksi
 
 
 
-<tr class="hover:bg-gray-50 transition">
+<tr class="hover:bg-slate-50 transition">
 
 
 
@@ -199,47 +436,35 @@ Aksi
 <td class="px-6 py-4">
 
 
-<div class="font-semibold text-gray-800">
+<p class="
+font-semibold
+text-slate-800
+">
 
 {{ $item->siswa->nama_siswa ?? '-' }}
 
-</div>
+</p>
 
 
-<div class="text-xs text-gray-500">
-
-NIS:
-{{ $item->siswa->nis ?? '-' }}
-
-</div>
-
-
-</td>
-
-
-
-
-
-
-
-<td class="px-6 py-4">
-
-
-<span class="
-bg-indigo-50
-text-indigo-700
-px-3
-py-1
-rounded-full
+<p class="
 text-xs
-font-semibold
+text-gray-400
 ">
 
+NIS {{ $item->siswa->nis ?? '-' }}
+
+</p>
+
+
+<p class="
+text-xs
+text-indigo-600
+mt-1
+">
 
 {{ $item->siswa->kelas->nama_kelas ?? '-' }}
 
-
-</span>
+</p>
 
 
 </td>
@@ -267,127 +492,25 @@ font-semibold
 <td class="px-6 py-4">
 
 
-{{ 
-\Carbon\Carbon::parse($item->tanggal)
-->format('d-m-Y')
-}}
+<p class="font-medium">
+
+{{ \Carbon\Carbon::parse($item->tanggal)->format('d M Y') }}
+
+</p>
 
 
-</td>
+<p class="text-xs text-gray-400">
 
-
-
-
-
-
-
-<td class="px-6 py-4">
-
-
-@if($item->tanggal_pengisian)
-
+Isi :
 
 {{ 
-\Carbon\Carbon::parse($item->tanggal_pengisian)
-->format('d-m-Y')
+$item->tanggal_pengisian
+?
+\Carbon\Carbon::parse($item->tanggal_pengisian)->format('d M Y')
+:
+'-'
 }}
 
-
-@else
-
--
-
-@endif
-
-
-</td>
-
-
-
-
-
-
-
-<td class="px-6 py-4">
-
-
-{{
-
-$item->sholat_subuh +
-
-$item->sholat_dzuhur +
-
-$item->sholat_ashar +
-
-$item->sholat_magrib +
-
-$item->sholat_isya
-
-}} / 5
-
-
-</td>
-
-
-
-
-
-
-
-<td class="px-6 py-4">
-
-
-@if($item->belajar)
-
-
-<span class="
-bg-green-100
-text-green-700
-px-3
-py-1
-rounded-full
-text-xs
-">
-
-Ya
-
-</span>
-
-
-@else
-
-
-<span class="
-bg-red-100
-text-red-700
-px-3
-py-1
-rounded-full
-text-xs
-">
-
-Tidak
-
-</span>
-
-
-@endif
-
-
-</td>
-
-
-
-
-
-
-
-<td class="px-6 py-4 max-w-xs">
-
-
-<p class="truncate">
-
-{{ $item->kegiatan_membantu ?? '-' }}
 
 </p>
 
@@ -403,9 +526,99 @@ Tidak
 <td class="px-6 py-4">
 
 
+<span class="
+font-bold
+text-indigo-600
+">
+
+{{ $item->skor ?? 0 }}
+
+</span>
+
+/100
+
+
+</td>
+
+
+
+
+
+
+
+<td class="px-6 py-4">
+
+
+@if($item->kategori=='Baik')
+
+
+<span class="
+bg-green-100
+text-green-700
+px-3
+py-1
+rounded-full
+text-xs
+font-semibold
+">
+
+Baik
+
+</span>
+
+
+@elseif($item->kategori=='Perlu Perhatian')
+
+
+<span class="
+bg-yellow-100
+text-yellow-700
+px-3
+py-1
+rounded-full
+text-xs
+font-semibold
+">
+
+Perhatian
+
+</span>
+
+
+@else
+
+
+<span class="
+bg-red-100
+text-red-700
+px-3
+py-1
+rounded-full
+text-xs
+font-semibold
+">
+
+Pendampingan
+
+</span>
+
+
+@endif
+
+
+</td>
+
+
+
+
+
+
+
+
+<td class="px-6 py-4">
+
+
 @if(
-$item->tanggal_pengisian
-&&
 $item->tanggal ==
 $item->tanggal_pengisian
 )
@@ -421,10 +634,9 @@ text-xs
 font-semibold
 ">
 
-✓ Tepat Waktu
+✓ Tepat
 
 </span>
-
 
 
 @else
@@ -440,7 +652,7 @@ text-xs
 font-semibold
 ">
 
-⚠ Telat Isi
+⚠ Telat
 
 </span>
 
@@ -456,13 +668,15 @@ font-semibold
 
 
 
-<td class="px-6 py-4">
+
+<td class="
+px-6
+py-4
+text-center
+">
 
 
-<a href="{{ route(
-    'admin.angket.detail',
-    $item->id
-) }}"
+<a href="{{ route('admin.angket.detail',$item->id) }}"
 
 class="
 bg-indigo-600
@@ -472,6 +686,7 @@ px-4
 py-2
 rounded-lg
 text-xs
+font-semibold
 ">
 
 
@@ -485,9 +700,6 @@ Detail
 
 
 
-
-
-
 </tr>
 
 
@@ -495,38 +707,24 @@ Detail
 @empty
 
 
-
 <tr>
 
-<td colspan="11"
+<td colspan="8"
 
 class="
-px-6
-py-12
 text-center
+py-12
 text-gray-500
 ">
 
 
-<div class="text-4xl mb-3">
-
-📝
-
-</div>
-
-
-<p class="font-semibold">
-
-Belum ada data angket
-
-</p>
+Belum ada data angket.
 
 
 </td>
 
 
 </tr>
-
 
 
 @endforelse
@@ -545,8 +743,6 @@ Belum ada data angket
 
 
 </div>
-
-
 
 
 

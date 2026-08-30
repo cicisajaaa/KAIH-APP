@@ -20,7 +20,7 @@
 {{-- HEADER --}}
 
 
-<div class="bg-white rounded-2xl border border-gray-100 shadow-sm p-6">
+<div class="bg-white rounded-2xl border shadow-sm p-6">
 
 
 <div class="flex justify-between items-center">
@@ -38,7 +38,7 @@ Monitoring Angket Orang Tua
 
 <p class="text-gray-500 mt-1">
 
-Pemantauan pengisian aktivitas harian siswa.
+Pemantauan aktivitas dan kondisi harian siswa.
 
 </p>
 
@@ -68,7 +68,6 @@ Tanggal Monitoring
 </div>
 
 
-
 </div>
 
 
@@ -92,7 +91,8 @@ Tanggal Monitoring
 
 action="{{ route('monitoring.angket') }}"
 
-class="grid md:grid-cols-3 gap-5 items-end">
+class="grid md:grid-cols-4 gap-5 items-end">
+
 
 
 
@@ -116,17 +116,13 @@ name="tanggal"
 
 value="{{ $tanggal }}"
 
-class="
-w-full
-mt-2
-border
-rounded-xl
-px-4
-py-3
-">
+class="w-full mt-2 border rounded-xl px-4 py-3"
+
+>
 
 
 </div>
+
 
 
 
@@ -144,19 +140,13 @@ Kelas
 </label>
 
 
-
 <select
 
 name="kelas_id"
 
-class="
-w-full
-mt-2
-border
-rounded-xl
-px-4
-py-3
-">
+class="w-full mt-2 border rounded-xl px-4 py-3"
+
+>
 
 
 <option value="">
@@ -201,18 +191,88 @@ value="{{ $item->id }}"
 <div>
 
 
+<label class="text-sm font-semibold text-gray-700">
+
+Kategori
+
+</label>
+
+
+
+<select
+
+name="kategori"
+
+class="w-full mt-2 border rounded-xl px-4 py-3"
+
+>
+
+
+<option value="">
+
+Semua Kondisi
+
+</option>
+
+
+
+<option value="Baik"
+
+{{ $kategori == 'Baik' ? 'selected':'' }}
+
+>
+
+Baik
+
+</option>
+
+
+
+<option value="Perlu Perhatian"
+
+{{ $kategori == 'Perlu Perhatian' ? 'selected':'' }}
+
+>
+
+Perlu Perhatian
+
+</option>
+
+
+
+
+<option value="Perlu Pendampingan"
+
+{{ $kategori == 'Perlu Pendampingan' ? 'selected':'' }}
+
+>
+
+Perlu Pendampingan
+
+</option>
+
+
+
+</select>
+
+
+</div>
+
+
+
+
+
+
+
+
+<div>
+
+
 <button
 
-class="
-bg-indigo-600
-hover:bg-indigo-700
-text-white
-px-6
-py-3
-rounded-xl
-font-semibold
-w-full
-">
+class="bg-indigo-600 hover:bg-indigo-700 text-white px-6 py-3 rounded-xl font-semibold w-full"
+
+>
 
 
 🔍 Tampilkan
@@ -222,7 +282,6 @@ w-full
 
 
 </div>
-
 
 
 
@@ -243,6 +302,7 @@ w-full
 {{-- STATISTIK --}}
 
 
+
 <div class="grid md:grid-cols-4 gap-5">
 
 
@@ -251,20 +311,17 @@ w-full
 
 <div class="bg-white border rounded-2xl p-5">
 
-
 <p class="text-sm text-gray-500">
 
 Total Siswa
 
 </p>
 
-
 <h3 class="text-3xl font-bold text-gray-800 mt-2">
 
 {{ $totalSiswa }}
 
 </h3>
-
 
 </div>
 
@@ -276,13 +333,11 @@ Total Siswa
 
 <div class="bg-green-50 border border-green-100 rounded-2xl p-5">
 
-
 <p class="text-sm text-green-700">
 
 Sudah Isi
 
 </p>
-
 
 <h3 class="text-3xl font-bold text-green-700 mt-2">
 
@@ -290,8 +345,91 @@ Sudah Isi
 
 </h3>
 
+</div>
+
+
+
+
+
+
+
+<div class="bg-yellow-50 border border-yellow-100 rounded-2xl p-5">
+
+<p class="text-sm text-yellow-700">
+
+Belum Isi
+
+</p>
+
+<h3 class="text-3xl font-bold text-yellow-700 mt-2">
+
+{{ $belumIsi }}
+
+</h3>
 
 </div>
+
+
+
+
+
+
+
+<div class="bg-indigo-50 border border-indigo-100 rounded-2xl p-5">
+
+<p class="text-sm text-indigo-700">
+
+Persentase
+
+</p>
+
+<h3 class="text-3xl font-bold text-indigo-700 mt-2">
+
+{{ $persentase }}%
+
+</h3>
+
+</div>
+
+
+
+
+
+</div>
+
+
+
+
+
+
+
+
+
+<div class="grid md:grid-cols-3 gap-5">
+
+
+
+
+
+<div class="bg-green-50 border border-green-100 rounded-2xl p-5">
+
+
+<p class="text-sm text-green-700">
+
+Kondisi Baik
+
+</p>
+
+
+<h3 class="text-3xl font-bold text-green-700 mt-2">
+
+{{ $baik }}
+
+</h3>
+
+
+</div>
+
 
 
 
@@ -304,14 +442,14 @@ Sudah Isi
 
 <p class="text-sm text-yellow-700">
 
-Belum Isi
+Perlu Perhatian
 
 </p>
 
 
 <h3 class="text-3xl font-bold text-yellow-700 mt-2">
 
-{{ $belumIsi }}
+{{ $perhatian }}
 
 </h3>
 
@@ -324,19 +462,20 @@ Belum Isi
 
 
 
-<div class="bg-indigo-50 border border-indigo-100 rounded-2xl p-5">
+
+<div class="bg-red-50 border border-red-100 rounded-2xl p-5">
 
 
-<p class="text-sm text-indigo-700">
+<p class="text-sm text-red-700">
 
-Persentase
+Perlu Pendampingan
 
 </p>
 
 
-<h3 class="text-3xl font-bold text-indigo-700 mt-2">
+<h3 class="text-3xl font-bold text-red-700 mt-2">
 
-{{ $persentase }}%
+{{ $pendampingan }}
 
 </h3>
 
@@ -346,7 +485,6 @@ Persentase
 
 
 
-
 </div>
 
 
@@ -357,7 +495,7 @@ Persentase
 
 
 
-{{-- TABEL --}}
+{{-- TABLE --}}
 
 
 <div class="bg-white border rounded-2xl shadow-sm overflow-hidden">
@@ -369,12 +507,13 @@ Persentase
 
 <h3 class="font-bold text-gray-800">
 
-Status Pengisian Siswa
+Data Monitoring Siswa
 
 </h3>
 
 
 </div>
+
 
 
 
@@ -422,7 +561,30 @@ Orang Tua
 
 </th>
 
+
 <th class="px-6 py-4 text-left text-xs uppercase text-gray-500">
+
+Skor
+
+</th>
+
+
+<th class="px-6 py-4 text-left text-xs uppercase text-gray-500">
+
+Kategori
+
+</th>
+
+
+<th class="
+px-6
+py-4
+text-left
+text-xs
+uppercase
+text-gray-500
+w-32
+">
 
 Status
 
@@ -446,9 +608,7 @@ Aksi
 
 
 
-
 <tbody class="divide-y">
-
 
 
 @foreach($siswas as $siswa)
@@ -457,30 +617,11 @@ Aksi
 
 @php
 
+$angket = $siswa->angketHarian->first();
 
-$sudahMengisi = $siswa
+$sudahMengisi = $angket ? true : false;
 
-    ->angketHarian()
-
-    ->whereDate(
-
-        'tanggal',
-
-        $tanggal
-
-    )
-
-    ->exists();
-
-
-
-$wali = $siswa
-
-    ->orangTua
-
-    ->first();
-
-
+$wali = $siswa->orangTua->first();
 
 @endphp
 
@@ -501,22 +642,21 @@ $wali = $siswa
 
 
 
-
 <td class="px-6 py-4">
 
 
-<div class="font-semibold text-gray-800">
+<p class="font-semibold text-gray-800">
 
 {{ $siswa->nama_siswa }}
 
-</div>
+</p>
 
 
-<div class="text-sm text-gray-500">
+<p class="text-sm text-gray-500">
 
 NIS: {{ $siswa->nis }}
 
-</div>
+</p>
 
 
 </td>
@@ -530,30 +670,7 @@ NIS: {{ $siswa->nis }}
 <td class="px-6 py-4">
 
 
-@if($siswa->kelas)
-
-
-<span class="
-px-3
-py-1
-rounded-full
-text-xs
-bg-indigo-50
-text-indigo-700
-">
-
-
-{{ $siswa->kelas->nama_kelas }}
-
-
-</span>
-
-
-@else
-
--
-
-@endif
+{{ $siswa->kelas->nama_kelas ?? '-' }}
 
 
 </td>
@@ -569,19 +686,81 @@ text-indigo-700
 
 @if($wali)
 
-
-<p class="font-medium">
-
 {{ $wali->nama_orang_tua }}
 
-</p>
+@else
+
+-
+
+@endif
 
 
-<p class="text-xs text-gray-500">
+</td>
 
-{{ $wali->hubungan }}
 
-</p>
+
+
+
+
+
+
+<td class="px-6 py-4">
+
+
+{{ $angket->skor ?? '-' }}
+
+
+</td>
+
+
+
+
+
+
+
+
+<td class="px-6 py-4">
+
+
+@if($angket)
+
+
+
+@if($angket->kategori == 'Baik')
+
+
+<span class="px-3 py-1 rounded-full text-xs bg-green-100 text-green-700">
+
+Baik
+
+</span>
+
+
+
+@elseif($angket->kategori == 'Perlu Perhatian')
+
+
+<span class="px-3 py-1 rounded-full text-xs bg-yellow-100 text-yellow-700">
+
+Perhatian
+
+</span>
+
+
+
+@else
+
+
+<span class="px-3 py-1 rounded-full text-xs bg-red-100 text-red-700">
+
+Pendampingan
+
+</span>
+
+
+
+@endif
+
 
 
 @else
@@ -595,15 +774,20 @@ text-indigo-700
 
 
 
+
+
+
+
 <td class="px-6 py-4">
-
-
 @if($sudahMengisi)
 
 
 <span class="
+inline-flex
+items-center
+whitespace-nowrap
 px-3
-py-1
+py-1.5
 rounded-full
 text-xs
 font-semibold
@@ -620,10 +804,12 @@ text-green-700
 @else
 
 
-
 <span class="
+inline-flex
+items-center
+whitespace-nowrap
 px-3
-py-1
+py-1.5
 rounded-full
 text-xs
 font-semibold
@@ -640,27 +826,26 @@ text-yellow-700
 @endif
 
 
-
 </td>
+
+
+
+
+
+
 
 
 <td class="px-6 py-4">
 
 
 <a href="{{ route(
-    'monitoring.angket.detail',
-    $siswa->id
+'monitoring.angket.detail',
+$siswa->id
 ) }}"
 
-class="
-bg-indigo-600
-hover:bg-indigo-700
-text-white
-px-4
-py-2
-rounded-lg
-text-xs
-">
+class="bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2 rounded-lg text-xs"
+
+>
 
 Detail
 
@@ -671,15 +856,11 @@ Detail
 
 
 
-
-
 </tr>
 
 
+
 @endforeach
-
-
-
 
 
 
@@ -693,7 +874,6 @@ Detail
 </div>
 
 
-
 </div>
 
 
@@ -702,7 +882,6 @@ Detail
 
 
 </div>
-
 
 
 @endsection

@@ -13,7 +13,10 @@ use Illuminate\Support\Facades\DB;
 
 use App\Models\AngketHarian;
 
+use App\Services\AngketService;
+
 use Carbon\Carbon;
+
 
 
 
@@ -21,24 +24,17 @@ class AngketController extends Controller
 {
 
 
-    /**
-     * Riwayat angket
-     */
     public function index()
     {
 
 
-        $user = Auth::user();
-
-
-
-        $orangTua = $user->orangTua()
-            ->with([
-                'siswa.kelas.jurusan',
-                'angketHarian'
-            ])
-            ->first();
-
+$orangTua = Auth::user()
+    ->orangTua()
+    ->with([
+        'siswa.kelas.jurusan',
+        'siswa.angketHarian'
+    ])
+    ->first();
 
 
         if(!$orangTua)
@@ -50,8 +46,6 @@ class AngketController extends Controller
             );
 
         }
-
-
 
 
 
@@ -67,20 +61,12 @@ class AngketController extends Controller
 
 
 
-
-
         return view(
-
             'orangtua.angket.index',
-
             compact(
-
                 'angketHarian',
-
                 'orangTua'
-
             )
-
         );
 
 
@@ -93,148 +79,18 @@ class AngketController extends Controller
 
 
 
-
-    /**
-     * Form pengisian angket
-     */
     public function create()
     {
 
 
-        $user = Auth::user();
-
-
-
-        $orangTua = $user->orangTua()
+        $orangTua = Auth::user()
+            ->orangTua()
             ->with('siswa')
             ->first();
-
 
 
 
         if(!$orangTua || !$orangTua->siswa)
-        {
-
-            abort(
-                403,
-                'Data siswa belum terhubung.'
-            );
-
-        }
-
-
-
-
-
-        $siswa = $orangTua->siswa;
-
-
-
-
-
-        /*
-        |--------------------------------------------------------------------------
-        | Cek apakah hari ini sudah isi
-        |--------------------------------------------------------------------------
-        */
-
-
-        $sudahIsiHariIni = AngketHarian::where(
-                'siswa_id',
-                $siswa->id
-            )
-            ->whereDate(
-                'tanggal',
-                Carbon::today()
-            )
-            ->exists();
-
-
-
-
-
-
-        if($sudahIsiHariIni)
-        {
-
-            return redirect()
-
-                ->route(
-                    'orangtua.angket.index'
-                )
-
-                ->with(
-                    'error',
-                    'Angket hari ini sudah diisi.'
-                );
-
-        }
-
-
-
-
-
-        $tanggalHariIni = Carbon::today()
-            ->format('Y-m-d');
-
-
-
-
-
-
-        return view(
-
-            'orangtua.angket.create',
-
-            compact(
-
-                'orangTua',
-
-                'siswa',
-
-                'tanggalHariIni'
-
-            )
-
-        );
-
-
-    }
-
-
-
-
-
-
-
-
-
-    /**
-     * Simpan angket
-     */
-    public function store(Request $request)
-    {
-
-
-        $user = Auth::user();
-
-
-
-
-
-        $orangTua = $user->orangTua()
-            ->with('siswa')
-            ->first();
-
-
-
-
-
-
-        if(
-            !$orangTua ||
-            !$orangTua->siswa
-        )
         {
 
             abort(
@@ -246,76 +102,96 @@ class AngketController extends Controller
 
 
 
+        $siswa = $orangTua->siswa;
 
 
 
-        /*
-        |--------------------------------------------------------------------------
-        | Validasi
-        |--------------------------------------------------------------------------
-        */
+        $tanggalHariIni = Carbon::today()
+            ->format('Y-m-d');
+
+
+
+
+        return view(
+            'orangtua.angket.create',
+            compact(
+                'orangTua',
+                'siswa',
+                'tanggalHariIni'
+            )
+        );
+
+
+    }
+
+
+
+
+
+
+
+
+
+    public function store(
+        Request $request,
+        AngketService $service
+    )
+    {
+
+
+        $orangTua = Auth::user()
+            ->orangTua()
+            ->with('siswa')
+            ->first();
+
+
+
+
+        if(!$orangTua || !$orangTua->siswa)
+        {
+
+            abort(
+                403,
+                'Data siswa belum tersedia.'
+            );
+
+        }
+
+
+
+        $siswaId = $orangTua->siswa->id;
+
+
+
+
+
 
 
         $request->validate([
 
 
             'tanggal'
-                =>
-                'required|date',
-
-
-
-            'bangun_pagi'
-                =>
-                'nullable',
-
-
-
-            'sholat_subuh'
-                =>
-                'nullable|boolean',
-
-
-
-            'sholat_dzuhur'
-                =>
-                'nullable|boolean',
-
-
-
-            'sholat_ashar'
-                =>
-                'nullable|boolean',
-
-
-
-            'sholat_magrib'
-                =>
-                'nullable|boolean',
-
-
-
-            'sholat_isya'
-                =>
-                'nullable|boolean',
-
-
-
-            'kegiatan_membantu'
-                =>
-                'nullable|string',
-
+            =>
+            'required|date',
 
 
             'belajar'
-                =>
-                'nullable|boolean',
+            =>
 
+            'nullable|boolean',
+            'bangun_pagi'
+            =>
+            'nullable',
 
 
             'tidur_malam'
-                =>
-                'nullable',
+            =>
+            'nullable',
+
+
+            'kegiatan_membantu'
+            =>
+            'nullable|string',
 
 
         ]);
@@ -326,16 +202,7 @@ class AngketController extends Controller
 
 
 
-
-
-        /*
-        |--------------------------------------------------------------------------
-        | Validasi tanggal
-        |--------------------------------------------------------------------------
-        */
-
-
-        $tanggalAktivitas = Carbon::parse(
+        $tanggal = Carbon::parse(
             $request->tanggal
         );
 
@@ -346,15 +213,13 @@ class AngketController extends Controller
 
 
 
-
-        if($tanggalAktivitas->gt($hariIni))
+        if($tanggal->gt($hariIni))
         {
 
             return back()
-
                 ->with(
                     'error',
-                    'Tanggal tidak boleh melebihi hari ini.'
+                    'Tanggal tidak boleh lebih dari hari ini.'
                 );
 
         }
@@ -363,20 +228,15 @@ class AngketController extends Controller
 
 
 
-
-        if(
-            $tanggalAktivitas
-            ->lt(
-                $hariIni->copy()->subDay()
-            )
-        )
+        if($tanggal->lt(
+            $hariIni->copy()->subDay()
+        ))
         {
 
             return back()
-
                 ->with(
                     'error',
-                    'Pengisian hanya bisa maksimal 1 hari sebelumnya.'
+                    'Pengisian maksimal satu hari sebelumnya.'
                 );
 
         }
@@ -385,36 +245,17 @@ class AngketController extends Controller
 
 
 
-
-
-
-
-        /*
-        |--------------------------------------------------------------------------
-        | Cek duplikasi
-        |--------------------------------------------------------------------------
-        */
 
 
         $cek = AngketHarian::where(
-
                 'siswa_id',
-
-                $orangTua->siswa->id
-
+                $siswaId
             )
-
             ->whereDate(
-
                 'tanggal',
-
                 $request->tanggal
-
             )
-
             ->exists();
-
-
 
 
 
@@ -424,10 +265,9 @@ class AngketController extends Controller
         {
 
             return back()
-
                 ->with(
                     'error',
-                    'Angket pada tanggal tersebut sudah ada.'
+                    'Angket tanggal tersebut sudah ada.'
                 );
 
         }
@@ -440,11 +280,75 @@ class AngketController extends Controller
 
 
 
-        /*
-        |--------------------------------------------------------------------------
-        | Simpan database
-        |--------------------------------------------------------------------------
-        */
+        $skor = $service->hitungSkor([
+
+
+
+            'sholat_subuh'
+            =>
+            $request->boolean('sholat_subuh'),
+
+
+
+            'sholat_dzuhur'
+            =>
+            $request->boolean('sholat_dzuhur'),
+
+
+
+            'sholat_ashar'
+            =>
+            $request->boolean('sholat_ashar'),
+
+
+
+            'sholat_magrib'
+            =>
+            $request->boolean('sholat_magrib'),
+
+
+
+            'sholat_isya'
+            =>
+            $request->boolean('sholat_isya'),
+
+
+
+            'belajar'
+            =>
+            $request->boolean('belajar'),
+
+
+
+            'bangun_pagi'
+            =>
+            $request->bangun_pagi,
+
+
+
+            'tidur_malam'
+            =>
+            $request->tidur_malam,
+
+
+        ]);
+
+
+
+
+
+
+
+        $kategori = $service->kategori(
+            $skor
+        );
+
+
+
+
+
+
+
 
 
         try
@@ -452,8 +356,18 @@ class AngketController extends Controller
 
 
             DB::transaction(function() use(
+
                 $request,
-                $orangTua
+
+                $orangTua,
+
+                $siswaId,
+
+                $skor,
+
+                $kategori
+
+
             ){
 
 
@@ -470,7 +384,7 @@ class AngketController extends Controller
 
                     'siswa_id'
                     =>
-                    $orangTua->siswa->id,
+                    $siswaId,
 
 
 
@@ -486,56 +400,45 @@ class AngketController extends Controller
 
 
 
-
                     'bangun_pagi'
                     =>
                     $request->bangun_pagi,
 
 
 
-
                     'sholat_subuh'
                     =>
-                    $request->boolean(
-                        'sholat_subuh'
-                    ),
-
+                    $request->boolean('sholat_subuh'),
 
 
 
                     'sholat_dzuhur'
                     =>
-                    $request->boolean(
-                        'sholat_dzuhur'
-                    ),
-
+                    $request->boolean('sholat_dzuhur'),
 
 
 
                     'sholat_ashar'
                     =>
-                    $request->boolean(
-                        'sholat_ashar'
-                    ),
-
+                    $request->boolean('sholat_ashar'),
 
 
 
                     'sholat_magrib'
                     =>
-                    $request->boolean(
-                        'sholat_magrib'
-                    ),
-
+                    $request->boolean('sholat_magrib'),
 
 
 
                     'sholat_isya'
                     =>
-                    $request->boolean(
-                        'sholat_isya'
-                    ),
+                    $request->boolean('sholat_isya'),
 
+
+
+                    'belajar'
+                    =>
+                    $request->boolean('belajar'),
 
 
 
@@ -545,19 +448,21 @@ class AngketController extends Controller
 
 
 
-
-                    'belajar'
-                    =>
-                    $request->boolean(
-                        'belajar'
-                    ),
-
-
-
-
                     'tidur_malam'
                     =>
                     $request->tidur_malam,
+
+
+
+                    'skor'
+                    =>
+                    $skor,
+
+
+
+                    'kategori'
+                    =>
+                    $kategori,
 
 
                 ]);
@@ -568,22 +473,16 @@ class AngketController extends Controller
 
 
 
+
         }
         catch(\Exception $e)
         {
 
 
-            return back()
-
-                ->with(
-                    'error',
-                    'Gagal menyimpan angket.'
-                );
+            dd($e->getMessage());
 
 
         }
-
-
 
 
 

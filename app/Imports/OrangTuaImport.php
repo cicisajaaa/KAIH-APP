@@ -5,10 +5,8 @@ namespace App\Imports;
 
 use App\Models\Siswa;
 use App\Models\OrangTua;
-//use App\Models\User;
 
 use Illuminate\Support\Collection;
-//use Illuminate\Support\Facades\Hash;
 
 use Maatwebsite\Excel\Concerns\ToCollection;
 use Maatwebsite\Excel\Concerns\WithHeadingRow;
@@ -32,24 +30,39 @@ class OrangTuaImport implements ToCollection, WithHeadingRow
             );
 
 
-            if(!$nis){
+            if(!$nis)
+            {
                 continue;
             }
+
+
+
 
 
 
             $siswa = Siswa::where(
                 'nis',
                 $nis
-            )->first();
+            )
+            ->first();
 
 
 
-            if(!$siswa){
+
+
+            if(!$siswa)
+            {
                 continue;
             }
 
 
+
+
+
+
+
+
+            // AYAH
 
             $this->buatOrangTua(
 
@@ -67,6 +80,13 @@ class OrangTuaImport implements ToCollection, WithHeadingRow
 
 
 
+
+
+
+
+
+            // IBU
+
             $this->buatOrangTua(
 
                 $siswa,
@@ -81,9 +101,17 @@ class OrangTuaImport implements ToCollection, WithHeadingRow
 
             );
 
+
+
+
         }
 
+
     }
+
+
+
+
 
 
 
@@ -94,65 +122,47 @@ class OrangTuaImport implements ToCollection, WithHeadingRow
         $hubungan,
         $pekerjaan,
         $hp
-    ){
+    )
+    {
 
-        if(!$nama){
+
+        if(!$nama)
+        {
             return;
         }
 
 
 
-        // $orangTua = OrangTua::updateOrCreate(
-
-        //     [
-
-        //         'siswa_id'=>$siswa->id,
-        //         'hubungan'=>$hubungan
-
-        //     ],
-
-        //     [
-
-        //         'nama_orang_tua'=>trim($nama),
-
-        //         'pekerjaan'=>$pekerjaan,
-
-        //         'no_hp'=>$hp
-
-        //     ]
-
-        // );
 
 
 
 
-        User::updateOrCreate(
+        OrangTua::updateOrCreate(
 
             [
-                'orang_tua_id'=>$orangTua->id
+
+                'siswa_id'=>$siswa->id,
+
+                'hubungan'=>$hubungan
+
             ],
 
             [
 
-                'name'=>$orangTua->nama_orang_tua,
+                'nama_orang_tua'=>trim($nama),
 
+                'pekerjaan'=>$pekerjaan,
 
-                'email'=>
-                    Str::slug($orangTua->nama_orang_tua)
-                    .$orangTua->id
-                    .'@kaih.app',
-
-
-                'password'=>
-                    Hash::make('orangtua123'),
-
-
-                'role'=>'orang_tua'
+                'no_hp'=>$hp
 
             ]
 
         );
 
+
+
     }
+
+
 
 }

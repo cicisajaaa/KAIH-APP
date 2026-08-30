@@ -19,13 +19,16 @@ class MonitoringAngketController extends Controller
 {
 
 
+    /**
+     * Monitoring utama
+     */
     public function index(Request $request)
     {
 
 
         /*
         |--------------------------------------------------------------------------
-        | Filter
+        | FILTER
         |--------------------------------------------------------------------------
         */
 
@@ -34,9 +37,10 @@ class MonitoringAngketController extends Controller
             ?? Carbon::today()->format('Y-m-d');
 
 
-
         $kelasId = $request->kelas_id;
 
+
+        $kategori = $request->kategori;
 
 
 
@@ -46,7 +50,7 @@ class MonitoringAngketController extends Controller
 
         /*
         |--------------------------------------------------------------------------
-        | Ambil kelas
+        | DATA KELAS
         |--------------------------------------------------------------------------
         */
 
@@ -62,22 +66,42 @@ class MonitoringAngketController extends Controller
 
 
 
-
-
         /*
         |--------------------------------------------------------------------------
-        | Data siswa
+        | DATA SISWA
         |--------------------------------------------------------------------------
         */
 
 
         $query = Siswa::with([
 
+
             'kelas',
 
-            'orangTua'
+
+            'orangTua',
+
+
+
+            'angketHarian'=>function($q) use($tanggal){
+
+
+                $q->whereDate(
+
+                    'tanggal',
+
+                    $tanggal
+
+                );
+
+
+            }
+
 
         ]);
+
+
+
 
 
 
@@ -87,8 +111,11 @@ class MonitoringAngketController extends Controller
         {
 
             $query->where(
+
                 'kelas_id',
+
                 $kelasId
+
             );
 
         }
@@ -97,10 +124,61 @@ class MonitoringAngketController extends Controller
 
 
 
+
+
+
+        if($kategori)
+        {
+
+
+            $query->whereHas(
+
+                'angketHarian',
+
+                function($q) use(
+                    $kategori,
+                    $tanggal
+                ){
+
+
+                    $q->whereDate(
+
+                        'tanggal',
+
+                        $tanggal
+
+                    )
+                    ->where(
+
+                        'kategori',
+
+                        $kategori
+
+                    );
+
+
+                }
+
+            );
+
+
+        }
+
+
+
+
+
+
+
+
         $siswas = $query
+
             ->orderBy(
+
                 'nama_siswa'
+
             )
+
             ->get();
 
 
@@ -113,7 +191,7 @@ class MonitoringAngketController extends Controller
 
         /*
         |--------------------------------------------------------------------------
-        | Statistik
+        | TOTAL SISWA
         |--------------------------------------------------------------------------
         */
 
@@ -124,41 +202,23 @@ class MonitoringAngketController extends Controller
 
 
 
-        $sudahIsi = AngketHarian::whereDate(
+
+
+
+
+        /*
+        |--------------------------------------------------------------------------
+        | JUMLAH SUDAH ISI
+        |--------------------------------------------------------------------------
+        */
+
+
+        $angketQuery = AngketHarian::whereDate(
 
                 'tanggal',
 
                 $tanggal
 
-            )
-
-            ->when(
-                $kelasId,
-
-                function($q) use($kelasId){
-
-                    $q->whereHas(
-                        'siswa',
-                        function($s) use($kelasId){
-
-                            $s->where(
-                                'kelas_id',
-                                $kelasId
-                            );
-
-                        }
-                    );
-
-                }
-
-            )
-
-            ->distinct(
-                'siswa_id'
-            )
-
-            ->count(
-                'siswa_id'
             );
 
 
@@ -167,9 +227,71 @@ class MonitoringAngketController extends Controller
 
 
 
-        $belumIsi =
-            $totalSiswa - $sudahIsi;
+        if($kelasId)
+        {
 
+
+            $angketQuery->whereHas(
+
+                'siswa',
+
+                function($q) use($kelasId){
+
+
+                    $q->where(
+
+                        'kelas_id',
+
+                        $kelasId
+
+                    );
+
+
+                }
+
+            );
+
+
+        }
+
+
+
+
+
+
+
+
+        if($kategori)
+        {
+
+
+            $angketQuery->where(
+
+                'kategori',
+
+                $kategori
+
+            );
+
+
+        }
+
+
+
+
+
+
+$sudahIsi = $angketQuery
+    ->select('siswa_id')
+    ->distinct()
+    ->count();
+
+
+
+
+
+
+        $belumIsi = $totalSiswa - $sudahIsi;
 
 
 
@@ -182,7 +304,9 @@ class MonitoringAngketController extends Controller
             ?
 
             round(
+
                 ($sudahIsi / $totalSiswa) * 100
+
             )
 
             :
@@ -195,9 +319,132 @@ class MonitoringAngketController extends Controller
 
 
 
+
+
+        /*
+        |--------------------------------------------------------------------------
+        | STATISTIK KATEGORI
+        |--------------------------------------------------------------------------
+        */
+
+
+        $kategoriQuery = AngketHarian::whereDate(
+
+            'tanggal',
+
+            $tanggal
+
+        );
+
+
+
+
+
+
+
+
+        if($kelasId)
+        {
+
+
+            $kategoriQuery->whereHas(
+
+                'siswa',
+
+                function($q) use($kelasId){
+
+
+                    $q->where(
+
+                        'kelas_id',
+
+                        $kelasId
+
+                    );
+
+
+                }
+
+            );
+
+
+        }
+
+
+
+
+
+
+
+        $baik = (clone $kategoriQuery)
+
+            ->where(
+
+                'kategori',
+
+                'Baik'
+
+            )
+
+            ->count();
+
+
+
+
+
+
+
+
+        $perhatian = (clone $kategoriQuery)
+
+            ->where(
+
+                'kategori',
+
+                'Perlu Perhatian'
+
+            )
+
+            ->count();
+
+
+
+
+
+
+
+
+        $pendampingan = (clone $kategoriQuery)
+
+            ->where(
+
+                'kategori',
+
+                'Perlu Pendampingan'
+
+            )
+
+            ->count();
+
+
+
+
+
+
+
+
+
+        /*
+        |--------------------------------------------------------------------------
+        | RETURN
+        |--------------------------------------------------------------------------
+        */
+
+
         return view(
 
             'admin.monitoring-angket.index',
+
 
             compact(
 
@@ -209,60 +456,106 @@ class MonitoringAngketController extends Controller
 
                 'kelasId',
 
+                'kategori',
+
+
+
                 'totalSiswa',
 
                 'sudahIsi',
 
                 'belumIsi',
 
-                'persentase'
+                'persentase',
+
+
+
+                'baik',
+
+                'perhatian',
+
+                'pendampingan'
+
 
             )
 
-        );
 
+        );
 
 
     }
 
 
 
+
+
+
+
+
+
+    /**
+     * Detail siswa
+     */
     public function detail($siswa)
-{
+    {
 
-    $siswa = Siswa::with([
 
-        'kelas',
+        $siswa = Siswa::with([
 
-        'orangTua',
 
-        'angketHarian' => function($query){
+            'kelas.jurusan',
 
-            $query->orderBy(
-                'tanggal',
-                'desc'
-            );
 
-        }
-
-    ])
-    ->findOrFail($siswa);
+            'orangTua',
 
 
 
 
-
-    return view(
-
-        'admin.monitoring-angket.detail',
-
-        compact(
-            'siswa'
-        )
-
-    );
+            'angketHarian'=>function($query){
 
 
-}
+                $query
+
+                ->orderBy(
+
+                    'tanggal',
+
+                    'desc'
+
+                );
+
+
+            }
+
+
+
+        ])
+
+        ->findOrFail($siswa);
+
+
+
+
+
+
+
+
+        return view(
+
+            'admin.monitoring-angket.detail',
+
+
+            compact(
+
+                'siswa'
+
+            )
+
+        );
+
+
+    }
+
+
 
 }

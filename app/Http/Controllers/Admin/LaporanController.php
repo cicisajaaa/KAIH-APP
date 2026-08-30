@@ -40,6 +40,8 @@ class LaporanController extends Controller
 
         $kelasId = $request->kelas_id;
 
+$kategori = $request->kategori;
+
 
 
 
@@ -76,13 +78,42 @@ class LaporanController extends Controller
         */
 
 
-        $siswaQuery = Siswa::with([
+$siswaQuery = Siswa::with([
 
-            'kelas.jurusan',
+    'kelas.jurusan',
 
-            'orangTua'
+    'orangTua',
 
-        ]);
+    'angketHarian' => function($query) use(
+        $tanggalMulai,
+        $tanggalAkhir
+    ){
+
+        if(
+            $tanggalMulai &&
+            $tanggalAkhir
+        ){
+
+            $query->whereBetween(
+                'tanggal',
+                [
+                    $tanggalMulai,
+                    $tanggalAkhir
+                ]
+            );
+
+        }
+
+
+        $query->orderBy(
+            'tanggal',
+            'desc'
+        );
+
+
+    }
+
+]);
 
 
 
@@ -124,48 +155,33 @@ class LaporanController extends Controller
         |--------------------------------------------------------------------------
         */
 
+foreach($siswas as $siswa)
+{
 
-        foreach($siswas as $siswa)
-        {
 
-
-            // Isi sesuai tanggal monitoring
-
-            $siswa->angketHariIni = AngketHarian::where(
-                    'siswa_id',
-                    $siswa->id
-                )
-                ->whereDate(
-                    'tanggal',
-                    $tanggalMonitoring
-                )
-                ->first();
+$siswa->angketHariIni = $siswa
+    ->angketHarian
+    ->where(
+        'tanggal',
+        $tanggalMonitoring
+    )
+    ->first();
 
 
 
-
-
-            // Cek telat 1 hari
-
-            $siswa->angketTelat = AngketHarian::where(
-                    'siswa_id',
-                    $siswa->id
-                )
-                ->whereDate(
-                    'tanggal',
-                    Carbon::parse($tanggalMonitoring)
-                        ->subDay()
-                )
-                ->whereDate(
-                    'tanggal_pengisian',
-                    Carbon::parse($tanggalMonitoring)
-                )
-                ->first();
+$siswa->angketTelat = $siswa
+    ->angketHarian
+    ->where(
+        'tanggal',
+        Carbon::parse($tanggalMonitoring)
+        ->subDay()
+        ->format('Y-m-d')
+    )
+    ->first();
 
 
 
-        }
-
+}
 
 
 
@@ -316,7 +332,122 @@ class LaporanController extends Controller
 
 
 
+/*
+|--------------------------------------------------------------------------
+| Statistik Kondisi Siswa
+|--------------------------------------------------------------------------
+*/
 
+
+$angketPeriode = AngketHarian::query();
+
+
+
+if(
+    $tanggalMulai &&
+    $tanggalAkhir
+)
+{
+
+    $angketPeriode
+        ->whereBetween(
+            'tanggal',
+            [
+                $tanggalMulai,
+                $tanggalAkhir
+            ]
+        );
+
+}
+
+
+
+
+
+
+if($kelasId)
+{
+
+    $angketPeriode->whereHas(
+
+        'siswa',
+
+        function($q) use($kelasId){
+
+            $q->where(
+                'kelas_id',
+                $kelasId
+            );
+
+        }
+
+    );
+
+}
+
+
+if($kategori)
+{
+
+    $angketPeriode->where(
+        'kategori',
+        $kategori
+    );
+
+}
+
+$angketPeriode = $angketPeriode->get();
+
+
+
+
+
+
+$rataRataSkor = round(
+
+    $angketPeriode
+        ->avg('skor') ?? 0
+
+);
+
+
+
+
+
+$jumlahBaik = $angketPeriode
+
+    ->where(
+        'kategori',
+        'Baik'
+    )
+
+    ->count();
+
+
+
+
+
+$jumlahPerhatian = $angketPeriode
+
+    ->where(
+        'kategori',
+        'Perlu Perhatian'
+    )
+
+    ->count();
+
+
+
+
+
+$jumlahPendampingan = $angketPeriode
+
+    ->where(
+        'kategori',
+        'Perlu Pendampingan'
+    )
+
+    ->count();
 
 
         /*
@@ -329,7 +460,7 @@ class LaporanController extends Controller
         $totalOrangTua = OrangTua::count();
 
 
-        $totalAngket = AngketHarian::count();
+        $totalAngket = $angketPeriode->count();
 
 
 
@@ -415,11 +546,21 @@ class LaporanController extends Controller
 
                 'totalAngket',
 
+                'kategori',
+
                 'siswaLaki',
 
                 'siswaPerempuan',
 
-                'kelasStatistik'
+                'kelasStatistik',
+
+                'rataRataSkor',
+
+'jumlahBaik',
+
+'jumlahPerhatian',
+
+'jumlahPendampingan'
 
             )
 
@@ -434,21 +575,29 @@ class LaporanController extends Controller
 
 
 
-
-    public function export()
-    {
-
-
-        return Excel::download(
-
-            new LaporanExport,
-
-            'laporan-angket.xlsx'
-
-        );
+public function export(Request $request)
+{
 
 
-    }
+    return Excel::download(
 
+        new LaporanExport(
+
+            $request->tanggal_mulai,
+
+            $request->tanggal_selesai,
+
+            $request->kelas_id,
+
+            $request->kategori
+
+        ),
+
+        'laporan-angket.xlsx'
+
+    );
+
+
+}
 
 }

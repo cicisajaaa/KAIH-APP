@@ -327,7 +327,308 @@ Akun
 
 
 
+{{-- KONDISI SISWA --}}
 
+
+<div>
+
+
+<div class="flex justify-between items-center mb-4">
+
+
+<h3 class="text-lg font-semibold">
+Kondisi Siswa
+</h3>
+
+
+<a href="{{ route('monitoring.angket') }}"
+class="text-sm text-indigo-600 hover:underline">
+
+Lihat Monitoring →
+
+</a>
+
+
+</div>
+
+
+
+<div class="
+grid
+grid-cols-1
+md:grid-cols-3
+gap-5
+">
+
+
+
+
+
+{{-- BAIK --}}
+
+
+<div class="
+bg-emerald-50
+border
+border-emerald-100
+rounded-2xl
+p-6
+">
+
+
+<div class="
+flex
+justify-between
+items-center
+">
+
+
+<div>
+
+
+<p class="
+text-sm
+text-emerald-700
+">
+
+Kondisi Baik
+
+</p>
+
+
+<h2 class="
+text-4xl
+font-bold
+text-emerald-600
+mt-3
+">
+
+{{ $jumlahBaik }}
+
+</h2>
+
+
+</div>
+
+
+
+<div class="
+w-12
+h-12
+rounded-xl
+bg-emerald-100
+flex
+items-center
+justify-center
+text-xl
+">
+
+✓
+
+</div>
+
+
+</div>
+
+
+<p class="
+text-xs
+text-emerald-600
+mt-4
+">
+
+Siswa dengan perkembangan positif
+
+</p>
+
+
+</div>
+
+
+
+
+
+
+
+
+
+{{-- PERHATIAN --}}
+
+
+<div class="
+bg-yellow-50
+border
+border-yellow-100
+rounded-2xl
+p-6
+">
+
+
+<div class="
+flex
+justify-between
+items-center
+">
+
+
+<div>
+
+
+<p class="
+text-sm
+text-yellow-700
+">
+
+Perlu Perhatian
+
+</p>
+
+
+<h2 class="
+text-4xl
+font-bold
+text-yellow-600
+mt-3
+">
+
+{{ $jumlahPerhatian }}
+
+</h2>
+
+
+</div>
+
+
+
+<div class="
+w-12
+h-12
+rounded-xl
+bg-yellow-100
+flex
+items-center
+justify-center
+text-xl
+">
+
+!
+
+</div>
+
+
+</div>
+
+
+<p class="
+text-xs
+text-yellow-600
+mt-4
+">
+
+Perlu pemantauan rutin
+
+</p>
+
+
+</div>
+
+
+
+
+
+
+
+
+
+{{-- PENDAMPINGAN --}}
+
+
+<div class="
+bg-red-50
+border
+border-red-100
+rounded-2xl
+p-6
+">
+
+
+<div class="
+flex
+justify-between
+items-center
+">
+
+
+<div>
+
+
+<p class="
+text-sm
+text-red-700
+">
+
+Perlu Pendampingan
+
+</p>
+
+
+<h2 class="
+text-4xl
+font-bold
+text-red-600
+mt-3
+">
+
+{{ $jumlahPendampingan }}
+
+</h2>
+
+
+</div>
+
+
+
+<div class="
+w-12
+h-12
+rounded-xl
+bg-red-100
+flex
+items-center
+justify-center
+text-xl
+">
+
+⚠
+
+</div>
+
+
+</div>
+
+
+<p class="
+text-xs
+text-red-600
+mt-4
+">
+
+Membutuhkan perhatian khusus
+
+</p>
+
+
+</div>
+
+
+
+
+
+
+</div>
+
+
+</div>
 
 {{-- MONITORING --}}
 
@@ -529,6 +830,221 @@ width: {{ $persentaseAngket }}%
 
 
 
+
+
+
+
+
+
+
+
+
+
+{{-- SISWA PERLU PERHATIAN --}}
+
+
+<div class="
+bg-white
+rounded-2xl
+border
+p-6
+">
+
+
+
+<div class="
+flex
+justify-between
+items-center
+mb-5
+">
+
+<h3 class="
+font-semibold
+text-lg
+">
+
+Siswa Perlu Perhatian
+
+</h3>
+
+
+</div>
+
+
+
+
+
+
+@if($siswaPerhatian->count())
+
+
+
+<div class="overflow-x-auto">
+
+
+<table class="w-full">
+
+
+<thead>
+
+
+<tr class="
+border-b
+text-sm
+text-slate-500
+">
+
+
+<th class="text-left py-3">
+Nama
+</th>
+
+
+<th class="text-left py-3">
+Kelas
+</th>
+
+
+<th class="text-left py-3">
+Skor
+</th>
+
+
+<th class="text-left py-3">
+Kategori
+</th>
+
+
+</tr>
+
+
+</thead>
+
+
+
+
+<tbody>
+
+
+@foreach($siswaPerhatian as $angket)
+
+
+
+<tr class="border-b">
+
+
+<td class="py-3">
+
+{{ $angket->siswa->nama_siswa ?? '-' }}
+
+</td>
+
+
+
+<td class="py-3">
+
+{{ $angket->siswa->kelas->nama_kelas ?? '-' }}
+
+</td>
+
+
+
+<td class="py-3">
+
+{{ $angket->skor }}
+
+</td>
+
+
+
+
+<td class="py-3">
+
+
+@if($angket->kategori == 'Perlu Perhatian')
+
+
+<span class="
+px-3
+py-1
+rounded-full
+text-xs
+bg-yellow-50
+text-yellow-600
+">
+
+Perlu Perhatian
+
+</span>
+
+
+@else
+
+
+<span class="
+px-3
+py-1
+rounded-full
+text-xs
+bg-red-50
+text-red-600
+">
+
+Perlu Pendampingan
+
+</span>
+
+
+@endif
+
+
+
+</td>
+
+
+
+</tr>
+
+
+
+@endforeach
+
+
+
+</tbody>
+
+
+
+</table>
+
+
+</div>
+
+
+
+
+@else
+
+
+<div class="
+text-center
+py-8
+text-emerald-600
+font-medium
+">
+
+Tidak ada siswa yang membutuhkan perhatian.
+
+</div>
+
+
+
+@endif
+
+
+
+</div>
 
 
 {{-- GRAFIK --}}
@@ -791,12 +1307,10 @@ Semua siswa sudah mengisi angket hari ini.
 
 
 
+
+
+
 </div>
-
-
-
-
-
 
 
 
@@ -820,7 +1334,7 @@ type:'line',
 data:{
 
 
-labels:@json($grafikTanggal),
+labels:@json($grafikTanggal ?? []),
 
 
 datasets:[{
@@ -829,7 +1343,7 @@ datasets:[{
 label:'Jumlah Pengisian',
 
 
-data:@json($grafikJumlah),
+data:@json($grafikJumlah ?? []),
 
 
 borderWidth:2,

@@ -4,12 +4,7 @@
 @section('title','Data Anak')
 
 
-@section('page-title')
-
-Data Anak
-
-@endsection
-
+@section('page-title','Data Anak')
 
 
 
@@ -22,32 +17,88 @@ Data Anak
 
 
 
-{{-- PROFIL SISWA --}}
-
-
-<div class="bg-white border rounded-xl p-6">
-
-
-
-<div class="flex items-center gap-5">
+{{-- HEADER --}}
 
 
 <div class="
-w-20
-h-20
-rounded-full
+bg-white
+border
+rounded-2xl
+p-6
+">
+
+
+<h2 class="
+text-xl
+font-bold
+text-slate-800
+">
+
+Data Anak
+
+</h2>
+
+
+<p class="
+text-sm
+text-slate-500
+mt-1
+">
+
+Informasi lengkap data siswa yang terhubung dengan akun orang tua.
+
+</p>
+
+
+</div>
+
+
+
+
+
+
+
+
+
+{{-- PROFIL SISWA --}}
+
+
+
+<div class="
+bg-white
+border
+rounded-2xl
+p-6
+">
+
+
+
+<div class="
+flex
+items-center
+gap-5
+">
+
+
+
+
+
+<div class="
+w-16
+h-16
+rounded-2xl
 bg-indigo-100
 text-indigo-700
 flex
 items-center
 justify-center
-text-3xl
+text-2xl
 font-bold
 ">
 
 
 {{ strtoupper(substr(
-$orangTua->siswa->nama_siswa ?? 'S',
+$orangTua->siswa->nama_siswa ?? '-',
 0,
 1
 )) }}
@@ -59,76 +110,27 @@ $orangTua->siswa->nama_siswa ?? 'S',
 
 
 
+
 <div>
 
 
-<h2 class="text-xl font-semibold text-gray-800">
+<h3 class="
+text-xl
+font-bold
+text-slate-800
+">
 
 {{ $orangTua->siswa->nama_siswa ?? '-' }}
-
-</h2>
-
-
-
-<p class="text-sm text-gray-500 mt-1">
-
-Informasi data siswa
-
-</p>
-
-
-
-</div>
-
-
-
-</div>
-
-
-
-</div>
-
-
-
-
-
-
-
-
-
-{{-- INFORMASI SISWA --}}
-
-
-<div class="bg-white border rounded-xl p-6">
-
-
-
-<h3 class="font-semibold text-gray-800 mb-5">
-
-Biodata Siswa
 
 </h3>
 
 
+<p class="
+text-sm
+text-slate-500
+">
 
-
-<div class="grid md:grid-cols-3 gap-6">
-
-
-
-
-
-<div>
-
-<p class="text-xs text-gray-400">
-
-NIS
-
-</p>
-
-
-<p class="font-medium mt-1">
-
+NIS :
 {{ $orangTua->siswa->nis ?? '-' }}
 
 </p>
@@ -140,21 +142,8 @@ NIS
 
 
 
+</div>
 
-<div>
-
-<p class="text-xs text-gray-400">
-
-Nama Lengkap
-
-</p>
-
-
-<p class="font-medium mt-1">
-
-{{ $orangTua->siswa->nama_siswa ?? '-' }}
-
-</p>
 
 
 </div>
@@ -164,26 +153,67 @@ Nama Lengkap
 
 
 
-<div>
 
-<p class="text-xs text-gray-400">
+
+
+{{-- DATA SISWA --}}
+
+
+<div class="
+grid
+md:grid-cols-2
+gap-5
+">
+
+
+
+
+
+<div class="
+bg-white
+border
+rounded-2xl
+p-6
+">
+
+
+<h3 class="
+font-semibold
+text-slate-800
+mb-4
+">
+
+Informasi Siswa
+
+</h3>
+
+
+
+
+
+
+<div class="space-y-3">
+
+
+
+<div class="
+flex
+justify-between
+text-sm
+">
+
+<span class="text-slate-500">
 
 Jenis Kelamin
 
-</p>
+</span>
 
 
-<p class="font-medium mt-1">
+<span class="font-medium">
 
-{{ 
-$orangTua->siswa->jenis_kelamin == 'L'
-?
-'Laki-laki'
-:
-'Perempuan'
-}}
+{{ $orangTua->siswa->jenis_kelamin ?? '-' }}
 
-</p>
+</span>
 
 
 </div>
@@ -195,20 +225,26 @@ $orangTua->siswa->jenis_kelamin == 'L'
 
 
 
-<div>
+<div class="
+flex
+justify-between
+text-sm
+">
 
-<p class="text-xs text-gray-400">
+<span class="text-slate-500">
 
 Kelas
 
-</p>
+</span>
 
 
-<p class="font-medium mt-1">
+<span class="font-medium">
 
-{{ $orangTua->siswa->kelas->nama_kelas ?? '-' }}
+{{ 
+$orangTua->siswa->kelas->nama_kelas ?? '-'
+}}
 
-</p>
+</span>
 
 
 </div>
@@ -220,49 +256,26 @@ Kelas
 
 
 
-<div>
+<div class="
+flex
+justify-between
+text-sm
+">
 
-<p class="text-xs text-gray-400">
+<span class="text-slate-500">
 
 Jurusan
 
-</p>
+</span>
 
 
-<p class="font-medium mt-1">
-
-{{ $orangTua->siswa->kelas->jurusan->nama_jurusan ?? '-' }}
-
-</p>
-
-
-</div>
-
-
-
-
-
-
-<div>
-
-<p class="text-xs text-gray-400">
-
-Tahun Data
-
-</p>
-
-
-<p class="font-medium mt-1">
+<span class="font-medium">
 
 {{ 
-$orangTua->siswa->created_at
-?
-$orangTua->siswa->created_at->format('Y')
-:
-'-'
+$orangTua->siswa->kelas->jurusan->nama_jurusan ?? '-'
 }}
 
-</p>
+</span>
 
 
 </div>
@@ -271,8 +284,8 @@ $orangTua->siswa->created_at->format('Y')
 
 
 
-</div>
 
+</div>
 
 
 </div>
@@ -288,39 +301,53 @@ $orangTua->siswa->created_at->format('Y')
 {{-- DATA ORANG TUA --}}
 
 
-<div class="bg-white border rounded-xl p-6">
+
+<div class="
+bg-white
+border
+rounded-2xl
+p-6
+">
 
 
+<h3 class="
+font-semibold
+text-slate-800
+mb-4
+">
 
-<h3 class="font-semibold text-gray-800 mb-5">
-
-Data Orang Tua
+Informasi Orang Tua
 
 </h3>
 
 
 
 
-<div class="grid md:grid-cols-3 gap-6">
+
+
+<div class="space-y-3">
 
 
 
+<div class="
+flex
+justify-between
+text-sm
+">
 
 
-<div>
+<span class="text-slate-500">
 
-<p class="text-xs text-gray-400">
+Nama
 
-Nama Orang Tua
-
-</p>
+</span>
 
 
-<p class="font-medium mt-1">
+<span class="font-medium">
 
-{{ $orangTua->nama_orang_tua ?? '-' }}
+{{ $orangTua->nama_orang_tua }}
 
-</p>
+</span>
 
 
 </div>
@@ -331,20 +358,26 @@ Nama Orang Tua
 
 
 
-<div>
 
-<p class="text-xs text-gray-400">
+<div class="
+flex
+justify-between
+text-sm
+">
+
+
+<span class="text-slate-500">
 
 Hubungan
 
-</p>
+</span>
 
 
-<p class="font-medium mt-1">
+<span class="font-medium">
 
-{{ $orangTua->hubungan ?? '-' }}
+{{ $orangTua->hubungan }}
 
-</p>
+</span>
 
 
 </div>
@@ -356,20 +389,53 @@ Hubungan
 
 
 
-<div>
+<div class="
+flex
+justify-between
+text-sm
+">
 
-<p class="text-xs text-gray-400">
+
+<span class="text-slate-500">
+
+No HP
+
+</span>
+
+
+<span class="font-medium">
+
+{{ $orangTua->no_hp ?? '-' }}
+
+</span>
+
+
+</div>
+
+
+
+
+
+
+<div class="
+flex
+justify-between
+text-sm
+">
+
+
+<span class="text-slate-500">
 
 Pekerjaan
 
-</p>
+</span>
 
 
-<p class="font-medium mt-1">
+<span class="font-medium">
 
 {{ $orangTua->pekerjaan ?? '-' }}
 
-</p>
+</span>
 
 
 </div>
@@ -378,7 +444,15 @@ Pekerjaan
 
 
 
+
 </div>
+
+
+
+</div>
+
+
+
 
 
 </div>
@@ -395,11 +469,20 @@ Pekerjaan
 
 
 
-<div class="bg-white border rounded-xl p-6">
+<div class="
+bg-white
+border
+rounded-2xl
+p-6
+">
 
 
 
-<h3 class="font-semibold text-gray-800 mb-5">
+<h3 class="
+font-semibold
+text-slate-800
+mb-5
+">
 
 Ringkasan Aktivitas
 
@@ -408,110 +491,49 @@ Ringkasan Aktivitas
 
 
 
-@php
 
-
-$totalAngket = $orangTua
-->angketHarian()
-->count();
-
-
-
-$totalBelajar = $orangTua
-->angketHarian()
-->where('belajar',1)
-->count();
-
-
-
-$totalIbadah = $orangTua
-->angketHarian()
-->get()
-->sum(function($item){
-
-
-return 
-$item->sholat_subuh +
-$item->sholat_dzuhur +
-$item->sholat_ashar +
-$item->sholat_magrib +
-$item->sholat_isya;
-
-
-});
-
-
-
-$rataIbadah = $totalAngket > 0
-
-?
-
-round(
-($totalIbadah /
-($totalAngket*5))
-*100
-)
-
-:
-
-0;
-
-
-
-$rataBelajar = $totalAngket > 0
-
-?
-
-round(
-($totalBelajar /
-$totalAngket)
-*100
-)
-
-:
-
-0;
-
-
-
-@endphp
+<div class="
+grid
+md:grid-cols-3
+gap-4
+">
 
 
 
 
 
+<div class="
+bg-indigo-50
+rounded-xl
+p-4
+">
 
 
-<div class="grid md:grid-cols-3 gap-5">
+<p class="
+text-xs
+text-indigo-600
+">
 
-
-
-
-
-<div class="border rounded-lg p-5">
-
-
-<p class="text-sm text-gray-500">
-
-Total Pengisian Angket
+Total Angket
 
 </p>
 
 
-<h3 class="text-3xl font-semibold mt-2">
+<h3 class="
+text-2xl
+font-bold
+text-indigo-700
+mt-2
+">
 
-{{ $totalAngket }}
+
+{{
+$orangTua->siswa->angketHarian->count()
+}}
 
 </h3>
 
 
-<p class="text-xs text-gray-400">
-
-Riwayat aktivitas
-
-</p>
-
-
 </div>
 
 
@@ -520,32 +542,35 @@ Riwayat aktivitas
 
 
 
+<div class="
+bg-emerald-50
+rounded-xl
+p-4
+">
 
 
-<div class="border rounded-lg p-5">
+<p class="
+text-xs
+text-emerald-600
+">
 
-
-<p class="text-sm text-gray-500">
-
-Kedisiplinan Belajar
+Status
 
 </p>
 
 
-<h3 class="text-3xl font-semibold mt-2">
+<h3 class="
+text-lg
+font-bold
+text-emerald-700
+mt-2
+">
 
-{{ $rataBelajar }}%
+Aktif
 
 </h3>
 
 
-<p class="text-xs text-gray-400">
-
-Berdasarkan pengisian angket
-
-</p>
-
-
 </div>
 
 
@@ -554,32 +579,35 @@ Berdasarkan pengisian angket
 
 
 
+<div class="
+bg-purple-50
+rounded-xl
+p-4
+">
 
 
-<div class="border rounded-lg p-5">
+<p class="
+text-xs
+text-purple-600
+">
 
-
-<p class="text-sm text-gray-500">
-
-Konsistensi Ibadah
+Monitoring
 
 </p>
 
 
-<h3 class="text-3xl font-semibold mt-2">
+<h3 class="
+text-lg
+font-bold
+text-purple-700
+mt-2
+">
 
-{{ $rataIbadah }}%
+KAIH
 
 </h3>
 
 
-<p class="text-xs text-gray-400">
-
-Berdasarkan sholat wajib
-
-</p>
-
-
 </div>
 
 
@@ -589,10 +617,7 @@ Berdasarkan sholat wajib
 </div>
 
 
-
 </div>
-
-
 
 
 

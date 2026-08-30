@@ -4,34 +4,67 @@ namespace App\Exports;
 
 
 use App\Models\Siswa;
-use App\Models\AngketHarian;
 
 use Carbon\Carbon;
+
 
 use Maatwebsite\Excel\Concerns\FromCollection;
 use Maatwebsite\Excel\Concerns\WithHeadings;
 use Maatwebsite\Excel\Concerns\WithMapping;
+use Maatwebsite\Excel\Concerns\ShouldAutoSize;
+use Maatwebsite\Excel\Concerns\WithStyles;
+
+
+use PhpOffice\PhpSpreadsheet\Worksheet\Worksheet;
 
 
 
 class LaporanExport implements
+
     FromCollection,
+
     WithHeadings,
-    WithMapping
+
+    WithMapping,
+
+    ShouldAutoSize,
+
+    WithStyles
+
 {
 
 
-    protected $tanggal;
+    protected $tanggalMulai;
+
+    protected $tanggalAkhir;
+
+    protected $kelasId;
+
+    protected $kategori;
 
 
 
+    public function __construct(
 
+        $tanggalMulai = null,
 
-    public function __construct()
+        $tanggalAkhir = null,
+
+        $kelasId = null,
+
+        $kategori = null
+
+    )
+
     {
 
-        $this->tanggal = Carbon::today()
-            ->format('Y-m-d');
+        $this->tanggalMulai = $tanggalMulai;
+
+        $this->tanggalAkhir = $tanggalAkhir;
+
+        $this->kelasId = $kelasId;
+
+        $this->kategori = $kategori;
 
     }
 
@@ -42,44 +75,31 @@ class LaporanExport implements
 
 
     public function collection()
+
     {
 
 
-        $siswas = Siswa::with([
+        $query = Siswa::with([
 
             'kelas',
-            'orangTua'
 
-        ])
-        ->orderBy(
-            'nama_siswa'
-        )
-        ->get();
+            'orangTua',
 
+            'angketHarian'
+
+        ]);
 
 
 
 
-        foreach($siswas as $siswa)
+
+        if($this->kelasId)
         {
 
-
-            $siswa->angketHariIni = AngketHarian::where(
-
-                    'siswa_id',
-
-                    $siswa->id
-
-                )
-                ->whereDate(
-
-                    'tanggal',
-
-                    $this->tanggal
-
-                )
-                ->first();
-
+            $query->where(
+                'kelas_id',
+                $this->kelasId
+            );
 
         }
 
@@ -87,7 +107,14 @@ class LaporanExport implements
 
 
 
-        return $siswas;
+        return $query
+
+            ->orderBy(
+                'nama_siswa'
+            )
+
+            ->get();
+
 
 
     }
@@ -100,12 +127,13 @@ class LaporanExport implements
 
 
 
-
     public function headings(): array
+
     {
 
 
         return [
+
 
             'No',
 
@@ -117,31 +145,14 @@ class LaporanExport implements
 
             'Orang Tua',
 
-            'Tanggal Angket',
+            'Jumlah Angket',
 
-            'Tanggal Pengisian',
+            'Rata-rata Skor',
 
-            'Status Pengisian',
+            'Kategori Terakhir',
 
-            'Bangun Pagi',
+            'Terakhir Mengisi'
 
-            'Sholat Subuh',
-
-            'Sholat Dzuhur',
-
-            'Sholat Ashar',
-
-            'Sholat Magrib',
-
-            'Sholat Isya',
-
-            'Jumlah Sholat',
-
-            'Belajar',
-
-            'Kegiatan Membantu',
-
-            'Tidur Malam'
 
         ];
 
@@ -157,6 +168,7 @@ class LaporanExport implements
 
 
     public function map($siswa): array
+
     {
 
 
@@ -169,55 +181,50 @@ class LaporanExport implements
 
 
 
-        /*
-        |--------------------------------------------------------------------------
-        | Belum Isi
-        |--------------------------------------------------------------------------
-        */
+        $angket = $siswa->angketHarian;
 
 
-        if(!$siswa->angketHariIni)
+
+
+
+
+        if(
+            $this->tanggalMulai &&
+            $this->tanggalAkhir
+        )
+
         {
 
-            return [
+            $angket = $angket->whereBetween(
 
-                $no,
+                'tanggal',
 
-                $siswa->nama_siswa,
+                [
 
-                $siswa->nis,
+                    $this->tanggalMulai,
 
-                $siswa->kelas->nama_kelas ?? '-',
+                    $this->tanggalAkhir
 
-                $siswa->orangTua->nama_orang_tua ?? '-',
+                ]
 
-                '-',
+            );
 
-                '-',
+        }
 
-                'Belum Isi',
 
-                '-',
 
-                '-',
 
-                '-',
 
-                '-',
+        if($this->kategori)
+        {
 
-                '-',
+            $angket = $angket->where(
 
-                '-',
+                'kategori',
 
-                '-',
+                $this->kategori
 
-                '-',
-
-                '-',
-
-                '-'
-
-            ];
+            );
 
         }
 
@@ -228,24 +235,15 @@ class LaporanExport implements
 
 
 
-        $item = $siswa->angketHariIni;
+        $terakhir = $angket
 
+            ->sortByDesc(
 
+                'tanggal'
 
+            )
 
-
-
-        $jumlahSholat =
-
-            $item->sholat_subuh +
-
-            $item->sholat_dzuhur +
-
-            $item->sholat_ashar +
-
-            $item->sholat_magrib +
-
-            $item->sholat_isya;
+            ->first();
 
 
 
@@ -253,18 +251,7 @@ class LaporanExport implements
 
 
 
-        $statusPengisian =
-
-            $item->tanggal == $item->tanggal_pengisian
-
-            ?
-
-            'Tepat Waktu'
-
-            :
-
-            'Terlambat';
-
+        $orangTua = $siswa->orangTua->first();
 
 
 
@@ -273,6 +260,7 @@ class LaporanExport implements
 
 
         return [
+
 
             $no,
 
@@ -286,53 +274,75 @@ class LaporanExport implements
             $siswa->kelas->nama_kelas ?? '-',
 
 
-            $siswa->orangTua->nama_orang_tua ?? '-',
+
+            $orangTua->nama_orang_tua ?? '-',
 
 
 
-            $item->tanggal,
-
-
-            $item->tanggal_pengisian,
-
-
-            $statusPengisian,
+            $angket->count(),
 
 
 
-            $item->bangun_pagi ?? '-',
+            round(
+
+                $angket->avg('skor') ?? 0
+
+            ),
 
 
 
-            $item->sholat_subuh ? 'Ya':'Tidak',
-
-
-            $item->sholat_dzuhur ? 'Ya':'Tidak',
-
-
-            $item->sholat_ashar ? 'Ya':'Tidak',
-
-
-            $item->sholat_magrib ? 'Ya':'Tidak',
-
-
-            $item->sholat_isya ? 'Ya':'Tidak',
+            $terakhir->kategori ?? '-',
 
 
 
-            $jumlahSholat.'/5',
+            $terakhir
+
+                ?
+
+                Carbon::parse(
+
+                    $terakhir->tanggal
+
+                )->format('d-m-Y')
+
+                :
+
+                '-'
+
+        ];
 
 
 
-            $item->belajar ? 'Ya':'Tidak',
+    }
 
 
 
-            $item->kegiatan_membantu ?? '-',
 
 
 
-            $item->tidur_malam ?? '-'
+
+
+
+    public function styles(
+        Worksheet $sheet
+    )
+
+    {
+
+
+        return [
+
+
+            1 => [
+
+                'font'=>[
+
+                    'bold'=>true
+
+                ]
+
+            ]
+
 
         ];
 

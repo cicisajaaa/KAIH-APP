@@ -20,13 +20,6 @@ class AngketController extends Controller
     {
 
 
-        /*
-        |--------------------------------------------------------------------------
-        | Query Angket
-        |--------------------------------------------------------------------------
-        */
-
-
         $query = AngketHarian::with([
 
             'siswa.kelas',
@@ -36,15 +29,6 @@ class AngketController extends Controller
         ]);
 
 
-
-
-
-
-        /*
-        |--------------------------------------------------------------------------
-        | Filter Tanggal
-        |--------------------------------------------------------------------------
-        */
 
 
         if($request->tanggal)
@@ -62,15 +46,6 @@ class AngketController extends Controller
 
 
 
-
-
-
-
-        /*
-        |--------------------------------------------------------------------------
-        | Filter Kelas
-        |--------------------------------------------------------------------------
-        */
 
 
         if($request->kelas_id)
@@ -105,15 +80,6 @@ class AngketController extends Controller
 
 
 
-
-
-        /*
-        |--------------------------------------------------------------------------
-        | Ambil Data
-        |--------------------------------------------------------------------------
-        */
-
-
         $angket = $query
 
             ->orderBy(
@@ -132,15 +98,6 @@ class AngketController extends Controller
 
 
 
-
-
-        /*
-        |--------------------------------------------------------------------------
-        | Data Kelas Untuk Filter
-        |--------------------------------------------------------------------------
-        */
-
-
         $kelas = Kelas::orderBy(
 
             'nama_kelas'
@@ -148,8 +105,6 @@ class AngketController extends Controller
         )
 
         ->get();
-
-
 
 
 
@@ -173,6 +128,54 @@ class AngketController extends Controller
 
 
     }
+
+
+
+
+
+
+
+    /*
+    |--------------------------------------------------------------------------
+    | Detail Angket
+    |--------------------------------------------------------------------------
+    */
+
+
+    public function detail($id)
+    {
+
+
+        $angket = AngketHarian::with([
+
+            'siswa.kelas',
+
+            'orangTua'
+
+        ])
+
+        ->findOrFail($id);
+
+
+
+
+
+
+        return view(
+
+            'admin.angket.detail',
+
+            compact(
+
+                'angket'
+
+            )
+
+        );
+
+
+    }
+
 
 
 }

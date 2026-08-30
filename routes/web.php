@@ -24,6 +24,7 @@ use App\Http\Controllers\OrangTua\DashboardController as OrangTuaDashboardContro
 use App\Http\Controllers\OrangTua\AngketController;
 use App\Http\Controllers\OrangTua\DataAnakController;
 use App\Http\Controllers\OrangTua\PasswordController;
+use App\Http\Controllers\OrangTua\RiwayatAngketController;
 
 
 
@@ -261,10 +262,14 @@ Route::get(
     )
     ->name('admin.akun.orangtua.reset');
 
-
-
-
-
+Route::post(
+    '/akun-orangtua/reset-semua',
+    [
+        AkunOrangTuaController::class,
+        'resetSemuaPassword'
+    ]
+)
+->name('admin.akun.orangtua.reset.semua');
 
 
     /*
@@ -405,7 +410,14 @@ Route::get(
     )
     ->names('orangtua');
 
-
+Route::post(
+    '/orang-tua/import',
+    [
+        OrangTuaController::class,
+        'import'
+    ]
+)
+->name('orangtua.import');
 
 });
 
@@ -432,7 +444,14 @@ Route::middleware([
 ->prefix('orang-tua')
 ->group(function () {
 
-
+Route::get(
+    '/riwayat-angket',
+    [
+        RiwayatAngketController::class,
+        'index'
+    ]
+)
+->name('orangtua.riwayat');
 
 
     /*

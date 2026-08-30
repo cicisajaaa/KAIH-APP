@@ -4,6 +4,9 @@
 @section('title','Isi Angket')
 
 
+@section('page-title','Isi Angket Harian')
+
+
 
 @section('content')
 
@@ -16,7 +19,13 @@
 
 {{-- HEADER --}}
 
-<div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-6">
+
+<div class="
+bg-white
+rounded-2xl
+border
+p-6
+">
 
 
 <div class="flex justify-between items-center">
@@ -24,14 +33,23 @@
 
 <div>
 
-<h2 class="text-2xl font-bold text-gray-800">
+
+<h2 class="
+text-xl
+font-bold
+text-slate-800
+">
 
 Isi Angket Harian
 
 </h2>
 
 
-<p class="text-gray-500 mt-1">
+<p class="
+text-sm
+text-slate-500
+mt-1
+">
 
 Catat aktivitas harian anak.
 
@@ -46,12 +64,13 @@ Catat aktivitas harian anak.
 <a href="{{ route('orangtua.angket.index') }}"
 
 class="
-bg-gray-500
-hover:bg-gray-600
+bg-slate-600
+hover:bg-slate-700
 text-white
 px-5
 py-3
 rounded-xl
+text-sm
 ">
 
 ← Kembali
@@ -73,10 +92,114 @@ rounded-xl
 
 
 
+{{-- DATA ANAK --}}
+
+
+<div class="
+bg-indigo-50
+border
+border-indigo-100
+rounded-2xl
+p-5
+">
+
+
+<div class="
+flex
+items-center
+gap-4
+">
+
+
+<div class="
+w-14
+h-14
+rounded-2xl
+bg-indigo-600
+text-white
+flex
+items-center
+justify-center
+text-xl
+font-bold
+">
+
+
+{{ strtoupper(substr(
+$siswa->nama_siswa,
+0,
+1
+)) }}
+
+
+</div>
+
+
+
+
+
+
+<div>
+
+
+<h3 class="
+font-bold
+text-indigo-900
+">
+
+{{ $siswa->nama_siswa }}
+
+</h3>
+
+
+<p class="
+text-sm
+text-indigo-700
+">
+
+NIS:
+{{ $siswa->nis }}
+
+</p>
+
+
+<p class="
+text-sm
+text-indigo-700
+">
+
+Kelas:
+{{ $siswa->kelas->nama_kelas ?? '-' }}
+
+</p>
+
+
+</div>
+
+
+</div>
+
+
+</div>
+
+
+
+
+
+
+
+
+
 {{-- FORM --}}
 
 
-<div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-6">
+
+<div class="
+bg-white
+rounded-2xl
+border
+p-6
+">
 
 
 
@@ -90,6 +213,7 @@ method="POST"
 
 
 @csrf
+
 
 
 
@@ -141,11 +265,15 @@ mb-5
 
 @php
 
-$tanggalInput = old('tanggal',$tanggalHariIni);
+$tanggalInput = old(
+'tanggal',
+$tanggalHariIni
+);
 
 
 $statusTelat =
 $tanggalInput != $tanggalHariIni;
+
 
 @endphp
 
@@ -163,30 +291,26 @@ bg-yellow-50
 border
 border-yellow-200
 text-yellow-700
-p-4
 rounded-xl
+p-4
 mb-5
 ">
 
 
-⚠️ Mengisi aktivitas tanggal:
+⚠️ Aktivitas tanggal:
 
 <b>
-
 {{ $tanggalInput }}
-
 </b>
 
 
 <br>
 
 
-Data akan tercatat sebagai:
+Akan tercatat sebagai:
 
 <b>
-
 Telat Isi
-
 </b>
 
 
@@ -202,17 +326,16 @@ bg-blue-50
 border
 border-blue-200
 text-blue-700
-p-4
 rounded-xl
+p-4
 mb-5
 ">
 
 
-ℹ️ Angket dapat diisi untuk hari ini atau maksimal 1 hari sebelumnya.
+ℹ️ Angket dapat diisi hari ini atau maksimal satu hari sebelumnya.
 
 
 </div>
-
 
 
 @endif
@@ -223,17 +346,26 @@ mb-5
 
 
 
-<div class="grid md:grid-cols-2 gap-5">
+{{-- TANGGAL DAN WAKTU --}}
 
 
 
+<div class="
+grid
+md:grid-cols-2
+gap-5
+">
 
 
 
 <div>
 
 
-<label class="font-semibold">
+<label class="
+text-sm
+font-semibold
+text-slate-700
+">
 
 Tanggal Aktivitas
 
@@ -254,14 +386,13 @@ max="{{ $tanggalHariIni }}"
 min="{{ \Carbon\Carbon::yesterday()->format('Y-m-d') }}"
 
 class="
+mt-2
 w-full
 border
 rounded-xl
 px-4
 py-3
-mt-2
 "
-
 
 >
 
@@ -275,10 +406,15 @@ mt-2
 
 
 
+
 <div>
 
 
-<label class="font-semibold">
+<label class="
+text-sm
+font-semibold
+text-slate-700
+">
 
 Bangun Pagi
 
@@ -295,12 +431,12 @@ name="bangun_pagi"
 value="{{ old('bangun_pagi') }}"
 
 class="
+mt-2
 w-full
 border
 rounded-xl
 px-4
 py-3
-mt-2
 "
 
 >
@@ -320,30 +456,52 @@ mt-2
 
 
 
-{{-- SHOLAT + BELAJAR --}}
+{{-- IBADAH --}}
 
 
-<div class="grid md:grid-cols-2 gap-5 mt-5">
+<div class="mt-6">
+
+
+<h3 class="
+font-semibold
+text-slate-800
+mb-4
+">
+
+Ibadah Harian
+
+</h3>
+
+
+
+
+
+<div class="
+grid
+md:grid-cols-5
+gap-3
+">
+
+
 
 
 
 @php
 
-$fields = [
+$ibadah = [
 
-'sholat_subuh'=>'Sholat Subuh',
+'sholat_subuh'=>'Subuh',
 
-'sholat_dzuhur'=>'Sholat Dzuhur',
+'sholat_dzuhur'=>'Dzuhur',
 
-'sholat_ashar'=>'Sholat Ashar',
+'sholat_ashar'=>'Ashar',
 
-'sholat_magrib'=>'Sholat Magrib',
+'sholat_magrib'=>'Magrib',
 
-'sholat_isya'=>'Sholat Isya',
-
-'belajar'=>'Belajar'
+'sholat_isya'=>'Isya'
 
 ];
+
 
 @endphp
 
@@ -352,68 +510,47 @@ $fields = [
 
 
 
-
-@foreach($fields as $key=>$label)
-
+@foreach($ibadah as $key=>$label)
 
 
-<div>
+<label class="
+flex
+items-center
+gap-3
+border
+rounded-xl
+p-4
+cursor-pointer
+hover:bg-slate-50
+">
 
 
-<label class="font-semibold">
+<input
 
-{{ $label }}
-
-</label>
-
-
-
-<select
+type="checkbox"
 
 name="{{ $key }}"
 
+value="1"
+
+{{ old($key) ? 'checked':'' }}
+
 class="
-w-full
-border
-rounded-xl
-px-4
-py-3
-mt-2
+rounded
+text-indigo-600
 "
 
-
 >
 
 
-<option value="1"
+<span class="text-sm">
 
-{{ old($key)=='1' ? 'selected':'' }}
+{{ $label }}
 
->
-
-Ya
-
-</option>
+</span>
 
 
-
-<option value="0"
-
-{{ old($key)=='0' ? 'selected':'' }}
-
->
-
-Tidak
-
-</option>
-
-
-
-</select>
-
-
-</div>
-
+</label>
 
 
 
@@ -421,6 +558,8 @@ Tidak
 
 
 
+</div>
+
 
 </div>
 
@@ -432,13 +571,119 @@ Tidak
 
 
 
-{{-- KEGIATAN --}}
+{{-- AKTIVITAS --}}
+
+
+
+<div class="mt-6">
+
+
+<h3 class="
+font-semibold
+text-slate-800
+mb-4
+">
+
+Aktivitas Anak
+
+</h3>
+
+
+
+
+
+
+<label class="
+text-sm
+font-semibold
+">
+
+Belajar
+
+</label>
+
+
+
+<div class="
+flex
+gap-5
+mt-3
+">
+
+
+<label class="
+flex
+items-center
+gap-2
+">
+
+
+<input
+
+type="radio"
+
+name="belajar"
+
+value="1"
+
+{{ old('belajar')=='1'?'checked':'' }}
+
+>
+
+
+Ya
+
+
+</label>
+
+
+
+
+
+<label class="
+flex
+items-center
+gap-2
+">
+
+
+<input
+
+type="radio"
+
+name="belajar"
+
+value="0"
+
+{{ old('belajar')=='0'?'checked':'' }}
+
+>
+
+
+Tidak
+
+
+</label>
+
+
+
+</div>
+
+
+
+
+
+
+
 
 
 <div class="mt-5">
 
 
-<label class="font-semibold">
+<label class="
+text-sm
+font-semibold
+">
 
 Kegiatan Membantu
 
@@ -453,15 +698,15 @@ name="kegiatan_membantu"
 rows="3"
 
 class="
+mt-2
 w-full
 border
 rounded-xl
 px-4
 py-3
-mt-2
 "
 
-placeholder="Contoh: Membantu membersihkan rumah"
+placeholder="Contoh: membantu membersihkan rumah"
 
 >{{ old('kegiatan_membantu') }}</textarea>
 
@@ -476,18 +721,17 @@ placeholder="Contoh: Membantu membersihkan rumah"
 
 
 
-{{-- TIDUR --}}
-
-
 <div class="mt-5">
 
 
-<label class="font-semibold">
+<label class="
+text-sm
+font-semibold
+">
 
 Tidur Malam
 
 </label>
-
 
 
 
@@ -500,15 +744,20 @@ name="tidur_malam"
 value="{{ old('tidur_malam') }}"
 
 class="
+mt-2
 w-full
 border
 rounded-xl
 px-4
 py-3
-mt-2
 "
 
+
 >
+
+
+</div>
+
 
 
 
@@ -519,6 +768,30 @@ mt-2
 
 
 
+
+
+
+<div class="
+flex
+justify-end
+gap-3
+mt-8
+">
+
+
+<a href="{{ route('orangtua.angket.index') }}"
+
+class="
+px-5
+py-3
+rounded-xl
+border
+text-slate-600
+">
+
+Batal
+
+</a>
 
 
 
@@ -528,7 +801,6 @@ mt-2
 type="submit"
 
 class="
-mt-6
 bg-indigo-600
 hover:bg-indigo-700
 text-white
@@ -536,10 +808,7 @@ px-6
 py-3
 rounded-xl
 font-semibold
-transition
-"
-
->
+">
 
 Simpan Angket
 
@@ -547,10 +816,14 @@ Simpan Angket
 
 
 
+</div>
+
+
+
+
 
 
 </form>
-
 
 
 </div>
@@ -563,20 +836,23 @@ Simpan Angket
 
 
 
-{{-- RIWAYAT --}}
+{{-- RIWAYAT TERAKHIR --}}
+
 
 
 <div class="
 bg-white
 rounded-2xl
-shadow-sm
 border
-border-gray-100
 p-6
 ">
 
 
-<h3 class="text-xl font-bold mb-4">
+<h3 class="
+font-bold
+text-slate-800
+mb-5
+">
 
 Riwayat Angket Terakhir
 
@@ -586,20 +862,16 @@ Riwayat Angket Terakhir
 
 
 
-
-
 @php
 
-
-$riwayat = $orangTua
-    ->angketHarian()
-    ->orderBy(
-        'tanggal',
-        'desc'
-    )
-    ->take(3)
-    ->get();
-
+$riwayat = $siswa
+->angketHarian()
+->orderBy(
+'tanggal',
+'desc'
+)
+->take(3)
+->get();
 
 
 @endphp
@@ -614,95 +886,31 @@ $riwayat = $orangTua
 
 
 
+<div class="space-y-4">
+
+
+
 @foreach($riwayat as $item)
-
-
-
-<div class="
-border
-rounded-xl
-p-4
-mb-3
-">
-
-
-
-
-
-<div class="flex justify-between items-center">
-
-
-
-<div>
-
-
-
-<p class="text-gray-700">
-
-Tanggal Aktivitas:
-
-<b>
-
-{{ \Carbon\Carbon::parse($item->tanggal)->format('d-m-Y') }}
-
-</b>
-
-</p>
-
-
-
-
-
-<p class="text-sm text-gray-500 mt-1">
-
-
-Tanggal Pengisian:
-
-<b>
-
-
-@if($item->tanggal_pengisian)
-
-
-{{ 
-\Carbon\Carbon::parse(
-$item->tanggal_pengisian
-)->format('d-m-Y')
-}}
-
-
-@else
-
--
-
-@endif
-
-
-</b>
-
-
-</p>
-
-
-
-</div>
-
-
-
-
 
 
 
 @php
 
+
 $tanggalAktivitas =
-\Carbon\Carbon::parse($item->tanggal)
-->format('Y-m-d');
+\Carbon\Carbon::parse(
+$item->tanggal
+)->format('Y-m-d');
 
 
 $tanggalIsi =
-\Carbon\Carbon::parse($item->tanggal_pengisian)
-->format('Y-m-d');
+$item->tanggal_pengisian
+?
+\Carbon\Carbon::parse(
+$item->tanggal_pengisian
+)->format('Y-m-d')
+:
+null;
 
 
 @endphp
@@ -712,18 +920,69 @@ $tanggalIsi =
 
 
 
+<div class="
+border
+rounded-xl
+p-5
+">
+
+
+<div class="
+flex
+justify-between
+">
+
+
+<div>
+
+
+<p class="font-semibold">
+
+{{
+
+\Carbon\Carbon::parse(
+$item->tanggal
+)->format('d-m-Y')
+
+}}
+
+</p>
+
+
+<p class="text-xs text-slate-500">
+
+Diisi:
+
+{{
+
+$item->tanggal_pengisian
+?
+\Carbon\Carbon::parse(
+$item->tanggal_pengisian
+)->format('d-m-Y H:i')
+:
+'-'
+
+}}
+
+</p>
+
+
+</div>
+
+
+
+
 @if($tanggalAktivitas == $tanggalIsi)
 
 
-
 <span class="
+bg-emerald-100
+text-emerald-700
 px-3
 py-1
 rounded-full
 text-xs
-font-semibold
-bg-green-100
-text-green-700
 ">
 
 ✓ Tepat Waktu
@@ -731,33 +990,27 @@ text-green-700
 </span>
 
 
-
 @else
 
 
-
 <span class="
+bg-yellow-100
+text-yellow-700
 px-3
 py-1
 rounded-full
 text-xs
-font-semibold
-bg-yellow-100
-text-yellow-700
 ">
 
-⚠ Telat Isi
+⚠ Telat
 
 </span>
-
 
 
 @endif
 
 
 
-
-
 </div>
 
 
@@ -765,116 +1018,60 @@ text-yellow-700
 
 
 
+<div class="
+mt-4
+grid
+md:grid-cols-3
+gap-3
+text-sm
+">
 
 
 
-<div class="mt-3 text-sm text-gray-600">
-
-
-<p>
+<div>
 
 Belajar:
 
 <b>
-
-{{ $item->belajar ? 'Ya':'Tidak' }}
-
+{{ $item->belajar == 1 ? 'Ya' : 'Tidak' }}
 </b>
 
-</p>
-
-
-
-
-
-<div class="grid grid-cols-2 gap-3 mt-3">
+</div>
 
 
 
 <div>
 
-
-<p>
-
-Subuh:
+Ibadah:
 
 <b>
 
-{{ $item->sholat_subuh ? '✓':'✕' }}
+{{
+
+$item->sholat_subuh+
+$item->sholat_dzuhur+
+$item->sholat_ashar+
+$item->sholat_magrib+
+$item->sholat_isya
+
+}}/5
 
 </b>
-
-</p>
-
-
-
-<p>
-
-Dzuhur:
-
-<b>
-
-{{ $item->sholat_dzuhur ? '✓':'✕' }}
-
-</b>
-
-</p>
-
-
-
-<p>
-
-Ashar:
-
-<b>
-
-{{ $item->sholat_ashar ? '✓':'✕' }}
-
-</b>
-
-</p>
-
-
 
 </div>
-
-
-
-
 
 
 
 <div>
 
-
-<p>
-
-Magrib:
+Tidur:
 
 <b>
 
-{{ $item->sholat_magrib ? '✓':'✕' }}
+{{ $item->tidur_malam ?? '-' }}
 
 </b>
 
-</p>
-
-
-
-<p>
-
-Isya:
-
-<b>
-
-{{ $item->sholat_isya ? '✓':'✕' }}
-
-</b>
-
-</p>
-
-
-
 </div>
 
 
@@ -883,14 +1080,7 @@ Isya:
 
 
 
-
 </div>
-
-
-
-
-</div>
-
 
 
 
@@ -898,33 +1088,67 @@ Isya:
 
 
 
+</div>
+
 
 
 @else
 
 
-
-<p class="text-gray-500">
+<p class="text-sm text-slate-500">
 
 Belum ada riwayat angket.
 
 </p>
 
 
-
 @endif
 
 
 
-
-
 </div>
 
 
 
 
 
+
 </div>
 
+
+<script>
+
+document.addEventListener('DOMContentLoaded', function(){
+
+    const form = document.querySelector(
+        'form[action="{{ route('orangtua.angket.store') }}"]'
+    );
+
+
+    if(form)
+    {
+
+        const button = form.querySelector(
+            'button[type="submit"]'
+        );
+
+
+        form.addEventListener(
+            'submit',
+            function(){
+
+                button.disabled = true;
+
+                button.innerHTML = 'Menyimpan...';
+
+            }
+        );
+
+    }
+
+
+});
+
+</script>
 
 @endsection

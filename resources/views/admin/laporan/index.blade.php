@@ -1,39 +1,40 @@
 @extends('admin.layouts.app')
 
 
+@php
+use App\Models\AngketHarian;
+@endphp
 @section('title','Laporan Monitoring')
 
 
 @section('content')
 
 
-<div class="space-y-8">
-
-
+<div class="space-y-6">
 
 
 
 {{-- HEADER --}}
 
 
+<div class="bg-white border rounded-xl p-5">
+
 <div class="
-bg-white
-rounded-2xl
-border
-p-7
+flex
+flex-col
+md:flex-row
+md:justify-between
+md:items-center
+gap-5
 ">
-
-
-<div class="flex justify-between items-center">
 
 
 <div>
 
-
 <h2 class="
 text-2xl
 font-bold
-text-slate-800
+text-gray-800
 ">
 
 Laporan Monitoring Siswa
@@ -42,11 +43,12 @@ Laporan Monitoring Siswa
 
 
 <p class="
-text-slate-500
+text-sm
+text-gray-500
 mt-2
 ">
 
-Rekap aktivitas harian siswa melalui pengisian angket KAIH.
+Rekap perkembangan aktivitas harian siswa KAIH.
 
 </p>
 
@@ -57,24 +59,29 @@ Rekap aktivitas harian siswa melalui pengisian angket KAIH.
 
 
 <div class="
-text-right
-hidden md:block
+flex
+items-center
+gap-4
 ">
+
+
+<div class="text-right">
 
 
 <p class="
-text-sm
-text-slate-400
+text-xs
+text-gray-400
 ">
 
-Periode Monitoring
+Periode
 
 </p>
 
 
 <p class="
+text-sm
 font-semibold
-text-slate-700
+text-gray-700
 ">
 
 
@@ -98,274 +105,34 @@ Hari Ini
 
 
 
-</div>
 
 
-</div>
-
-
-
-
-
-
-
-
-
-{{-- SUMMARY --}}
-
-
-
-<div class="
-grid
-grid-cols-1
-md:grid-cols-4
-gap-5
-">
-
-
-
-
-
-<div class="
-bg-white
-rounded-2xl
-border
-p-6
-">
-
-
-<p class="text-sm text-slate-500">
-
-Total Siswa
-
-</p>
-
-
-<div class="flex items-center justify-between mt-4">
-
-
-<h2 class="
-text-4xl
-font-bold
-text-blue-600
-">
-
-{{ $totalSiswa }}
-
-</h2>
-
-
-<div class="
-w-10
-h-10
-rounded-xl
-bg-blue-50
-flex
-items-center
-justify-center
-text-blue-600
-">
-
-👤
-
-</div>
-
-
-</div>
-
-
-</div>
-
-
-
-
-
-
-
-
-<div class="
-bg-white
-rounded-2xl
-border
-p-6
-">
-
-
-<p class="text-sm text-slate-500">
-
-Sudah Isi
-
-</p>
-
-
-<div class="flex items-center justify-between mt-4">
-
-
-<h2 class="
-text-4xl
-font-bold
-text-emerald-600
-">
-
-{{ $sudahIsi }}
-
-</h2>
-
-
-<div class="
-w-10
-h-10
-rounded-xl
-bg-emerald-50
-flex
-items-center
-justify-center
-text-emerald-600
-">
-
-✓
-
-</div>
-
-
-</div>
-
-
-</div>
-
-
-
-
-
-
-
-
-<div class="
-bg-white
-rounded-2xl
-border
-p-6
-">
-
-
-<p class="text-sm text-slate-500">
-
-Belum Isi
-
-</p>
-
-
-<div class="flex items-center justify-between mt-4">
-
-
-<h2 class="
-text-4xl
-font-bold
-text-red-500
-">
-
-{{ $belumIsi }}
-
-</h2>
-
-
-<div class="
-w-10
-h-10
-rounded-xl
-bg-red-50
-flex
-items-center
-justify-center
-text-red-600
-">
-
-!
-
-</div>
-
-
-</div>
-
-
-</div>
-
-
-
-
-
-
-
-
-<div class="
-bg-white
-rounded-2xl
-border
-p-6
-">
-
-
-<p class="text-sm text-slate-500">
-
-Kepatuhan
-
-</p>
-
-
-
-<div class="flex justify-between mt-4">
-
-
-<h2 class="
-text-4xl
-font-bold
-text-indigo-600
-">
-
-{{ $persentasePengisian }}%
-
-</h2>
-
-
-
-</div>
-
-
-
-
-<div class="
-mt-4
-h-2
-bg-slate-100
-rounded-full
-">
-
-
-<div
+<a href="{{ route('laporan.export',request()->query()) }}"
 
 class="
-h-2
-bg-indigo-600
-rounded-full
-"
-
-style="
-width:{{ $persentasePengisian }}%
+bg-green-600
+hover:bg-green-700
+text-white
+px-5
+py-2.5
+rounded-xl
+text-sm
+font-semibold
+shadow-sm
 ">
 
-</div>
+⬇ Export Excel
 
-
-</div>
-
-
-</div>
-
+</a>
 
 
 
 </div>
 
+
+
+</div>
+</div>
 
 
 
@@ -377,88 +144,27 @@ width:{{ $persentasePengisian }}%
 {{-- FILTER --}}
 
 
-
-<div class="
-bg-white
-rounded-2xl
-border
-p-6
-">
+<div class="bg-white border rounded-xl p-5">
 
 
+<h3 class="font-semibold text-gray-800 mb-4">
 
-<div class="
-flex
-justify-between
-items-center
-mb-6
-">
-
-
-<div>
-
-
-<h3 class="
-font-semibold
-text-lg
-">
-
-Pencarian Data
+Filter Laporan
 
 </h3>
-
-
-<p class="
-text-sm
-text-slate-400
-">
-
-Gunakan filter untuk melihat data tertentu.
-
-</p>
-
-
-</div>
-
-
-
-
-<a href="{{ route('laporan.index') }}"
-
-class="
-text-sm
-text-slate-500
-hover:text-indigo-600
-">
-
-Reset
-
-</a>
-
-
-
-</div>
-
-
-
-
 
 
 
 <form method="GET">
 
 
-<div class="
-grid
-md:grid-cols-4
-gap-5
-">
+<div class="grid md:grid-cols-5 gap-4">
 
 
 
 <div>
 
-<label class="text-sm font-medium">
+<label class="text-xs text-gray-500">
 
 Kelas
 
@@ -470,12 +176,13 @@ Kelas
 name="kelas_id"
 
 class="
-mt-2
 w-full
-rounded-xl
+mt-2
 border
-px-4
-py-3
+rounded-lg
+px-3
+py-2
+text-sm
 ">
 
 
@@ -486,11 +193,12 @@ Semua Kelas
 </option>
 
 
-
 @foreach($kelas as $item)
 
 
-<option value="{{ $item->id }}"
+<option
+
+value="{{ $item->id }}"
 
 {{ $kelasId==$item->id?'selected':'' }}
 
@@ -516,9 +224,9 @@ Semua Kelas
 
 <div>
 
-<label class="text-sm font-medium">
+<label class="text-xs text-gray-500">
 
-Tanggal Awal
+Tanggal Mulai
 
 </label>
 
@@ -532,14 +240,17 @@ name="tanggal_mulai"
 value="{{ $tanggalMulai }}"
 
 class="
-mt-2
 w-full
-rounded-xl
+mt-2
 border
-px-4
-py-3
-">
+rounded-lg
+px-3
+py-2
+text-sm
+"
 
+
+>
 
 </div>
 
@@ -548,10 +259,9 @@ py-3
 
 
 
-
 <div>
 
-<label class="text-sm font-medium">
+<label class="text-xs text-gray-500">
 
 Tanggal Akhir
 
@@ -567,27 +277,81 @@ name="tanggal_selesai"
 value="{{ $tanggalAkhir }}"
 
 class="
-mt-2
 w-full
-rounded-xl
+mt-2
 border
-px-4
-py-3
-">
+rounded-lg
+px-3
+py-2
+text-sm
+"
 
+
+>
 
 </div>
 
 
 
+<div>
+
+<label class="text-xs text-gray-500">
+
+Kategori
+
+</label>
 
 
+<select
+name="kategori"
+class="
+w-full
+mt-2
+border
+rounded-lg
+px-3
+py-2
+text-sm
+">
+
+
+<option value="">
+Semua Kondisi
+</option>
+
+
+<option value="Baik"
+{{ ($kategori ?? '')=='Baik'?'selected':'' }}
+>
+Baik
+</option>
+
+
+<option value="Perlu Perhatian"
+{{ ($kategori ?? '')=='Perlu Perhatian'?'selected':'' }}
+>
+Perlu Perhatian
+</option>
+
+
+<option value="Perlu Pendampingan"
+{{ ($kategori ?? '')=='Perlu Pendampingan'?'selected':'' }}
+>
+Perlu Pendampingan
+</option>
+
+
+</select>
+
+
+</div>
 
 
 <div class="flex items-end">
 
 
 <button
+
 
 class="
 w-full
@@ -596,10 +360,13 @@ hover:bg-indigo-700
 text-white
 rounded-xl
 py-3
+text-sm
 font-semibold
+shadow-sm
+transition
 ">
 
-Tampilkan Data
+Tampilkan
 
 </button>
 
@@ -607,14 +374,13 @@ Tampilkan Data
 </div>
 
 
-</div>
 
+</div>
 
 
 </form>
 
 
-
 </div>
 
 
@@ -625,47 +391,222 @@ Tampilkan Data
 
 
 
-{{-- TABLE --}}
-
-
-
-<div class="
-bg-white
-rounded-2xl
-border
-overflow-hidden
-">
-
+{{-- STATISTIK UTAMA --}}
 
 
 <div class="
-px-6
-py-5
-border-b
+grid
+grid-cols-1
+sm:grid-cols-2
+lg:grid-cols-4
+gap-5
 ">
 
 
-<h3 class="
-font-semibold
-text-lg
-">
 
-Detail Aktivitas Siswa
+<div class="bg-white border rounded-xl p-4">
 
-</h3>
+<p class="text-xs text-gray-500">
+
+Total Siswa
+
+</p>
+
+<h2 class="text-2xl font-bold text-gray-800 mt-2">
+
+{{ $totalSiswa }}
+
+</h2>
 
 
-<p class="
-text-sm
-text-slate-400
-">
+</div>
 
-Status pengisian dan perkembangan aktivitas harian.
+
+
+
+
+<div class="bg-white border rounded-xl p-4">
+
+<p class="text-xs text-gray-500">
+
+Total Angket
 
 </p>
 
 
+<h2 class="text-2xl font-bold text-indigo-600 mt-2">
+
+{{ $totalAngket }}
+
+</h2>
+
+
 </div>
+
+
+
+
+
+<div class="bg-white border rounded-xl p-4">
+
+<p class="text-xs text-gray-500">
+
+Rata-rata Skor
+
+</p>
+
+
+<h2 class="text-2xl font-bold text-blue-600 mt-2">
+
+{{ $rataRataSkor }}
+
+</h2>
+
+
+</div>
+
+
+
+
+
+<div class="bg-white border rounded-xl p-4">
+
+<p class="text-xs text-gray-500">
+
+Kepatuhan Pengisian
+
+</p>
+
+
+<h2 class="text-2xl font-bold text-green-600 mt-2">
+
+{{ $persentasePengisian }}%
+
+</h2>
+
+
+</div>
+
+
+</div>
+
+
+
+
+
+
+
+
+
+{{-- KONDISI SISWA --}}
+
+
+
+<div class="
+grid
+grid-cols-1
+md:grid-cols-3
+gap-5
+">
+
+
+
+<div class="bg-green-50 border border-green-100 rounded-xl p-4">
+
+
+<p class="text-sm text-green-700">
+
+Kondisi Baik
+
+</p>
+
+
+<h2 class="text-2xl font-bold text-green-700 mt-2">
+
+{{ $jumlahBaik }}
+
+</h2>
+
+
+</div>
+
+
+
+
+
+<div class="bg-yellow-50 border border-yellow-100 rounded-xl p-4">
+
+
+<p class="text-sm text-yellow-700">
+
+Perlu Perhatian
+
+</p>
+
+
+<h2 class="text-2xl font-bold text-yellow-700 mt-2">
+
+{{ $jumlahPerhatian }}
+
+</h2>
+
+
+</div>
+
+
+
+
+
+<div class="bg-red-50 border border-red-100 rounded-xl p-4">
+
+
+<p class="text-sm text-red-700">
+
+Perlu Pendampingan
+
+</p>
+
+
+<h2 class="text-2xl font-bold text-red-700 mt-2">
+
+{{ $jumlahPendampingan }}
+
+</h2>
+
+
+</div>
+
+
+</div>
+
+
+
+
+
+
+
+
+
+{{-- TABEL --}}
+
+
+
+<div class="bg-white border rounded-xl overflow-hidden">
+
+
+
+<div class="p-5 border-b">
+
+
+<h3 class="font-semibold text-gray-800">
+
+Rekap Perkembangan Siswa
+
+</h3>
+
+
+</div>
+
 
 
 
@@ -675,53 +616,59 @@ Status pengisian dan perkembangan aktivitas harian.
 <div class="overflow-x-auto">
 
 
-<table class="w-full">
+<table class="w-full text-sm whitespace-nowrap">
 
 
 <thead class="bg-slate-50">
 
-
 <tr>
 
 
-<th class="px-6 py-4 text-left text-sm">
+<th class="px-6 py-4 text-left">
+
+No
+
+</th>
+
+
+<th class="px-6 py-4 text-left">
 
 Siswa
 
 </th>
 
 
-<th class="px-6 py-4 text-left text-sm">
+<th class="px-6 py-4 text-left">
 
 Kelas
 
 </th>
 
 
-<th class="px-6 py-4 text-left text-sm">
+<th class="px-6 py-4 text-left">
+
+Jumlah Angket
+
+</th>
+
+
+<th class="px-6 py-4 text-left">
+
+Skor
+
+</th>
+
+
+<th class="px-6 py-4 text-left">
+
+Kondisi
+
+</th>
+
+
+<th class="px-6 py-4 text-left">
 
 Status
-
-</th>
-
-
-<th class="px-6 py-4 text-left text-sm">
-
-Ibadah
-
-</th>
-
-
-<th class="px-6 py-4 text-left text-sm">
-
-Belajar
-
-</th>
-
-
-<th class="px-6 py-4 text-left text-sm">
-
-Waktu Isi
 
 </th>
 
@@ -735,6 +682,8 @@ Waktu Isi
 
 
 
+
+
 <tbody>
 
 
@@ -742,30 +691,77 @@ Waktu Isi
 @foreach($siswas as $siswa)
 
 
-<tr class="
-border-b
-hover:bg-slate-50
-transition
-">
+@php
+
+$data = $siswa->angketHarian;
+
+
+if($tanggalMulai && $tanggalAkhir)
+{
+
+    $data = $data->whereBetween(
+        'tanggal',
+        [
+            $tanggalMulai,
+            $tanggalAkhir
+        ]
+    );
+
+}
+
+if($kategori)
+{
+
+    $data = $data->where(
+        'kategori',
+        $kategori
+    );
+
+}
+
+$terakhir = $data
+    ->sortByDesc('tanggal')
+    ->first();
+
+
+$skor = round(
+    $data->avg('skor') ?? 0
+);
+
+
+$kategoriSiswa = $terakhir->kategori ?? null;
+
+
+@endphp
+
+
+
+
+<tr class="border-t hover:bg-gray-50">
+
+
+
+<td class="px-6 py-4">
+
+{{ $loop->iteration }}
+
+</td>
+
+
 
 
 
 <td class="px-6 py-4">
 
 
-<p class="
-font-semibold
-">
+<p class="font-semibold">
 
 {{ $siswa->nama_siswa }}
 
 </p>
 
 
-<p class="
-text-xs
-text-slate-400
-">
+<p class="text-xs text-gray-400">
 
 NIS {{ $siswa->nis }}
 
@@ -773,6 +769,8 @@ NIS {{ $siswa->nis }}
 
 
 </td>
+
+
 
 
 
@@ -792,42 +790,84 @@ NIS {{ $siswa->nis }}
 
 <td class="px-6 py-4">
 
+{{ $data->count() }}
 
-@if($siswa->angketHariIni)
+</td>
+
+
+
+
+
+
+
+<td class="px-6 py-4 font-semibold">
+
+{{ $skor }}
+
+</td>
+
+
+
+
+
+
+
+<td class="px-6 py-4">
+
+
+@if($kategoriSiswa=='Baik')
 
 
 <span class="
-px-3
-py-1
+px-3 py-1
 rounded-full
-bg-emerald-50
-text-emerald-600
 text-xs
-font-semibold
+bg-green-100
+text-green-700
 ">
 
-Selesai
+Baik
 
 </span>
+
+
+
+@elseif($kategoriSiswa=='Perlu Perhatian')
+
+
+<span class="
+px-3 py-1
+rounded-full
+text-xs
+bg-yellow-100
+text-yellow-700
+">
+
+Perhatian
+
+</span>
+
+
+
+@elseif($kategoriSiswa)
+
+<span class="
+px-3 py-1
+rounded-full
+text-xs
+bg-red-100
+text-red-700
+">
+
+Pendampingan
+
+</span>
+
 
 
 @else
 
-
-<span class="
-px-3
-py-1
-rounded-full
-bg-red-50
-text-red-600
-text-xs
-font-semibold
-">
-
-Belum
-
-</span>
-
+-
 
 @endif
 
@@ -843,75 +883,45 @@ Belum
 <td class="px-6 py-4">
 
 
-@if($siswa->angketHariIni)
+@if($data->count())
 
 
-{{ 
-$siswa->angketHariIni->sholat_subuh+
-$siswa->angketHariIni->sholat_dzuhur+
-$siswa->angketHariIni->sholat_ashar+
-$siswa->angketHariIni->sholat_magrib+
-$siswa->angketHariIni->sholat_isya
-}} / 5
+<span class="
+text-green-600
+text-xs
+font-semibold
+">
+
+Terdata
+
+</span>
 
 
 @else
 
--
+
+<span class="
+text-gray-400
+text-xs
+">
+
+Belum Ada
+
+</span>
+
 
 @endif
 
 
 </td>
 
-
-
-
-
-
-
-<td class="px-6 py-4">
-
-
-@if($siswa->angketHariIni)
-
-{{ $siswa->angketHariIni->belajar?'Ya':'Tidak' }}
-
-@else
-
--
-
-@endif
-
-
-</td>
-
-
-
-
-
-
-
-<td class="px-6 py-4 text-sm">
-
-
-@if($siswa->angketHariIni)
-
-{{ $siswa->angketHariIni->tanggal_pengisian }}
-
-@else
-
--
-
-@endif
-
-
-</td>
 
 
 
 
 </tr>
+
+
 
 
 @endforeach
@@ -928,8 +938,8 @@ $siswa->angketHariIni->sholat_isya
 </div>
 
 
-
 </div>
+
 
 
 

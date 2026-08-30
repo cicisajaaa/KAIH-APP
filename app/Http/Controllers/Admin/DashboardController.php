@@ -25,7 +25,7 @@ class DashboardController extends Controller
 
         /*
         |--------------------------------------------------------------------------
-        | Data Master
+        | DATA MASTER
         |--------------------------------------------------------------------------
         */
 
@@ -47,9 +47,11 @@ class DashboardController extends Controller
 
 
 
+
+
         /*
         |--------------------------------------------------------------------------
-        | Statistik Angket Hari Ini
+        | TANGGAL HARI INI
         |--------------------------------------------------------------------------
         */
 
@@ -59,7 +61,16 @@ class DashboardController extends Controller
 
 
 
-        // jumlah siswa yang sudah isi
+
+
+
+
+
+        /*
+        |--------------------------------------------------------------------------
+        | STATISTIK ANGKET HARI INI
+        |--------------------------------------------------------------------------
+        */
 
 
         $angketHariIni = AngketHarian::whereDate(
@@ -74,12 +85,10 @@ class DashboardController extends Controller
 
 
 
-        // siswa yang belum isi
-
 
         $belumIsiAngket = Siswa::whereDoesntHave(
                 'angketHarian',
-                function($query) use ($hariIni){
+                function($query) use($hariIni){
 
                     $query->whereDate(
                         'tanggal',
@@ -96,25 +105,107 @@ class DashboardController extends Controller
 
 
 
-        // persentase
-
 
         if($totalSiswa > 0)
         {
 
+
             $persentaseAngket = round(
+
                 ($angketHariIni / $totalSiswa) * 100,
+
                 1
+
             );
+
 
         }
         else
         {
 
+
             $persentaseAngket = 0;
+
 
         }
 
+
+
+
+
+/*
+|--------------------------------------------------------------------------
+| KONDISI SISWA TERAKHIR
+|--------------------------------------------------------------------------
+*/
+$tanggalTerakhir = AngketHarian::max('tanggal') ?? Carbon::today();
+
+
+
+$jumlahBaik = AngketHarian::whereDate(
+        'tanggal',
+        $tanggalTerakhir
+    )
+    ->where(
+        'kategori',
+        'Baik'
+    )
+    ->count();
+
+
+
+$jumlahPerhatian = AngketHarian::whereDate(
+        'tanggal',
+        $tanggalTerakhir
+    )
+    ->where(
+        'kategori',
+        'Perlu Perhatian'
+    )
+    ->count();
+
+
+
+$jumlahPendampingan = AngketHarian::whereDate(
+        'tanggal',
+        $tanggalTerakhir
+    )
+    ->where(
+        'kategori',
+        'Perlu Pendampingan'
+    )
+    ->count();
+
+
+
+
+
+        /*
+        |--------------------------------------------------------------------------
+        | SISWA PERLU PERHATIAN
+        |--------------------------------------------------------------------------
+        */
+$siswaPerhatian = AngketHarian::with([
+
+    'siswa.kelas'
+
+])
+->whereIn(
+
+    'kategori',
+
+    [
+        'Perlu Perhatian',
+        'Perlu Pendampingan'
+    ]
+
+)
+->whereDate(
+    'tanggal',
+    $tanggalTerakhir
+)
+->limit(10)
+->get();
 
 
 
@@ -123,7 +214,7 @@ class DashboardController extends Controller
 
         /*
         |--------------------------------------------------------------------------
-        | Grafik Angket 7 Hari Terakhir
+        | GRAFIK 7 HARI TERAKHIR
         |--------------------------------------------------------------------------
         */
 
@@ -131,6 +222,7 @@ class DashboardController extends Controller
         $grafikTanggal = [];
 
         $grafikJumlah = [];
+
 
 
 
@@ -146,8 +238,11 @@ class DashboardController extends Controller
 
 
 
+
             $grafikTanggal[] =
+
                 $tanggal->format('d M');
+
 
 
 
@@ -156,9 +251,13 @@ class DashboardController extends Controller
             $grafikJumlah[] =
 
                 AngketHarian::whereDate(
+
                     'tanggal',
+
                     $tanggal
+
                 )
+
                 ->count();
 
 
@@ -171,31 +270,49 @@ class DashboardController extends Controller
 
 
 
+
+
         /*
         |--------------------------------------------------------------------------
-        | Daftar Siswa Belum Isi Hari Ini
+        | SISWA BELUM ISI HARI INI
         |--------------------------------------------------------------------------
         */
 
 
         $siswaBelumIsi = Siswa::whereDoesntHave(
+
                 'angketHarian',
+
                 function($query) use($hariIni){
 
+
                     $query->whereDate(
+
                         'tanggal',
+
                         $hariIni
+
                     );
 
+
                 }
+
             )
+
             ->with([
+
                 'kelas'
+
             ])
+
             ->orderBy(
+
                 'nama_siswa'
+
             )
+
             ->limit(10)
+
             ->get();
 
 
@@ -204,11 +321,22 @@ class DashboardController extends Controller
 
 
 
+        /*
+        |--------------------------------------------------------------------------
+        | RETURN VIEW
+        |--------------------------------------------------------------------------
+        */
+
+
         return view(
 
             'admin.dashboard',
 
             compact(
+
+                /*
+                DATA MASTER
+                */
 
                 'totalJurusan',
 
@@ -219,6 +347,12 @@ class DashboardController extends Controller
                 'totalOrangTua',
 
 
+
+
+                /*
+                ANGKET
+                */
+
                 'angketHariIni',
 
                 'belumIsiAngket',
@@ -226,12 +360,41 @@ class DashboardController extends Controller
                 'persentaseAngket',
 
 
+
+                /*
+                KONDISI SISWA
+                */
+
+                'jumlahBaik',
+
+                'jumlahPerhatian',
+
+                'jumlahPendampingan',
+
+                'siswaPerhatian',
+
+
+
+
+                /*
+                GRAFIK
+                */
+
                 'grafikTanggal',
 
                 'grafikJumlah',
 
 
-                'siswaBelumIsi'
+
+
+                /*
+                BELUM ISI
+                */
+
+                'siswaBelumIsi',
+
+               
+
 
             )
 
