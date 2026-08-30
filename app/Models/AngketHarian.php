@@ -52,41 +52,32 @@ class AngketHarian extends Model
 
 
 
+protected $casts = [
 
-    protected $casts = [
+    'tanggal' => 'date',
 
-        'tanggal' => 'date',
+    'tanggal_pengisian' => 'datetime',
 
-        'tanggal_pengisian' => 'datetime',
+    'sholat_subuh' => 'boolean',
 
+    'sholat_dzuhur' => 'boolean',
 
-        'sholat_subuh' => 'boolean',
+    'sholat_ashar' => 'boolean',
 
-        'sholat_dzuhur' => 'boolean',
+    'sholat_magrib' => 'boolean',
 
-        'sholat_ashar' => 'boolean',
+    'sholat_isya' => 'boolean',
 
-        'sholat_magrib' => 'boolean',
+    'belajar' => 'boolean',
 
-        'sholat_isya' => 'boolean',
+    'skor' => 'integer',
 
-        'belajar' => 'boolean',
-
-        'skor' => 'integer',
-
-    ];
+];
 
 
 
 
 
-
-
-    /*
-    |--------------------------------------------------------------------------
-    | Relasi
-    |--------------------------------------------------------------------------
-    */
 
 
     public function orangTua()
@@ -103,7 +94,6 @@ class AngketHarian extends Model
 
 
 
-
     public function siswa()
     {
 
@@ -113,197 +103,6 @@ class AngketHarian extends Model
         );
 
     }
-
-
-
-
-
-
-
-
-
-    /*
-    |--------------------------------------------------------------------------
-    | Hitung Skor Aktivitas
-    |--------------------------------------------------------------------------
-    */
-
-
-    public function hitungSkor()
-    {
-
-
-        $skor = 0;
-
-
-
-        /*
-        |--------------------------------------------------------------------------
-        | Ibadah (40 poin)
-        |--------------------------------------------------------------------------
-        */
-
-
-        $jumlahIbadah =
-
-            $this->sholat_subuh +
-            $this->sholat_dzuhur +
-            $this->sholat_ashar +
-            $this->sholat_magrib +
-            $this->sholat_isya;
-
-
-
-        $skor += ($jumlahIbadah / 5) * 40;
-
-
-
-
-
-
-
-        /*
-        |--------------------------------------------------------------------------
-        | Belajar (30 poin)
-        |--------------------------------------------------------------------------
-        */
-
-
-        if($this->belajar)
-        {
-
-            $skor += 30;
-
-        }
-
-
-
-
-
-
-
-        /*
-        |--------------------------------------------------------------------------
-        | Bangun Pagi (20 poin)
-        |--------------------------------------------------------------------------
-        */
-
-
-        if($this->bangun_pagi)
-        {
-
-
-            $jamBangun = \Carbon\Carbon::parse(
-                $this->bangun_pagi
-            );
-
-
-            if($jamBangun->hour <= 5)
-            {
-
-                $skor += 20;
-
-            }
-
-            elseif($jamBangun->hour <= 7)
-            {
-
-                $skor += 10;
-
-            }
-
-
-        }
-
-
-
-
-
-
-
-
-        /*
-        |--------------------------------------------------------------------------
-        | Tidur Malam (10 poin)
-        |--------------------------------------------------------------------------
-        */
-
-
-        if($this->tidur_malam)
-        {
-
-
-            $jamTidur = \Carbon\Carbon::parse(
-                $this->tidur_malam
-            );
-
-
-            if($jamTidur->hour >= 21)
-            {
-
-                $skor += 10;
-
-            }
-
-
-        }
-
-
-
-
-
-
-
-        return round($skor);
-
-
-    }
-
-
-
-
-
-
-
-
-
-    /*
-    |--------------------------------------------------------------------------
-    | Tentukan Kategori
-    |--------------------------------------------------------------------------
-    */
-
-
-    public function tentukanKategori($skor)
-    {
-
-
-        if($skor >= 80)
-        {
-
-            return 'Baik';
-
-        }
-
-
-        elseif($skor >= 50)
-        {
-
-            return 'Perlu Perhatian';
-
-        }
-
-
-        else
-        {
-
-            return 'Perlu Pendampingan';
-
-        }
-
-
-    }
-
 
 
 }

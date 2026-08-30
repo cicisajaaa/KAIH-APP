@@ -1,9 +1,6 @@
 @extends('admin.layouts.app')
 
 
-@php
-use App\Models\AngketHarian;
-@endphp
 @section('title','Laporan Monitoring')
 
 
@@ -83,17 +80,23 @@ text-sm
 font-semibold
 text-gray-700
 ">
-
-
 @if($tanggalMulai && $tanggalAkhir)
 
 {{ $tanggalMulai }}
 s/d
 {{ $tanggalAkhir }}
 
+@elseif($tanggalMulai)
+
+Mulai {{ $tanggalMulai }}
+
+@elseif($tanggalAkhir)
+
+Sampai {{ $tanggalAkhir }}
+
 @else
 
-Hari Ini
+Semua Data
 
 @endif
 
@@ -125,7 +128,23 @@ shadow-sm
 
 </a>
 
+<a href="{{ route('laporan.pdf',request()->query()) }}"
 
+class="
+bg-red-600
+hover:bg-red-700
+text-white
+px-5
+py-2.5
+rounded-xl
+text-sm
+font-semibold
+shadow-sm
+">
+
+🖨 Cetak PDF
+
+</a>
 
 </div>
 
@@ -584,19 +603,12 @@ Perlu Pendampingan
 
 
 
-
-
-
 {{-- TABEL --}}
-
-
 
 <div class="bg-white border rounded-xl overflow-hidden">
 
 
-
 <div class="p-5 border-b">
-
 
 <h3 class="font-semibold text-gray-800">
 
@@ -604,12 +616,7 @@ Rekap Perkembangan Siswa
 
 </h3>
 
-
 </div>
-
-
-
-
 
 
 
@@ -625,67 +632,56 @@ Rekap Perkembangan Siswa
 
 
 <th class="px-6 py-4 text-left">
-
 No
-
 </th>
 
 
 <th class="px-6 py-4 text-left">
-
 Siswa
-
 </th>
 
 
 <th class="px-6 py-4 text-left">
-
 Kelas
-
 </th>
 
 
 <th class="px-6 py-4 text-left">
-
 Jumlah Angket
-
 </th>
 
 
 <th class="px-6 py-4 text-left">
-
 Skor
-
 </th>
 
 
 <th class="px-6 py-4 text-left">
-
 Kondisi
-
 </th>
 
 
 <th class="px-6 py-4 text-left">
-
 Status
+</th>
 
+
+<th class="px-6 py-4 text-left">
+Aksi
 </th>
 
 
 </tr>
-
 
 </thead>
 
 
 
 
-
-
-
 <tbody>
 
+
+@if($siswas->count())
 
 
 @foreach($siswas as $siswa)
@@ -699,34 +695,43 @@ $data = $siswa->angketHarian;
 if($tanggalMulai && $tanggalAkhir)
 {
 
-    $data = $data->whereBetween(
-        'tanggal',
-        [
-            $tanggalMulai,
-            $tanggalAkhir
-        ]
-    );
+$data = $data->whereBetween(
+'tanggal',
+[
+$tanggalMulai,
+$tanggalAkhir
+]
+);
 
 }
+
 
 if($kategori)
 {
 
-    $data = $data->where(
-        'kategori',
-        $kategori
-    );
+$data = $data->where(
+'kategori',
+$kategori
+);
 
 }
 
+
+
 $terakhir = $data
-    ->sortByDesc('tanggal')
-    ->first();
+
+->sortByDesc('tanggal')
+
+->sortByDesc('id')
+
+->first();
+
 
 
 $skor = round(
-    $data->avg('skor') ?? 0
+$data->avg('skor') ?? 0
 );
+
 
 
 $kategoriSiswa = $terakhir->kategori ?? null;
@@ -746,7 +751,6 @@ $kategoriSiswa = $terakhir->kategori ?? null;
 {{ $loop->iteration }}
 
 </td>
-
 
 
 
@@ -773,17 +777,11 @@ NIS {{ $siswa->nis }}
 
 
 
-
-
-
 <td class="px-6 py-4">
 
 {{ $siswa->kelas->nama_kelas ?? '-' }}
 
 </td>
-
-
-
 
 
 
@@ -797,9 +795,6 @@ NIS {{ $siswa->nis }}
 
 
 
-
-
-
 <td class="px-6 py-4 font-semibold">
 
 {{ $skor }}
@@ -809,13 +804,10 @@ NIS {{ $siswa->nis }}
 
 
 
-
-
-
 <td class="px-6 py-4">
 
 
-@if($kategoriSiswa=='Baik')
+@if($kategoriSiswa == 'Baik')
 
 
 <span class="
@@ -832,7 +824,7 @@ Baik
 
 
 
-@elseif($kategoriSiswa=='Perlu Perhatian')
+@elseif($kategoriSiswa == 'Perlu Perhatian')
 
 
 <span class="
@@ -849,7 +841,8 @@ Perhatian
 
 
 
-@elseif($kategoriSiswa)
+@elseif($kategoriSiswa == 'Perlu Pendampingan')
+
 
 <span class="
 px-3 py-1
@@ -873,8 +866,6 @@ Pendampingan
 
 
 </td>
-
-
 
 
 
@@ -918,13 +909,62 @@ Belum Ada
 
 
 
+<td class="px-6 py-4">
+
+
+<a href="{{ route(
+'monitoring.angket.detail',
+$siswa->id
+) }}"
+
+class="
+bg-indigo-100
+text-indigo-700
+px-3
+py-1
+rounded-lg
+text-xs
+font-semibold
+">
+
+Detail
+
+</a>
+
+
+</td>
+
+
 
 </tr>
 
 
 
-
 @endforeach
+
+
+
+@else
+
+
+<tr>
+
+<td colspan="8"
+
+class="
+text-center
+py-6
+text-gray-500
+">
+
+Belum ada data siswa
+
+</td>
+
+</tr>
+
+
+@endif
 
 
 
@@ -939,13 +979,5 @@ Belum Ada
 
 
 </div>
-
-
-
-
-
-
-</div>
-
 
 @endsection

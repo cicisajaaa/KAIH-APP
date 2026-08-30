@@ -2,135 +2,452 @@
 
 namespace App\Http\Controllers\Admin;
 
+
 use App\Http\Controllers\Controller;
+
 use Illuminate\Http\Request;
+
 use App\Models\Kelas;
 use App\Models\Jurusan;
+
 use App\Exports\KelasExport;
+use App\Imports\KelasImport;
+
 use Maatwebsite\Excel\Facades\Excel;
-use App\Imports\KelasImport; 
+
+
 
 class KelasController extends Controller
 {
+
+
     /**
-     * Display a listing of the resource.
+     * Menampilkan daftar kelas
      */
     public function index()
-{
-    $kelas = Kelas::with('jurusan')
-                ->orderBy('nama_kelas')
-                ->get();
+    {
 
-    return view('admin.kelas.index', compact('kelas'));
-}
+        $kelas = Kelas::with('jurusan')
+            ->orderBy('nama_kelas')
+            ->get();
+
+
+
+        return view(
+
+            'admin.kelas.index',
+
+            compact('kelas')
+
+        );
+
+    }
+
+
+
+
+
+
+
 
     /**
-     * Show the form for creating a new resource.
+     * Form tambah kelas
      */
+    public function create()
+    {
 
-public function create()
-{
-    $jurusans = Jurusan::orderBy('nama_jurusan')->get();
 
-    return view('admin.kelas.create', compact('jurusans'));
-}
+        $jurusans = Jurusan::orderBy(
+            'nama_jurusan'
+        )
+        ->get();
+
+
+
+        return view(
+
+            'admin.kelas.create',
+
+            compact('jurusans')
+
+        );
+
+
+    }
+
+
+
+
+
+
+
+
 
     /**
-     * Store a newly created resource in storage.
+     * Simpan kelas baru
      */
     public function store(Request $request)
-{
-    $request->validate([
-        'nama_kelas' => 'required',
-        'jurusan_id' => 'nullable|exists:jurusans,id'
-    ]);
-
-    Kelas::create([
-        'nama_kelas' => $request->nama_kelas,
-        'jurusan_id' => $request->jurusan_id
-    ]);
-
-    return redirect()
-        ->route('kelas.index')
-        ->with('success', 'Data kelas berhasil ditambahkan.');
-}   
-
-    public function export()
     {
-        return Excel::download(
-            new KelasExport(),
-            'kelas.xlsx'
-        );
+
+
+        $request->validate([
+
+
+            'nama_kelas' => [
+                'required',
+                'string',
+                'max:255'
+            ],
+
+
+
+            'jurusan_id' => [
+                'nullable',
+                'exists:jurusans,id'
+            ]
+
+
+        ]);
+
+
+
+
+
+
+
+        Kelas::create([
+
+
+            'nama_kelas'
+            =>
+            $request->nama_kelas,
+
+
+
+            'jurusan_id'
+            =>
+            $request->jurusan_id ?: null
+
+
+        ]);
+
+
+
+
+
+
+
+        return redirect()
+
+            ->route('kelas.index')
+
+            ->with(
+
+                'success',
+
+                'Data kelas berhasil ditambahkan.'
+
+            );
+
+
     }
 
+
+
+
+
+
+
+
+
     /**
-     * Display the specified resource.
+     * Detail kelas
      */
-    public function show(string $id)
+    public function show($id)
     {
-        //
+
+
+        $kelas = Kelas::with([
+
+            'jurusan',
+
+            'siswa'
+
+        ])
+        ->findOrFail($id);
+
+
+
+
+        return view(
+
+            'admin.kelas.show',
+
+            compact('kelas')
+
+        );
+
+
     }
 
+
+
+
+
+
+
+
+
     /**
-     * Show the form for editing the specified resource.
+     * Form edit kelas
      */
     public function edit($id)
-{
-    $kelas = Kelas::findOrFail($id);
-    $jurusans = Jurusan::all();
+    {
 
-    return view('admin.kelas.edit', compact('kelas', 'jurusans'));
-}
+
+        $kelas = Kelas::findOrFail($id);
+
+
+
+        $jurusans = Jurusan::orderBy(
+            'nama_jurusan'
+        )
+        ->get();
+
+
+
+
+
+        return view(
+
+            'admin.kelas.edit',
+
+            compact(
+
+                'kelas',
+
+                'jurusans'
+
+            )
+
+        );
+
+
+    }
+
+
+
+
+
+
+
 
 
     /**
-     * Update the specified resource in storage.
+     * Update kelas
      */
-   public function update(Request $request, $id)
-{
-   $request->validate([
-    'nama_kelas' => 'required',
-    'jurusan_id' => 'nullable'
-]);
-    $kelas = Kelas::findOrFail($id);
+    public function update(Request $request, $id)
+    {
 
-    $kelas->update([
-        'nama_kelas' => $request->nama_kelas,
-        'jurusan_id' => $request->jurusan_id
-    ]);
 
-    return redirect()
-        ->route('kelas.index')
-        ->with('success', 'Data kelas berhasil diupdate');
-}
+        $request->validate([
+
+
+            'nama_kelas' => [
+                'required',
+                'string',
+                'max:255'
+            ],
+
+
+
+            'jurusan_id' => [
+                'nullable',
+                'exists:jurusans,id'
+            ]
+
+
+        ]);
+
+
+
+
+
+
+
+        $kelas = Kelas::findOrFail($id);
+
+
+
+
+
+        $kelas->update([
+
+
+            'nama_kelas'
+            =>
+            $request->nama_kelas,
+
+
+
+            'jurusan_id'
+            =>
+            $request->jurusan_id ?: null
+
+
+        ]);
+
+
+
+
+
+
+
+
+        return redirect()
+
+            ->route('kelas.index')
+
+            ->with(
+
+                'success',
+
+                'Data kelas berhasil diperbarui.'
+
+            );
+
+
+    }
+
+
+
+
+
+
+
+
 
     /**
-     * Remove the specified resource from storage.
+     * Hapus kelas
      */
-   public function destroy($id)
-{
-    $kelas = Kelas::findOrFail($id);
+    public function destroy($id)
+    {
 
-    $kelas->delete();
 
-    return redirect()
-        ->route('kelas.index')
-        ->with('success', 'Data kelas berhasil dihapus');
-}
+        $kelas = Kelas::findOrFail($id);
 
-public function import(Request $request)
-{
-    $request->validate([
-        'file' => 'required|mimes:xlsx,xls'
-    ]);
 
-    Excel::import(
-        new KelasImport,
-        $request->file('file')
-    );
 
-    return redirect()
-        ->route('kelas.index')
-        ->with('success', 'Data kelas berhasil diimport');
-}
+        $kelas->delete();
+
+
+
+
+
+        return redirect()
+
+            ->route('kelas.index')
+
+            ->with(
+
+                'success',
+
+                'Data kelas berhasil dihapus.'
+
+            );
+
+
+    }
+
+
+
+
+
+
+
+
+
+    /**
+     * Export Excel
+     */
+    public function export()
+    {
+
+
+        return Excel::download(
+
+            new KelasExport(),
+
+            'kelas.xlsx'
+
+        );
+
+
+    }
+
+
+
+
+
+
+
+
+
+    /**
+     * Import Excel
+     */
+    public function import(Request $request)
+    {
+
+
+        $request->validate([
+
+
+            'file' => [
+
+                'required',
+
+                'mimes:xlsx,xls'
+
+            ]
+
+
+        ]);
+
+
+
+
+
+
+
+        Excel::import(
+
+            new KelasImport,
+
+            $request->file('file')
+
+        );
+
+
+
+
+
+
+
+        return redirect()
+
+            ->route('kelas.index')
+
+            ->with(
+
+                'success',
+
+                'Data kelas berhasil diimport.'
+
+            );
+
+
+    }
+
+
 }

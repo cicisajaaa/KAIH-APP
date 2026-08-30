@@ -186,14 +186,11 @@ else
     ]);
 
 
-
     $diupdate++;
 
 
 }
     }
-
-
 
 
 
@@ -398,68 +395,47 @@ public function resetSemuaPassword()
         'role',
         'orang_tua'
     )
-    ->with(
-        'orangTua.siswa'
-    )
+    ->with('orangTua.siswa')
     ->get();
 
 
-    $berhasil = 0;
+    $jumlah = 0;
 
 
     foreach($users as $user)
     {
 
-
         $nis = optional($user->orangTua)
             ->siswa
-            ->nis ?? null;
+            ->nis;
 
 
-
-        if(!$nis)
+        if($nis)
         {
-            continue;
+
+            $user->update([
+
+                'password'=>Hash::make(
+                    'Kaih#'.$nis
+                ),
+
+                'must_change_password'=>true
+
+            ]);
+
+
+            $jumlah++;
+
         }
-
-
-
-        $user->update([
-
-
-            'password'
-            =>
-            Hash::make(
-                'Kaih#'.$nis
-            ),
-
-
-            'must_change_password'
-            =>
-            true,
-
-
-        ]);
-
-
-
-        $berhasil++;
-
 
     }
 
 
-
-
-    return back()->with(
-
-        'success',
-
-        "Berhasil reset password {$berhasil} akun orang tua."
-
-    );
-
+    return back()
+        ->with(
+            'success',
+            "Berhasil reset {$jumlah} akun orang tua."
+        );
 
 }
-
 }

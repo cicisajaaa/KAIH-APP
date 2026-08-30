@@ -166,36 +166,25 @@ $orangTua = Auth::user()
 
 
 
+$request->validate([
 
-        $request->validate([
+    'tanggal'=>'required|date',
 
+    'sholat_subuh'=>'nullable|boolean',
+    'sholat_dzuhur'=>'nullable|boolean',
+    'sholat_ashar'=>'nullable|boolean',
+    'sholat_magrib'=>'nullable|boolean',
+    'sholat_isya'=>'nullable|boolean',
 
-            'tanggal'
-            =>
-            'required|date',
+    'belajar'=>'nullable|boolean',
 
+    'bangun_pagi'=>'nullable',
 
-            'belajar'
-            =>
+    'tidur_malam'=>'nullable',
 
-            'nullable|boolean',
-            'bangun_pagi'
-            =>
-            'nullable',
+    'kegiatan_membantu'=>'nullable|string',
 
-
-            'tidur_malam'
-            =>
-            'nullable',
-
-
-            'kegiatan_membantu'
-            =>
-            'nullable|string',
-
-
-        ]);
-
+]);
 
 
 
@@ -213,34 +202,32 @@ $orangTua = Auth::user()
 
 
 
-        if($tanggal->gt($hariIni))
-        {
+if($tanggal->gt($hariIni))
+{
 
-            return back()
-                ->with(
-                    'error',
-                    'Tanggal tidak boleh lebih dari hari ini.'
-                );
+    return back()
+        ->withInput()
+        ->with(
+            'error',
+            'Tanggal tidak boleh lebih dari hari ini.'
+        );
 
-        }
-
-
-
+}
 
 
-        if($tanggal->lt(
-            $hariIni->copy()->subDay()
-        ))
-        {
+if($tanggal->lt(
+    $hariIni->copy()->subDay()
+))
+{
 
-            return back()
-                ->with(
-                    'error',
-                    'Pengisian maksimal satu hari sebelumnya.'
-                );
+    return back()
+        ->withInput()
+        ->with(
+            'error',
+            'Pengisian maksimal satu hari sebelumnya.'
+        );
 
-        }
-
+}
 
 
 
@@ -261,16 +248,17 @@ $orangTua = Auth::user()
 
 
 
-        if($cek)
-        {
+if($cek)
+{
 
-            return back()
-                ->with(
-                    'error',
-                    'Angket tanggal tersebut sudah ada.'
-                );
+    return back()
+        ->withInput()
+        ->with(
+            'error',
+            'Angket tanggal tersebut sudah ada.'
+        );
 
-        }
+}
 
 
 
@@ -475,15 +463,17 @@ $orangTua = Auth::user()
 
 
         }
-        catch(\Exception $e)
-        {
+catch(\Exception $e)
+{
 
+    return back()
+        ->withInput()
+        ->with(
+            'error',
+            'Terjadi kesalahan saat menyimpan angket.'
+        );
 
-            dd($e->getMessage());
-
-
-        }
-
+}
 
 
 

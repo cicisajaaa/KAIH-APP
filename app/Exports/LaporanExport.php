@@ -42,7 +42,7 @@ class LaporanExport implements
 
     protected $kategori;
 
-
+    protected $no = 0;
 
     public function __construct(
 
@@ -79,16 +79,53 @@ class LaporanExport implements
     {
 
 
-        $query = Siswa::with([
+$query = Siswa::with([
 
-            'kelas',
+    'kelas',
 
-            'orangTua',
+    'orangTua',
 
-            'angketHarian'
+    'angketHarian' => function($q){
 
-        ]);
+        if(
+            $this->tanggalMulai &&
+            $this->tanggalAkhir
+        ){
 
+            $q->whereBetween(
+                'tanggal',
+                [
+                    $this->tanggalMulai,
+                    $this->tanggalAkhir
+                ]
+            );
+
+        }
+
+
+        if($this->kategori)
+        {
+
+            $q->where(
+                'kategori',
+                $this->kategori
+            );
+
+        }
+
+
+        $q->orderBy(
+            'tanggal',
+            'desc'
+        )
+        ->orderBy(
+            'id',
+            'desc'
+        );
+
+    }
+
+]);
 
 
 
@@ -165,68 +202,15 @@ class LaporanExport implements
 
 
 
+public function map($siswa): array
+
+{
 
 
-    public function map($siswa): array
-
-    {
+    $this->no++;
 
 
-        static $no = 0;
-
-
-        $no++;
-
-
-
-
-
-        $angket = $siswa->angketHarian;
-
-
-
-
-
-
-        if(
-            $this->tanggalMulai &&
-            $this->tanggalAkhir
-        )
-
-        {
-
-            $angket = $angket->whereBetween(
-
-                'tanggal',
-
-                [
-
-                    $this->tanggalMulai,
-
-                    $this->tanggalAkhir
-
-                ]
-
-            );
-
-        }
-
-
-
-
-
-        if($this->kategori)
-        {
-
-            $angket = $angket->where(
-
-                'kategori',
-
-                $this->kategori
-
-            );
-
-        }
+    $angket = $siswa->angketHarian;
 
 
 
@@ -235,16 +219,17 @@ class LaporanExport implements
 
 
 
-        $terakhir = $angket
 
-            ->sortByDesc(
 
-                'tanggal'
+$terakhir = $angket
 
-            )
-
-            ->first();
-
+    ->sortByDesc(
+        'tanggal'
+    )
+    ->sortByDesc(
+        'id'
+    )
+    ->first();
 
 
 
@@ -259,10 +244,9 @@ class LaporanExport implements
 
 
 
-        return [
+     return [
 
-
-            $no,
+    $this->no,
 
 
             $siswa->nama_siswa,

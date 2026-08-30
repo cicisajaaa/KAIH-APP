@@ -14,7 +14,7 @@ use Illuminate\Http\Request;
 
 use App\Exports\LaporanExport;
 use Maatwebsite\Excel\Facades\Excel;
-
+use Barryvdh\DomPDF\Facade\Pdf;
 use Carbon\Carbon;
 
 
@@ -105,10 +105,14 @@ $siswaQuery = Siswa::with([
         }
 
 
-        $query->orderBy(
-            'tanggal',
-            'desc'
-        );
+$query->orderBy(
+    'tanggal',
+    'desc'
+)
+->orderBy(
+    'id',
+    'desc'
+);
 
 
     }
@@ -257,15 +261,17 @@ $siswa->angketTelat = $siswa
 
 
 
+$angketHarian = $angketQuery
 
-        $angketHarian = $angketQuery
-
-            ->orderBy(
-                'tanggal',
-                'desc'
-            )
-
-            ->get();
+    ->orderBy(
+        'tanggal',
+        'desc'
+    )
+    ->orderBy(
+        'id',
+        'desc'
+    )
+    ->get();
 
 
 
@@ -462,7 +468,16 @@ $jumlahPendampingan = $angketPeriode
 
         $totalAngket = $angketPeriode->count();
 
+$persentaseBaik = 0;
 
+if($totalAngket > 0)
+{
+
+    $persentaseBaik = round(
+        ($jumlahBaik / $totalAngket) * 100
+    );
+
+}
 
 
 
@@ -541,6 +556,7 @@ $jumlahPendampingan = $angketPeriode
 
                 'persentasePengisian',
 
+                'persentaseBaik',
 
                 'totalOrangTua',
 
@@ -600,4 +616,120 @@ public function export(Request $request)
 
 }
 
+
+public function pdf(Request $request)
+{
+
+    $query = AngketHarian::with([
+
+        'siswa.kelas',
+
+        'orangTua'
+
+    ]);
+
+
+
+    if(
+        $request->tanggal_mulai &&
+        $request->tanggal_selesai
+    )
+    {
+
+        $query->whereBetween(
+
+            'tanggal',
+
+            [
+
+                $request->tanggal_mulai,
+
+                $request->tanggal_selesai
+
+            ]
+
+        );
+
+    }
+
+
+
+
+    if($request->kelas_id)
+    {
+
+        $query->whereHas(
+
+            'siswa',
+
+            function($q) use($request){
+
+                $q->where(
+                    'kelas_id',
+                    $request->kelas_id
+                );
+
+            }
+
+        );
+
+    }
+
+
+
+
+    if($request->kategori)
+    {
+
+        $query->where(
+            'kategori',
+            $request->kategori
+        );
+
+    }
+
+
+
+
+$angket = $query
+
+    ->orderBy(
+        'tanggal',
+        'desc'
+    )
+    ->orderBy(
+        'id',
+        'desc'
+    )
+    ->get();
+
+
+
+
+
+
+    $pdf = Pdf::loadView(
+
+        'admin.laporan.pdf',
+
+        [
+
+            'angket'=>$angket,
+
+'tanggalMulai'=>$request->tanggal_mulai,
+
+'tanggalAkhir'=>$request->tanggal_selesai
+        ]
+
+    );
+
+
+
+
+
+    return $pdf->download(
+        'laporan-monitoring-angket.pdf'
+    );
+
+}
 }

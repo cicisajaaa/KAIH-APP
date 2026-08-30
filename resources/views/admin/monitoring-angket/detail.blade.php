@@ -16,114 +16,38 @@
 
 @php
 
-
 $terakhir = $siswa->angketHarian->first();
 
-
-$totalAngket = $siswa->angketHarian->count();
-
-
-
-$totalBelajar = $siswa->angketHarian
-    ->where('belajar',true)
-    ->count();
-
-
-
-$persenBelajar = $totalAngket > 0
-    ? round(($totalBelajar/$totalAngket)*100)
-    : 0;
-
-
-
-
-
-$totalIbadah = 0;
-
-
-foreach($siswa->angketHarian as $item)
-{
-
-    $totalIbadah +=
-
-    $item->sholat_subuh +
-    $item->sholat_dzuhur +
-    $item->sholat_ashar +
-    $item->sholat_magrib +
-    $item->sholat_isya;
-
-}
-
-
-
-
-$persenIbadah = $totalAngket > 0
-
-    ? round(($totalIbadah/($totalAngket*5))*100)
-
-    : 0;
-
-
-
-
-
-
-/*
-|--------------------------------------------------------------------------
-| DATA GRAFIK
-|--------------------------------------------------------------------------
-*/
-
-
 $grafikData = $siswa->angketHarian
-
     ->whereNotNull('skor')
-
-    ->where('skor','>',0)
-
-    ->sortBy('tanggal');
-
-
-
+    ->sortBy('tanggal')
+    ->sortBy('id')
+    ->values();
 
 
 $grafikTanggal = $grafikData
-
     ->pluck('tanggal')
-
     ->map(function($tanggal){
 
         return \Carbon\Carbon::parse($tanggal)
             ->format('d M Y');
 
     })
-
     ->values();
 
 
 
-
-
 $grafikSkor = $grafikData
-
     ->pluck('skor')
-
     ->map(function($skor){
 
         return (int)$skor;
 
     })
-
     ->values();
 
 
-
 @endphp
-
-
-
-
-
 
 
 {{-- PROFIL --}}
@@ -191,7 +115,7 @@ Kelas : {{ $siswa->kelas->nama_kelas ?? '-' }}
 <p class="text-sm text-gray-500">
 
 Orang Tua :
-{{ $siswa->orangTua->first()->nama_orang_tua ?? '-' }}
+{{ optional($siswa->orangTua->first())->nama_orang_tua ?? '-' }}
 
 </p>
 
@@ -272,7 +196,7 @@ Skor
 
 <p class="text-3xl font-bold text-indigo-600">
 
-{{ $terakhir->skor ?? 0 }}
+{{ $skorTerakhir ?? 0 }}
 
 <span class="text-sm text-gray-400">
 
@@ -298,6 +222,7 @@ Kategori
 
 </p>
 
+@if($kategoriTerakhir == 'Baik')
 
 <span class="
 inline-block
@@ -309,13 +234,47 @@ text-xs
 bg-green-100
 text-green-700
 ">
-
-
-{{ $terakhir->kategori ?? '-' }}
-
-
+Baik
 </span>
 
+
+@elseif($kategoriTerakhir == 'Perlu Perhatian')
+
+<span class="
+inline-block
+mt-2
+px-3
+py-1
+rounded-full
+text-xs
+bg-yellow-100
+text-yellow-700
+">
+Perlu Perhatian
+</span>
+
+
+@elseif($kategoriTerakhir == 'Perlu Pendampingan')
+
+<span class="
+inline-block
+mt-2
+px-3
+py-1
+rounded-full
+text-xs
+bg-red-100
+text-red-700
+">
+Perlu Pendampingan
+</span>
+
+
+@else
+
+-
+
+@endif
 
 </div>
 
@@ -335,15 +294,21 @@ Tanggal
 
 <p class="font-semibold text-sm mt-2">
 
-{{ \Carbon\Carbon::parse($terakhir->tanggal)->format('d M Y') }}
+{{ $terakhir ? \Carbon\Carbon::parse($terakhir->tanggal)->format('d M Y') : '-' }}
 
 </p>
 
 
 </div>
 
-
 </div>
+
+
+@else
+
+<p class="text-gray-500 text-sm">
+Belum ada data angket siswa.
+</p>
 
 
 @endif
@@ -436,7 +401,7 @@ Konsistensi Belajar
 
 <p class="text-2xl font-bold text-green-600 mt-2">
 
-{{ $persenBelajar }}%
+{{ $persentaseBelajar }}%
 
 </p>
 
@@ -456,7 +421,7 @@ Kepatuhan Ibadah
 
 <p class="text-2xl font-bold text-blue-600 mt-2">
 
-{{ $persenIbadah }}%
+{{ $persentaseIbadah }}%
 
 </p>
 
@@ -620,6 +585,8 @@ Riwayat Aktivitas
 <div class="space-y-4">
 
 
+@if($siswa->angketHarian->count())
+
 
 @foreach($siswa->angketHarian as $item)
 
@@ -769,6 +736,14 @@ Tidur
 
 
 @endforeach
+
+@else
+
+<p class="text-center text-gray-500 py-5">
+Belum ada riwayat aktivitas.
+</p>
+
+@endif
 
 
 

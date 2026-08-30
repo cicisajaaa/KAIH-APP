@@ -613,13 +613,11 @@ Aksi
 
 @foreach($siswas as $siswa)
 
-
-
 @php
 
 $angket = $siswa->angketHarian->first();
 
-$sudahMengisi = $angket ? true : false;
+$sudahMengisi = $angket !== null;
 
 $wali = $siswa->orangTua->first();
 
@@ -779,13 +777,23 @@ Pendampingan
 
 
 <td class="px-6 py-4">
+
+    
 @if($sudahMengisi)
+
+
+@if(
+    \Carbon\Carbon::parse($angket->tanggal)
+    ->format('Y-m-d')
+    ==
+    \Carbon\Carbon::parse($angket->tanggal_pengisian)
+    ->format('Y-m-d')
+)
 
 
 <span class="
 inline-flex
 items-center
-whitespace-nowrap
 px-3
 py-1.5
 rounded-full
@@ -795,10 +803,9 @@ bg-green-100
 text-green-700
 ">
 
-✓ Sudah Isi
+✓ Tepat Waktu
 
 </span>
-
 
 
 @else
@@ -807,7 +814,6 @@ text-green-700
 <span class="
 inline-flex
 items-center
-whitespace-nowrap
 px-3
 py-1.5
 rounded-full
@@ -817,14 +823,36 @@ bg-yellow-100
 text-yellow-700
 ">
 
-⚠ Belum Isi
+⚠ Telat Isi
 
 </span>
 
 
-
 @endif
 
+
+
+@else
+
+
+<span class="
+inline-flex
+items-center
+px-3
+py-1.5
+rounded-full
+text-xs
+font-semibold
+bg-gray-100
+text-gray-600
+">
+
+Belum Isi
+
+</span>
+
+
+@endif
 
 </td>
 

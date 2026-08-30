@@ -210,7 +210,43 @@ action="{{ route('orangtua.angket.store') }}"
 method="POST"
 
 >
+@if(session('success'))
 
+<div class="
+bg-green-50
+border
+border-green-200
+text-green-700
+rounded-xl
+p-4
+mb-5
+">
+
+{{ session('success') }}
+
+</div>
+
+@endif
+
+
+
+@if(session('error'))
+
+<div class="
+bg-red-50
+border
+border-red-200
+text-red-700
+rounded-xl
+p-4
+mb-5
+">
+
+{{ session('error') }}
+
+</div>
+
+@endif
 
 @csrf
 

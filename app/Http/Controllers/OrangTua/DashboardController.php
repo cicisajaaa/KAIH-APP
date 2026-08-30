@@ -2,12 +2,13 @@
 
 namespace App\Http\Controllers\OrangTua;
 
-
 use App\Http\Controllers\Controller;
 
 use Illuminate\Support\Facades\Auth;
 
 use App\Models\AngketHarian;
+
+use App\Services\AngketService;
 
 use Carbon\Carbon;
 
@@ -17,7 +18,7 @@ class DashboardController extends Controller
 {
 
 
-    public function index()
+    public function index(AngketService $service)
     {
 
 
@@ -26,10 +27,9 @@ class DashboardController extends Controller
 
 
 
-
         /*
         |--------------------------------------------------------------------------
-        | Validasi Role
+        | Validasi User
         |--------------------------------------------------------------------------
         */
 
@@ -37,8 +37,7 @@ class DashboardController extends Controller
         if(
             !$user ||
             $user->role !== 'orang_tua'
-        )
-        {
+        ){
 
             abort(403);
 
@@ -56,20 +55,22 @@ class DashboardController extends Controller
         |--------------------------------------------------------------------------
         */
 
-$orangTua = $user->orangTua()
-->with([
-    'siswa.kelas.jurusan',
-    'siswa.angketHarian'
-])
-->first();
+
+        $orangTua = $user->orangTua()
+            ->with([
+                'siswa.kelas.jurusan',
+                'siswa.angketHarian'
+            ])
+            ->first();
 
 
 
 
 
-
-        if(!$orangTua || !$orangTua->siswa)
-        {
+        if(
+            !$orangTua ||
+            !$orangTua->siswa
+        ){
 
             abort(
                 403,
@@ -101,25 +102,14 @@ $orangTua = $user->orangTua()
 
 
         $angketHariIni = AngketHarian::where(
-
                 'siswa_id',
-
                 $siswa->id
-
             )
-
             ->whereDate(
-
                 'tanggal',
-
                 Carbon::today()
-
             )
-
             ->first();
-
-
-
 
 
 
@@ -128,10 +118,7 @@ $orangTua = $user->orangTua()
 
         $jumlahIbadahHariIni = 0;
 
-
         $statusBelajarHariIni = false;
-
-
 
 
 
@@ -139,28 +126,22 @@ $orangTua = $user->orangTua()
         if($angketHariIni)
         {
 
+$jumlahIbadahHariIni =
 
-            $jumlahIbadahHariIni =
+    ($angketHariIni->sholat_subuh ? 1 : 0) +
 
+    ($angketHariIni->sholat_dzuhur ? 1 : 0) +
 
-                $angketHariIni->sholat_subuh +
+    ($angketHariIni->sholat_ashar ? 1 : 0) +
 
-                $angketHariIni->sholat_dzuhur +
+    ($angketHariIni->sholat_magrib ? 1 : 0) +
 
-                $angketHariIni->sholat_ashar +
-
-                $angketHariIni->sholat_magrib +
-
-                $angketHariIni->sholat_isya;
-
-
+    ($angketHariIni->sholat_isya ? 1 : 0);
 
 
 
             $statusBelajarHariIni =
-
                 $angketHariIni->belajar;
-
 
 
         }
@@ -175,35 +156,26 @@ $orangTua = $user->orangTua()
 
         /*
         |--------------------------------------------------------------------------
-        | Riwayat Angket
+        | Semua Riwayat Angket
         |--------------------------------------------------------------------------
         */
 
-$riwayatAngket = AngketHarian::where(
 
-        'siswa_id',
+        $riwayatAngket = AngketHarian::where(
+                'siswa_id',
+                $siswa->id
+            )
+            ->orderBy(
+                'tanggal',
+                'desc'
+            )
+            ->orderBy(
+                'id',
+                'desc'
+            )
+            ->get();
 
-        $siswa->id
 
-    )
-
-    ->orderBy(
-
-        'tanggal',
-
-        'desc'
-
-    )
-
-    ->orderBy(
-
-        'id',
-
-        'desc'
-
-    )
-
-    ->get();
 
 
 
@@ -213,7 +185,7 @@ $riwayatAngket = AngketHarian::where(
 
         /*
         |--------------------------------------------------------------------------
-        | Statistik Perkembangan
+        | Statistik Belajar
         |--------------------------------------------------------------------------
         */
 
@@ -222,13 +194,12 @@ $riwayatAngket = AngketHarian::where(
 
 
 
-$totalBelajar = $riwayatAngket
-    ->where(
-        'belajar',
-        1
-    )
-    ->count();
-
+        $totalBelajar = $riwayatAngket
+            ->where(
+                'belajar',
+                1
+            )
+            ->count();
 
 
 
@@ -239,7 +210,7 @@ $totalBelajar = $riwayatAngket
             ?
 
             round(
-                ($totalBelajar/$totalHari)*100
+                ($totalBelajar / $totalHari) * 100
             )
 
             :
@@ -253,6 +224,14 @@ $totalBelajar = $riwayatAngket
 
 
 
+
+        /*
+        |--------------------------------------------------------------------------
+        | Statistik Ibadah
+        |--------------------------------------------------------------------------
+        */
+
+
         $totalIbadah = 0;
 
 
@@ -260,19 +239,17 @@ $totalBelajar = $riwayatAngket
         foreach($riwayatAngket as $item)
         {
 
+$totalIbadah +=
 
-            $totalIbadah +=
+    ($item->sholat_subuh ? 1 : 0) +
 
+    ($item->sholat_dzuhur ? 1 : 0) +
 
-                $item->sholat_subuh +
+    ($item->sholat_ashar ? 1 : 0) +
 
-                $item->sholat_dzuhur +
+    ($item->sholat_magrib ? 1 : 0) +
 
-                $item->sholat_ashar +
-
-                $item->sholat_magrib +
-
-                $item->sholat_isya;
+    ($item->sholat_isya ? 1 : 0);
 
 
         }
@@ -287,9 +264,7 @@ $totalBelajar = $riwayatAngket
             ?
 
             round(
-
-                ($totalIbadah / ($totalHari*5))*100
-
+                ($totalIbadah / ($totalHari * 5)) * 100
             )
 
             :
@@ -316,75 +291,73 @@ $totalBelajar = $riwayatAngket
 
 
 
-
         $skorTerakhir =
-
-            $angketTerakhir->skor ?? 0;
-
+            $angketTerakhir?->skor ?? 0;
 
 
 
 
         $kategoriTerakhir =
-
-            $angketTerakhir->kategori ?? '-';
-
-$statusKondisi = $kategoriTerakhir;
-
-$rincianSkor = [
-
-    'Subuh' => 
-        $angketTerakhir && $angketTerakhir->sholat_subuh 
-        ? 10 : 0,
+            $angketTerakhir?->kategori ?? '-';
 
 
-    'Dzuhur' => 
-        $angketTerakhir && $angketTerakhir->sholat_dzuhur 
-        ? 10 : 0,
 
 
-    'Ashar' => 
-        $angketTerakhir && $angketTerakhir->sholat_ashar 
-        ? 10 : 0,
+        $statusKondisi =
+            $kategoriTerakhir;
 
 
-    'Magrib' => 
-        $angketTerakhir && $angketTerakhir->sholat_magrib 
-        ? 10 : 0,
 
 
-    'Isya' => 
-        $angketTerakhir && $angketTerakhir->sholat_isya 
-        ? 10 : 0,
 
 
-    'Belajar' => 
-        $angketTerakhir && $angketTerakhir->belajar 
-        ? 20 : 0,
 
 
-'Bangun Pagi' => 
-    $angketTerakhir && $angketTerakhir->bangun_pagi
-    ? (
-        \Carbon\Carbon::parse($angketTerakhir->bangun_pagi)->hour >= 4 &&
-        \Carbon\Carbon::parse($angketTerakhir->bangun_pagi)->hour <= 5
-        ? 15
-        : 10
-    )
-    : 0,
+
+        /*
+        |--------------------------------------------------------------------------
+        | Detail Skor
+        |--------------------------------------------------------------------------
+        */
+
+$rincianSkor = $service->rincianSkor([
 
 
-'Tidur Malam' => 
-    $angketTerakhir && $angketTerakhir->tidur_malam
-    ? (
-        \Carbon\Carbon::parse($angketTerakhir->tidur_malam)->hour >= 20 &&
-        \Carbon\Carbon::parse($angketTerakhir->tidur_malam)->hour <= 21
-        ? 15
-        : 10
-    )
-    : 0,
+    'sholat_subuh' =>
+        $angketTerakhir?->sholat_subuh ?? false,
 
-];
+
+    'sholat_dzuhur' =>
+        $angketTerakhir?->sholat_dzuhur ?? false,
+
+
+    'sholat_ashar' =>
+        $angketTerakhir?->sholat_ashar ?? false,
+
+
+    'sholat_magrib' =>
+        $angketTerakhir?->sholat_magrib ?? false,
+
+
+    'sholat_isya' =>
+        $angketTerakhir?->sholat_isya ?? false,
+
+
+    'belajar' =>
+        $angketTerakhir?->belajar ?? false,
+
+
+    'bangun_pagi' =>
+        $angketTerakhir?->bangun_pagi,
+
+
+    'tidur_malam' =>
+        $angketTerakhir?->tidur_malam,
+
+]);
+
+
+
 
 
 
@@ -397,9 +370,8 @@ $rincianSkor = [
         */
 
 
-        $riwayatTerbaru = $riwayatAngket
-
-            ->take(5);
+        $riwayatTerbaru =
+            $riwayatAngket->take(5);
 
 
 
@@ -414,76 +386,54 @@ $rincianSkor = [
         | Grafik 7 Hari
         |--------------------------------------------------------------------------
         */
- $grafikTanggal = [];
-
-$grafikSkor = [];
-
-$grafikIbadah = [];
 
 
+        $grafikTanggal = [];
 
+        $grafikSkor = [];
 
+        $grafikIbadah = [];
 
 
 
-        for($i = 6; $i >=0; $i--)
+
+
+
+        for($i = 6; $i >= 0; $i--)
         {
 
 
-            $tanggal = Carbon::today()
-
+            $tanggal =
+                Carbon::today()
                 ->subDays($i);
 
 
 
 
 
-
             $data = AngketHarian::where(
-
                     'siswa_id',
-
                     $siswa->id
-
                 )
-
                 ->whereDate(
-
                     'tanggal',
-
                     $tanggal
-
                 )
-
                 ->first();
 
 
 
 
 
-
-
             $grafikTanggal[] =
-
                 $tanggal->format('d M');
 
 
 
 
 
-
-
 $grafikSkor[] =
-
-    $data
-
-    ?
-
-    $data->skor
-
-    :
-
-    0;
+    $data?->skor ?? 0;
 
 
 
@@ -493,41 +443,31 @@ $grafikSkor[] =
             if($data)
             {
 
+$ibadah =
 
-                $ibadah =
+($data->sholat_subuh ? 1 : 0) +
 
+($data->sholat_dzuhur ? 1 : 0) +
 
-                    $data->sholat_subuh +
+($data->sholat_ashar ? 1 : 0) +
 
-                    $data->sholat_dzuhur +
+($data->sholat_magrib ? 1 : 0) +
 
-                    $data->sholat_ashar +
-
-                    $data->sholat_magrib +
-
-                    $data->sholat_isya;
-
-
+($data->sholat_isya ? 1 : 0);
 
 
 
                 $grafikIbadah[] =
-
-                    ($ibadah/5)*100;
-
+                    ($ibadah / 5) * 100;
 
 
             }
-
             else
             {
 
-
                 $grafikIbadah[] = 0;
 
-
             }
-
 
 
         }
@@ -558,27 +498,23 @@ $grafikSkor[] =
 
                 'statusBelajarHariIni',
 
-
                 'persentaseBelajar',
 
                 'persentaseIbadah',
-
 
                 'skorTerakhir',
 
                 'kategoriTerakhir',
 
-
                 'rincianSkor',
-                
+
                 'riwayatTerbaru',
 
-'grafikTanggal',
+                'grafikTanggal',
 
-'grafikSkor',
+                'grafikSkor',
 
-'grafikIbadah'
-
+                'grafikIbadah'
 
             )
 

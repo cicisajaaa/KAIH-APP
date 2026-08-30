@@ -2,49 +2,149 @@
 
 namespace App\Imports;
 
+
 use App\Models\Kelas;
 use App\Models\Jurusan;
+
+
 use Maatwebsite\Excel\Concerns\ToModel;
 use Maatwebsite\Excel\Concerns\WithHeadingRow;
 
+
+
 class KelasImport implements ToModel, WithHeadingRow
 {
+
+
     public function model(array $row)
     {
-        // Lewati baris kosong
-        if (empty($row['nama_kelas'])) {
+
+
+        /*
+        |--------------------------------------------------------------------------
+        | Lewati baris kosong
+        |--------------------------------------------------------------------------
+        */
+
+        if(empty($row['nama_kelas']))
+        {
+
             return null;
+
         }
 
 
-        // Cari jurusan berdasarkan kode
-        $jurusan = Jurusan::where(
-            'kode_jurusan',
-            $row['kode_jurusan'] ?? null
-        )->first();
 
 
-        // Jika jurusan tidak ditemukan
-        // jangan masukkan kelas
-        if (!$jurusan) {
-            return null;
-        }
 
 
-        // Cek kelas sudah ada
-        $kelas = Kelas::where('nama_kelas', $row['nama_kelas'])
-            ->where('jurusan_id', $jurusan->id)
+
+
+        /*
+        |--------------------------------------------------------------------------
+        | Cari jurusan jika tersedia
+        |--------------------------------------------------------------------------
+        */
+
+
+        $jurusan = null;
+
+
+
+        if(
+            !empty($row['kode_jurusan'])
+        )
+        {
+
+
+            $jurusan = Jurusan::where(
+
+                'kode_jurusan',
+
+                $row['kode_jurusan']
+
+            )
             ->first();
 
 
-        if ($kelas) {
-            return null;
         }
 
 
+
+
+
+
+
+
+        /*
+        |--------------------------------------------------------------------------
+        | Cek kelas sudah ada
+        |--------------------------------------------------------------------------
+        */
+
+
+        $kelas = Kelas::where(
+
+            'nama_kelas',
+
+            $row['nama_kelas']
+
+        )
+        ->first();
+
+
+
+
+
+
+
+        if($kelas)
+        {
+
+            return null;
+
+        }
+
+
+
+
+
+
+
+
+
+        /*
+        |--------------------------------------------------------------------------
+        | Simpan kelas
+        |--------------------------------------------------------------------------
+        |
+        | Jurusan boleh kosong
+        |
+        */
+
+
         return new Kelas([
-            'nama_kelas' => $row['nama_kelas'],
-            'jurusan_id' => $jurusan->id,
+
+
+            'nama_kelas'
+            =>
+            trim(
+                $row['nama_kelas']
+            ),
+
+
+
+            'jurusan_id'
+            =>
+            $jurusan?->id
+
+
+
         ]);
+
+
+
     }
+
+
 }

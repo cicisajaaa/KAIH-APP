@@ -36,7 +36,7 @@ use App\Http\Controllers\OrangTua\RiwayatAngketController;
 
 Route::get('/', function () {
 
-    return view('welcome');
+    return redirect()->route('login');
 
 });
 
@@ -194,7 +194,14 @@ Route::middleware([
     )
     ->name('laporan.export');
 
-
+Route::get(
+    '/laporan/pdf',
+    [
+        LaporanController::class,
+        'pdf'
+    ]
+)
+->name('laporan.pdf');
 
 /*
 |--------------------------------------------------------------------------
