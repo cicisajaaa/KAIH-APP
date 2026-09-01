@@ -91,9 +91,10 @@ class AngketService
         {
 
 
-            $jam = Carbon::parse(
-                $data['bangun_pagi']
-            );
+        $jam = Carbon::createFromFormat(
+    'H:i',
+    $data['bangun_pagi']
+);
 
 
 
@@ -140,9 +141,10 @@ class AngketService
         {
 
 
-            $jam = Carbon::parse(
-                $data['tidur_malam']
-            );
+ $jam = Carbon::createFromFormat(
+    'H:i',
+    $data['tidur_malam']
+);
 
 
 

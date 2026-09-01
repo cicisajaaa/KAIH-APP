@@ -49,12 +49,17 @@ class OrangTuaController extends Controller
             $query->where(function($q) use ($search){
 
 
-                $q->where(
-                    'nama_orang_tua',
-                    'like',
-                    "%{$search}%"
-                )
+$q->where(
+    'nama_orang_tua',
+    'like',
+    "%{$search}%"
+)
 
+->orWhere(
+    'no_hp',
+    'like',
+    "%{$search}%"
+)
 
                 ->orWhereHas(
                     'siswa',

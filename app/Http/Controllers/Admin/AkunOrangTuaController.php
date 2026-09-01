@@ -22,174 +22,44 @@ class AkunOrangTuaController extends Controller
     /**
      * Generate akun orang tua
      */
-    public function generate()
+   public function generate()
+{
+
+    $siswas = Siswa::with('orangTua')
+        ->get();
+
+
+    $dibuat = 0;
+    $diupdate = 0;
+    $tidakAdaOrtu = 0;
+
+
+
+    foreach($siswas as $siswa)
     {
 
 
-        $siswas = Siswa::with('orangTua')
-            ->get();
-
-
-
-        $dibuat = 0;
-        $diupdate = 0;
-        $tidakAdaOrtu = 0;
-
-
-
-
-
-        foreach($siswas as $siswa)
-        {
-
-
-
-            /*
-            |--------------------------------------------------------------------------
-            | Ambil orang tua utama
-            |--------------------------------------------------------------------------
-            */
-
-
-            $orangTua = $siswa->orangTua
-                ->where('hubungan','Ayah')
-                ->first();
-
-
-
-            if(!$orangTua)
-            {
-
-                $orangTua = $siswa->orangTua->first();
-
-            }
-
-
-
-
-
-            if(!$orangTua)
-            {
-
-                $tidakAdaOrtu++;
-
-                continue;
-
-            }
-
-
-
-
-
-            /*
-            |--------------------------------------------------------------------------
-            | Password default
-            |--------------------------------------------------------------------------
-            */
-
-
-            $passwordDefault = 'Kaih#'.$siswa->nis;
-
-
-
-
-
-
-
-
-            /*
-            |--------------------------------------------------------------------------
-            | Cek akun
-            |--------------------------------------------------------------------------
-            */
-
-
-            $user = User::where(
-                'orang_tua_id',
-                $orangTua->id
-            )
+        $orangTua = $siswa->orangTua
+            ->where('hubungan','Ayah')
             ->first();
 
 
 
+        if(!$orangTua)
+        {
+
+            $orangTua = $siswa->orangTua->first();
+
+        }
 
 
 
+        if(!$orangTua)
+        {
 
+            $tidakAdaOrtu++;
 
-            if(!$user)
-            {
-
-
-                User::create([
-
-
-                    'name'
-                    =>
-                    $orangTua->nama_orang_tua,
-
-
-                    'email'
-                    =>
-                    $siswa->nis.'@kaih.com',
-
-
-                    'password'
-                    =>
-                    Hash::make($passwordDefault),
-
-
-                    'role'
-                    =>
-                    'orang_tua',
-
-
-                    'orang_tua_id'
-                    =>
-                    $orangTua->id,
-
-
-                    'must_change_password'
-                    =>
-                    true,
-
-
-                ]);
-
-
-
-                $dibuat++;
-
-
-
-            }
-            else
-            {
-
-
-                $user->update([
-
-
-                    'name'
-                    =>
-                    $orangTua->nama_orang_tua,
-
-
-                    'email'
-                    =>
-                    $siswa->nis.'@kaih.com',
-
-
-                ]);
-
-
-
-                $diupdate++;
-
-
-            }
-
-
+            continue;
 
         }
 
@@ -198,17 +68,81 @@ class AkunOrangTuaController extends Controller
 
 
 
+        $passwordDefault =
+            'Kaih#'.$siswa->nis;
 
-        return back()->with(
 
-            'success',
 
-            "Generate selesai. Dibuat: {$dibuat}, diperbarui: {$diupdate}, tanpa orang tua: {$tidakAdaOrtu}"
+
+
+
+
+        $user = User::updateOrCreate(
+
+            [
+
+                'orang_tua_id'=>$orangTua->id
+
+            ],
+
+
+            [
+
+                'name'=>$orangTua->nama_orang_tua,
+
+
+                'email'=>$siswa->nis.'@kaih.com',
+
+
+                'role'=>'orang_tua',
+
+
+                'password'=>Hash::make($passwordDefault),
+
+
+                'must_change_password'=>true
+
+
+            ]
 
         );
 
 
+
+
+
+
+
+        if($user->wasRecentlyCreated)
+        {
+
+            $dibuat++;
+
+        }
+        else
+        {
+
+            $diupdate++;
+
+        }
+
+
+
     }
+
+
+
+
+    return back()->with(
+
+        'success',
+
+        "Generate selesai. Dibuat: {$dibuat}, diperbarui: {$diupdate}, tanpa orang tua: {$tidakAdaOrtu}"
+
+    );
+
+
+}
 
 
 

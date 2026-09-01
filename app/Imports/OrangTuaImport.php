@@ -25,14 +25,43 @@ class OrangTuaImport implements ToCollection, WithHeadingRow
         {
 
 
+
+            /*
+            |--------------------------------------------------------------------------
+            | Ambil NIS
+            |--------------------------------------------------------------------------
+            */
+
+
             $nis = trim(
-                (string)($row['nis'] ?? '')
+                str_replace(
+                    '.0',
+                    '',
+                    (string)(
+                        $row['nis']
+                        ??
+                        ''
+                    )
+                )
             );
+
+
+
+
+
+
+            /*
+            |--------------------------------------------------------------------------
+            | Skip jika NIS kosong
+            |--------------------------------------------------------------------------
+            */
 
 
             if(!$nis)
             {
+
                 continue;
+
             }
 
 
@@ -40,9 +69,25 @@ class OrangTuaImport implements ToCollection, WithHeadingRow
 
 
 
-            $siswa = Siswa::where(
-                'nis',
-                $nis
+
+
+            /*
+            |--------------------------------------------------------------------------
+            | Cari siswa berdasarkan NIS
+            |--------------------------------------------------------------------------
+            */
+
+
+            $siswa = Siswa::whereRaw(
+
+                'TRIM(nis) = ?',
+
+                [
+
+                    $nis
+
+                ]
+
             )
             ->first();
 
@@ -50,9 +95,30 @@ class OrangTuaImport implements ToCollection, WithHeadingRow
 
 
 
+
+
+
+            /*
+            |--------------------------------------------------------------------------
+            | Jika siswa tidak ditemukan
+            |--------------------------------------------------------------------------
+            */
+
+
             if(!$siswa)
             {
+
+
+                \Log::warning(
+
+                    "NIS tidak ditemukan saat import orang tua: ".$nis
+
+                );
+
+
                 continue;
+
+
             }
 
 
@@ -62,19 +128,37 @@ class OrangTuaImport implements ToCollection, WithHeadingRow
 
 
 
-            // AYAH
+
+            /*
+            |--------------------------------------------------------------------------
+            | Import Ayah
+            |--------------------------------------------------------------------------
+            */
+
 
             $this->buatOrangTua(
 
+
                 $siswa,
 
-                $row['nama_ayah'] ?? null,
+
+                $row['nama_ayah']
+                ??
+                null,
+
 
                 'Ayah',
 
-                $row['pekerjaan_ayah'] ?? null,
 
-                $row['no_hp_ayah'] ?? null
+                $row['pekerjaan_ayah']
+                ??
+                null,
+
+
+                $row['no_hp_ayah']
+                ??
+                null
+
 
             );
 
@@ -85,26 +169,46 @@ class OrangTuaImport implements ToCollection, WithHeadingRow
 
 
 
-            // IBU
+
+            /*
+            |--------------------------------------------------------------------------
+            | Import Ibu
+            |--------------------------------------------------------------------------
+            */
+
 
             $this->buatOrangTua(
 
+
                 $siswa,
 
-                $row['nama_ibu'] ?? null,
+
+                $row['nama_ibu']
+                ??
+                null,
+
 
                 'Ibu',
 
-                $row['pekerjaan_ibu'] ?? null,
 
-                $row['no_hp_ibu'] ?? null
+                $row['pekerjaan_ibu']
+                ??
+                null,
+
+
+                $row['no_hp_ibu']
+                ??
+                null
+
 
             );
+
 
 
 
 
         }
+
 
 
     }
@@ -116,20 +220,40 @@ class OrangTuaImport implements ToCollection, WithHeadingRow
 
 
 
+
+    /*
+    |--------------------------------------------------------------------------
+    | Simpan Orang Tua
+    |--------------------------------------------------------------------------
+    */
+
+
     private function buatOrangTua(
+
         $siswa,
+
         $nama,
+
         $hubungan,
+
         $pekerjaan,
+
         $hp
+
     )
     {
 
 
-        if(!$nama)
+
+        if(
+            !$nama
+        )
         {
+
             return;
+
         }
+
 
 
 
@@ -139,23 +263,49 @@ class OrangTuaImport implements ToCollection, WithHeadingRow
 
         OrangTua::updateOrCreate(
 
+
             [
 
-                'siswa_id'=>$siswa->id,
 
-                'hubungan'=>$hubungan
+                'siswa_id'
+                =>
+                $siswa->id,
+
+
+                'hubungan'
+                =>
+                $hubungan
+
 
             ],
 
+
+
+
             [
 
-                'nama_orang_tua'=>trim($nama),
 
-                'pekerjaan'=>$pekerjaan,
+                'nama_orang_tua'
+                =>
+                trim($nama),
 
-                'no_hp'=>$hp
+
+
+                'pekerjaan'
+                =>
+                $pekerjaan,
+
+
+
+                'no_hp'
+                =>
+                $hp
+
+
 
             ]
+
+
 
         );
 

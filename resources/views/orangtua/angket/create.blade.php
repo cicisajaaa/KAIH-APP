@@ -570,14 +570,13 @@ mt-5
 
 >
 
-
 <label class="
 text-sm
 font-semibold
 text-slate-700
 ">
 
-Alasan Tidak Sholat
+Keterangan Ibadah
 
 </label>
 
@@ -589,10 +588,9 @@ text-slate-500
 mt-1
 ">
 
-Isi alasan apabila terdapat sholat yang tidak dilakukan.
+Tuliskan keterangan apabila ada ibadah yang tidak dilakukan, misalnya sedang berhalangan, sakit, atau kondisi lainnya.
 
 </p>
-
 
 
 <textarea
@@ -610,7 +608,7 @@ px-4
 py-3
 "
 
-placeholder="Contoh: sakit, bepergian, kondisi tertentu"
+placeholder="Contoh: sedang berhalangan, sakit, atau ada kondisi tertentu"
 
 >{{ old('alasan_tidak_sholat') }}</textarea>
 

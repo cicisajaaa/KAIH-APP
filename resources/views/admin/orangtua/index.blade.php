@@ -418,7 +418,7 @@ name="search"
 
 value="{{ request('search') }}"
 
-placeholder="Nama orang tua / siswa / NIS"
+placeholder="Nama orang tua / siswa / NIS / No HP"
 
 class="
 w-full

@@ -32,6 +32,8 @@ if(
                 !$request->routeIs('orangtua.password.edit')
                 &&
                 !$request->routeIs('orangtua.password.update')
+                &&
+!$request->routeIs('logout')
             ){
 
                 return redirect()

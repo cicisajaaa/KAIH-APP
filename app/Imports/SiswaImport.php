@@ -442,53 +442,25 @@ class SiswaSheetImport implements ToCollection, WithHeadingRow
 
 
 
-            /*
-            |--------------------------------------------------------------------------
-            | Simpan siswa
-            |--------------------------------------------------------------------------
-            |
-            | Jika NIS sudah ada:
-            | tidak pindahkan kelas
-            |
-            */
+$siswa = Siswa::updateOrCreate(
 
+    [
 
-            $siswa = Siswa::firstOrNew([
+        'nis'=>$nis
 
-                'nis'=>$nis
+    ],
 
-            ]);
+    [
 
+        'nama_siswa'=>$nama,
 
+        'jenis_kelamin'=>$jk,
 
+        'kelas_id'=>$kelas->id
 
+    ]
 
-            $siswa->nama_siswa =
-                $nama;
-
-
-
-
-            $siswa->jenis_kelamin =
-                $jk;
-
-
-
-
-
-            if(!$siswa->exists)
-            {
-
-                $siswa->kelas_id =
-                    $kelas->id;
-
-            }
-
-
-
-
-
-            $siswa->save();
+);
 
 
 

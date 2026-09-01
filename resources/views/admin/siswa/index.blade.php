@@ -929,9 +929,6 @@ Belum Ada
 
 
 
-
-
-
 <td class="px-6 py-4">
 
 
@@ -939,6 +936,7 @@ Belum Ada
 flex
 justify-center
 gap-2
+flex-wrap
 ">
 
 
@@ -952,11 +950,36 @@ px-3
 py-2
 rounded-lg
 text-xs
+font-semibold
 ">
 
 Edit
 
 </a>
+
+
+
+
+
+<a href="{{ route('siswa.kelas',$siswa->kelas_id) }}"
+
+class="
+bg-indigo-600
+hover:bg-indigo-700
+text-white
+px-3
+py-2
+rounded-lg
+text-xs
+font-semibold
+">
+
+Lihat Kelas
+
+</a>
+
+
+
 
 
 
@@ -969,13 +992,13 @@ method="POST"
 
 onsubmit="return confirm('Hapus siswa ini?')"
 
-
 >
 
 
 @csrf
 
 @method('DELETE')
+
 
 
 <button
@@ -988,31 +1011,16 @@ px-3
 py-2
 rounded-lg
 text-xs
+font-semibold
 ">
 
-
 Hapus
-
 
 </button>
 
 
-<a href="{{ route('siswa.kelas',$siswa->kelas_id) }}"
-class="
-bg-indigo-600
-hover:bg-indigo-700
-text-white
-px-3
-py-2
-rounded-lg
-text-xs
-">
-
-Lihat Kelas
-
-</a>
-
 </form>
+
 
 
 </div>

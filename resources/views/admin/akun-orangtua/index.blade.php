@@ -516,7 +516,9 @@ Orang Tua
 <th class="px-6 py-4 text-left text-xs uppercase text-slate-500">
 Siswa
 </th>
-
+<th class="px-6 py-4 text-left text-xs uppercase text-slate-500">
+NIS
+</th>
 
 <th class="px-6 py-4 text-left text-xs uppercase text-slate-500">
 Kelas
@@ -579,12 +581,15 @@ Aksi
 
 <td class="px-6 py-4">
 
-{{ $user->orangTua->siswa->nama_siswa ?? '-' }}
+{{ optional($user->orangTua)->siswa->nama_siswa ?? '-' }}
 
 </td>
 
+<td class="px-6 py-4">
 
+{{ optional($user->orangTua)->siswa->nis ?? '-' }}
 
+</td>
 
 <td class="px-6 py-4">
 
@@ -597,7 +602,7 @@ bg-indigo-50
 text-indigo-700
 ">
 
-{{ $user->orangTua->siswa->kelas->nama_kelas ?? '-' }}
+{{ optional($user->orangTua)->siswa->kelas->nama_kelas ?? '-' }}
 
 </span>
 
@@ -714,7 +719,7 @@ Reset
 
 <tr>
 
-<td colspan="7"
+<td colspan="8"
 
 class="text-center py-12 text-gray-500"
 >
