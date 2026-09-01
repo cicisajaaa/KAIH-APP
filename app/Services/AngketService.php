@@ -9,23 +9,9 @@ class AngketService
 {
 
 
-    /*
-    |--------------------------------------------------------------------------
-    | Hitung Total Skor Angket
-    |--------------------------------------------------------------------------
-    |
-    | Total maksimal:
-    | Ibadah        : 50
-    | Belajar       : 20
-    | Bangun pagi   : 15
-    | Tidur malam   : 15
-    |
-    | Total          : 100
-    |
-    */
-
     public function hitungSkor($data)
     {
+
 
         $skor = 0;
 
@@ -33,7 +19,7 @@ class AngketService
 
         /*
         |--------------------------------------------------------------------------
-        | IBADAH (50 POINT)
+        | IBADAH 50 POINT
         |--------------------------------------------------------------------------
         */
 
@@ -53,10 +39,9 @@ class AngketService
         foreach($ibadah as $item)
         {
 
+
             if(
-                isset($data[$item])
-                &&
-                $data[$item] == true
+                !empty($data[$item])
             )
             {
 
@@ -73,15 +58,13 @@ class AngketService
 
         /*
         |--------------------------------------------------------------------------
-        | BELAJAR (20 POINT)
+        | BELAJAR 20 POINT
         |--------------------------------------------------------------------------
         */
 
 
         if(
-            isset($data['belajar'])
-            &&
-            $data['belajar'] == true
+            !empty($data['belajar'])
         )
         {
 
@@ -97,7 +80,7 @@ class AngketService
 
         /*
         |--------------------------------------------------------------------------
-        | BANGUN PAGI (15 POINT)
+        | BANGUN PAGI 15 POINT
         |--------------------------------------------------------------------------
         */
 
@@ -107,6 +90,7 @@ class AngketService
         )
         {
 
+
             $jam = Carbon::parse(
                 $data['bangun_pagi']
             );
@@ -114,30 +98,28 @@ class AngketService
 
 
             if(
-                $jam->hour >= 4
-                &&
-                $jam->hour <= 5
+                $jam->hour >=4 &&
+                $jam->hour <=5
             )
             {
 
-                $skor += 15;
+                $skor +=15;
 
             }
 
 
             elseif(
-                $jam->hour >= 6
-                &&
-                $jam->hour <= 7
+                $jam->hour ==6 ||
+                $jam->hour ==7
             )
             {
 
-                $skor += 10;
+                $skor +=10;
 
             }
 
-        }
 
+        }
 
 
 
@@ -147,7 +129,7 @@ class AngketService
 
         /*
         |--------------------------------------------------------------------------
-        | TIDUR MALAM (15 POINT)
+        | TIDUR MALAM 15 POINT
         |--------------------------------------------------------------------------
         */
 
@@ -157,6 +139,7 @@ class AngketService
         )
         {
 
+
             $jam = Carbon::parse(
                 $data['tidur_malam']
             );
@@ -164,13 +147,12 @@ class AngketService
 
 
             if(
-                $jam->hour >=20
-                &&
+                $jam->hour >=20 &&
                 $jam->hour <=21
             )
             {
 
-                $skor += 15;
+                $skor +=15;
 
             }
 
@@ -180,9 +162,20 @@ class AngketService
             )
             {
 
-                $skor += 10;
+                $skor +=10;
 
             }
+
+
+            elseif(
+                $jam->hour ==23
+            )
+            {
+
+                $skor +=5;
+
+            }
+
 
         }
 
@@ -190,7 +183,9 @@ class AngketService
 
 
 
-        return $skor;
+
+        return min($skor,100);
+
 
     }
 
@@ -201,18 +196,11 @@ class AngketService
 
 
 
-
-    /*
-    |--------------------------------------------------------------------------
-    | Menentukan Kategori
-    |--------------------------------------------------------------------------
-    */
-
-
     public function kategori($skor)
     {
 
-        if($skor >= 80)
+
+        if($skor >=80)
         {
 
             return 'Baik';
@@ -220,7 +208,7 @@ class AngketService
         }
 
 
-        elseif($skor >= 60)
+        elseif($skor >=60)
         {
 
             return 'Perlu Perhatian';
@@ -228,12 +216,8 @@ class AngketService
         }
 
 
-        else
-        {
+        return 'Perlu Pendampingan';
 
-            return 'Perlu Pendampingan';
-
-        }
 
     }
 
@@ -245,63 +229,34 @@ class AngketService
 
 
 
-    /*
-    |--------------------------------------------------------------------------
-    | Rincian Perolehan Skor
-    |--------------------------------------------------------------------------
-    |
-    | Digunakan untuk dashboard orang tua
-    | menampilkan detail nilai setiap aktivitas
-    |
-    */
-
     public function rincianSkor($data)
     {
 
 
         $rincian = [
 
-            'Subuh' => 0,
-
-            'Dzuhur' => 0,
-
-            'Ashar' => 0,
-
-            'Magrib' => 0,
-
-            'Isya' => 0,
-
-            'Belajar' => 0,
-
-            'Bangun Pagi' => 0,
-
-            'Tidur Malam' => 0,
+            'Subuh'=>0,
+            'Dzuhur'=>0,
+            'Ashar'=>0,
+            'Magrib'=>0,
+            'Isya'=>0,
+            'Belajar'=>0,
+            'Bangun Pagi'=>0,
+            'Tidur Malam'=>0,
 
         ];
 
 
 
-
-
-
-        /*
-        |--------------------------------------------------------------------------
-        | IBADAH
-        |--------------------------------------------------------------------------
-        */
 
 
         $ibadah = [
 
-            'sholat_subuh'  => 'Subuh',
-
-            'sholat_dzuhur' => 'Dzuhur',
-
-            'sholat_ashar'  => 'Ashar',
-
-            'sholat_magrib' => 'Magrib',
-
-            'sholat_isya'   => 'Isya',
+            'sholat_subuh'=>'Subuh',
+            'sholat_dzuhur'=>'Dzuhur',
+            'sholat_ashar'=>'Ashar',
+            'sholat_magrib'=>'Magrib',
+            'sholat_isya'=>'Isya',
 
         ];
 
@@ -309,21 +264,31 @@ class AngketService
 
 
 
-        foreach($ibadah as $field => $label)
+        foreach($ibadah as $field=>$label)
         {
 
 
             if(
-                isset($data[$field])
-                &&
-                $data[$field] == true
+                !empty($data[$field])
             )
             {
 
-                $rincian[$label] = 10;
+                $rincian[$label]=10;
 
             }
 
+        }
+
+
+
+
+
+
+
+        if(!empty($data['belajar']))
+        {
+
+            $rincian['Belajar']=20;
 
         }
 
@@ -333,73 +298,34 @@ class AngketService
 
 
 
-
-
-        /*
-        |--------------------------------------------------------------------------
-        | BELAJAR
-        |--------------------------------------------------------------------------
-        */
-
-
-        if(
-            isset($data['belajar'])
-            &&
-            $data['belajar'] == true
-        )
-        {
-
-            $rincian['Belajar'] = 20;
-
-        }
-
-
-
-
-
-
-
-
-
-        /*
-        |--------------------------------------------------------------------------
-        | BANGUN PAGI
-        |--------------------------------------------------------------------------
-        */
-
-
-        if(
-            !empty($data['bangun_pagi'])
-        )
+        if(!empty($data['bangun_pagi']))
         {
 
 
-            $jam = Carbon::parse(
+            $jam=Carbon::parse(
                 $data['bangun_pagi']
             );
 
 
 
             if(
-                $jam->hour >=4
-                &&
-                $jam->hour <=5
+                $jam->hour>=4 &&
+                $jam->hour<=5
             )
             {
 
-                $rincian['Bangun Pagi'] = 15;
+                $rincian['Bangun Pagi']=15;
 
             }
 
 
             elseif(
-                $jam->hour >=6
-                &&
-                $jam->hour <=7
+                $jam->hour==6 ||
+                $jam->hour==7
             )
             {
 
-                $rincian['Bangun Pagi'] = 10;
+                $rincian['Bangun Pagi']=10;
 
             }
 
@@ -412,44 +338,43 @@ class AngketService
 
 
 
-
-        /*
-        |--------------------------------------------------------------------------
-        | TIDUR MALAM
-        |--------------------------------------------------------------------------
-        */
-
-
-        if(
-            !empty($data['tidur_malam'])
-        )
+        if(!empty($data['tidur_malam']))
         {
 
 
-            $jam = Carbon::parse(
+            $jam=Carbon::parse(
                 $data['tidur_malam']
             );
 
 
 
             if(
-                $jam->hour >=20
-                &&
-                $jam->hour <=21
+                $jam->hour>=20 &&
+                $jam->hour<=21
             )
             {
 
-                $rincian['Tidur Malam'] = 15;
+                $rincian['Tidur Malam']=15;
 
             }
 
 
             elseif(
-                $jam->hour ==22
+                $jam->hour==22
             )
             {
 
-                $rincian['Tidur Malam'] = 10;
+                $rincian['Tidur Malam']=10;
+
+            }
+
+
+            elseif(
+                $jam->hour==23
+            )
+            {
+
+                $rincian['Tidur Malam']=5;
 
             }
 

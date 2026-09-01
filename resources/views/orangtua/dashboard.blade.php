@@ -11,32 +11,27 @@
 @section('content')
 
 
-
 <div class="space-y-6">
 
 
 
-
-
 {{-- HEADER --}}
-
 
 <div class="
 bg-white
 rounded-2xl
 border
 p-6
+flex
+justify-between
+items-center
 ">
-
-
-<div class="flex justify-between items-center">
 
 
 <div>
 
-
 <h1 class="
-text-xl
+text-2xl
 font-bold
 text-slate-800
 ">
@@ -62,11 +57,27 @@ Selamat datang,
 
 
 
+<a href="{{ route('orangtua.angket.index') }}"
+
+class="
+bg-indigo-600
+hover:bg-indigo-700
+text-white
+px-5
+py-3
+rounded-xl
+text-sm
+font-semibold
+">
+
+Riwayat Angket
+
+</a>
+
 
 </div>
 
 
-</div>
 
 
 
@@ -74,9 +85,7 @@ Selamat datang,
 
 
 
-
-
-{{-- DATA ANAK --}}
+{{-- PROFIL SISWA --}}
 
 
 <div class="
@@ -90,31 +99,26 @@ p-6
 <div class="
 flex
 items-center
-gap-4
+gap-5
 ">
 
 
-
 <div class="
-w-14
-h-14
-rounded-xl
+w-16
+h-16
+rounded-2xl
 bg-indigo-100
 text-indigo-700
 flex
 items-center
 justify-center
+text-2xl
 font-bold
-text-xl
 ">
-
 
 {{ strtoupper(substr($siswa->nama_siswa,0,1)) }}
 
-
 </div>
-
-
 
 
 
@@ -123,8 +127,8 @@ text-xl
 
 
 <h2 class="
+text-xl
 font-bold
-text-lg
 ">
 
 {{ $siswa->nama_siswa }}
@@ -132,20 +136,15 @@ text-lg
 </h2>
 
 
-<p class="
-text-sm
-text-slate-500
-">
+<p class="text-sm text-slate-500">
 
-NIS : {{ $siswa->nis }}
+NIS :
+{{ $siswa->nis }}
 
 </p>
 
 
-<p class="
-text-sm
-text-slate-500
-">
+<p class="text-sm text-slate-500">
 
 Kelas :
 {{ $siswa->kelas->nama_kelas ?? '-' }}
@@ -153,32 +152,74 @@ Kelas :
 </p>
 
 
+<p class="text-sm text-slate-500">
+
+Jurusan :
+{{ $siswa->kelas->jurusan->nama_jurusan ?? '-' }}
+
+</p>
+
+
+</div>
+
+
+</div>
+
+
 </div>
 
 
 
-</div>
-
-
-
-</div>
 
 
 
 
 
 
-
-
-
-{{-- STATUS HARI INI --}}
+{{-- STATISTIK UTAMA --}}
 
 
 <div class="
 grid
-md:grid-cols-3
+md:grid-cols-4
 gap-5
 ">
+
+
+
+<div class="
+bg-white
+border
+rounded-2xl
+p-5
+">
+
+<p class="text-sm text-slate-500">
+
+Skor Terakhir
+
+</p>
+
+
+<h2 class="
+text-4xl
+font-bold
+text-indigo-600
+mt-3
+">
+
+{{ $skorTerakhir }}
+
+<span class="text-lg text-slate-400">
+/100
+</span>
+
+</h2>
+
+
+</div>
+
+
 
 
 
@@ -192,19 +233,35 @@ p-5
 ">
 
 
-<p class="
-text-sm
-text-slate-500
-">
+<p class="text-sm text-slate-500">
 
-Status Angket Hari Ini
+Kategori
 
 </p>
 
 
 
+@if($kategoriTerakhir == 'Baik')
 
-@if($angketHariIni)
+<span class="
+inline-block
+mt-3
+px-3
+py-1
+rounded-full
+bg-green-100
+text-green-700
+text-sm
+font-semibold
+">
+
+🟢 Baik
+
+</span>
+
+
+
+@elseif($kategoriTerakhir == 'Perlu Perhatian')
 
 
 <span class="
@@ -213,15 +270,16 @@ mt-3
 px-3
 py-1
 rounded-full
-text-xs
+bg-yellow-100
+text-yellow-700
+text-sm
 font-semibold
-bg-emerald-100
-text-emerald-700
 ">
 
-✓ Sudah Diisi
+🟡 Perlu Perhatian
 
 </span>
+
 
 
 @else
@@ -233,13 +291,13 @@ mt-3
 px-3
 py-1
 rounded-full
-text-xs
+bg-red-100
+text-red-700
+text-sm
 font-semibold
-bg-yellow-100
-text-yellow-700
 ">
 
-Belum Diisi
+🔴 Perlu Pendampingan
 
 </span>
 
@@ -247,10 +305,7 @@ Belum Diisi
 @endif
 
 
-
 </div>
-
-
 
 
 
@@ -266,12 +321,9 @@ p-5
 ">
 
 
-<p class="
-text-sm
-text-slate-500
-">
+<p class="text-sm text-slate-500">
 
-Skor Anak
+Ibadah Hari Ini
 
 </p>
 
@@ -279,18 +331,16 @@ Skor Anak
 <h2 class="
 text-3xl
 font-bold
-text-indigo-600
+text-blue-600
 mt-3
 ">
 
-{{ $skorTerakhir ?? 0 }}
+{{ $jumlahIbadahHariIni }}/5
 
 </h2>
 
 
 </div>
-
-
 
 
 
@@ -306,55 +356,21 @@ p-5
 ">
 
 
-<p class="
-text-sm
-text-slate-500
-">
+<p class="text-sm text-slate-500">
 
-Kategori
+Belajar Hari Ini
 
 </p>
 
 
 <h2 class="
+text-3xl
 font-bold
+text-emerald-600
 mt-3
 ">
 
-
-@if(($kategoriTerakhir ?? '') == 'Baik')
-
-
-<span class="text-emerald-600">
-
-🟢 Baik
-
-</span>
-
-
-@elseif(($kategoriTerakhir ?? '') == 'Perlu Perhatian')
-
-
-<span class="text-yellow-600">
-
-🟡 Perlu Perhatian
-
-</span>
-
-
-@else
-
-
-<span class="text-slate-600">
-
-{{ $kategoriTerakhir ?? '-' }}
-
-</span>
-
-
-@endif
-
-
+{{ $statusBelajarHariIni ? 'Ya':'Tidak' }}
 
 </h2>
 
@@ -363,13 +379,158 @@ mt-3
 
 
 
-
 </div>
 
 
 
 
+
+
+
+
+
+{{-- STATUS ANGKET --}}
+
+
+@if(!$angketHariIni)
+
+
+<div class="
+bg-yellow-50
+border
+border-yellow-200
+rounded-2xl
+p-5
+">
+
+
+<p class="
+font-semibold
+text-yellow-700
+">
+
+⚠️ Angket hari ini belum diisi.
+
+</p>
+
+
+<a href="{{ route('orangtua.angket.create') }}"
+
+class="
+inline-block
+mt-3
+bg-indigo-600
+text-white
+px-5
+py-2
+rounded-lg
+text-sm
+">
+
+Isi Angket Sekarang
+
+</a>
+
+
+</div>
+
+
+@else
+
+
+<div class="
+bg-green-50
+border
+border-green-200
+rounded-2xl
+p-5
+">
+
+
+<p class="
+font-semibold
+text-green-700
+">
+
+✓ Angket hari ini sudah diisi.
+
+</p>
+
+
+<p class="
+text-sm
+text-green-600
+mt-1
+">
+
+Skor hari ini:
+{{ $angketHariIni->skor }}/100
+
+</p>
+
+
+</div>
+
+
+@endif
+
+
+
+
+
+
+
+{{-- KETERANGAN TIDAK SHOLAT --}}
+
+
+@if($alasanTidakSholat)
+
+
+<div class="
+bg-red-50
+border
+border-red-200
+rounded-2xl
+p-5
+">
+
+
+<h3 class="
+font-bold
+text-red-700
+">
+
+Keterangan Tidak Sholat
+
+</h3>
+
+
+<p class="
+text-sm
+text-red-600
+mt-2
+">
+
+{{ $alasanTidakSholat }}
+
+</p>
+
+
+</div>
+
+
+@endif
+
+
+
+
+
+
+
+
+
 {{-- RINCIAN SKOR --}}
+
 
 <div class="
 bg-white
@@ -381,8 +542,7 @@ p-6
 
 <h3 class="
 font-bold
-text-slate-800
-mb-4
+mb-5
 ">
 
 Rincian Penilaian Terakhir
@@ -391,56 +551,43 @@ Rincian Penilaian Terakhir
 
 
 
-<div class="space-y-3">
+<div class="
+grid
+md:grid-cols-4
+gap-4
+">
 
 
 @foreach($rincianSkor as $nama=>$nilai)
 
 
 <div class="
-flex
-justify-between
-items-center
 bg-slate-50
 rounded-xl
-px-4
-py-3
+p-4
 ">
 
 
-<span class="text-sm text-slate-700">
+<p class="
+text-xs
+text-slate-500
+">
 
 {{ $nama }}
 
-</span>
+</p>
 
 
-@if($nilai > 0)
-
-<span class="
-text-emerald-600
-font-semibold
+<p class="
+text-xl
+font-bold
+mt-2
+{{ $nilai >0 ? 'text-indigo-600':'text-slate-400' }}
 ">
 
-✓ +{{ $nilai }}
+{{ $nilai }}
 
-</span>
-
-
-@else
-
-
-<span class="
-text-slate-400
-font-semibold
-">
-
-- 0
-
-</span>
-
-
-@endif
+</p>
 
 
 </div>
@@ -458,6 +605,11 @@ font-semibold
 
 
 
+
+
+
+
+
 {{-- PERKEMBANGAN --}}
 
 
@@ -469,8 +621,6 @@ gap-5
 
 
 
-
-
 <div class="
 bg-white
 border
@@ -478,28 +628,21 @@ rounded-2xl
 p-5
 ">
 
-
-<p class="
-text-sm
-text-slate-500
-">
-
+<p class="text-sm text-slate-500">
 Konsistensi Belajar
-
 </p>
 
 
 <h2 class="
-text-2xl
+text-3xl
 font-bold
-text-emerald-600
+text-green-600
 mt-2
 ">
 
-{{ $persentaseBelajar ?? 0 }}%
+{{ $persentaseBelajar }}%
 
 </h2>
-
 
 </div>
 
@@ -508,8 +651,6 @@ mt-2
 
 
 
-
-
 <div class="
 bg-white
 border
@@ -517,32 +658,23 @@ rounded-2xl
 p-5
 ">
 
-
-<p class="
-text-sm
-text-slate-500
-">
-
+<p class="text-sm text-slate-500">
 Kepatuhan Ibadah
-
 </p>
 
 
 <h2 class="
-text-2xl
+text-3xl
 font-bold
 text-blue-600
 mt-2
 ">
 
-{{ $persentaseIbadah ?? 0 }}%
+{{ $persentaseIbadah }}%
 
 </h2>
 
-
 </div>
-
-
 
 
 
@@ -556,19 +688,13 @@ rounded-2xl
 p-5
 ">
 
-
-<p class="
-text-sm
-text-slate-500
-">
-
-Hari Terpantau
-
+<p class="text-sm text-slate-500">
+Total Pengisian
 </p>
 
 
 <h2 class="
-text-2xl
+text-3xl
 font-bold
 text-purple-600
 mt-2
@@ -576,52 +702,15 @@ mt-2
 
 {{ $siswa->angketHarian->count() }}
 
+Hari
+
 </h2>
 
-
 </div>
 
 
 
 </div>
-
-
-
-
-
-
-
-
-
-{{-- BUTTON ANGKET --}}
-
-
-
-@if(!$angketHariIni)
-
-
-<a href="{{ route('orangtua.angket.create') }}"
-
-class="
-block
-text-center
-bg-indigo-600
-hover:bg-indigo-700
-text-white
-rounded-xl
-py-3
-font-semibold
-">
-
-
-+ Isi Angket Hari Ini
-
-
-</a>
-
-
-
-@endif
 
 
 
@@ -644,18 +733,15 @@ p-6
 
 <h3 class="
 font-bold
-text-slate-800
 mb-5
 ">
 
-Perkembangan Skor Aktivitas 7 Hari
+Grafik Perkembangan 7 Hari
 
 </h3>
 
 
-
 <canvas id="perkembanganChart"></canvas>
-
 
 
 </div>
@@ -668,8 +754,7 @@ Perkembangan Skor Aktivitas 7 Hari
 
 
 
-{{-- RIWAYAT TERBARU --}}
-
+{{-- RIWAYAT --}}
 
 
 <div class="
@@ -682,20 +767,16 @@ p-6
 
 <h3 class="
 font-bold
-text-slate-800
 mb-5
 ">
 
-Aktivitas Terbaru
+Aktivitas Terakhir
 
 </h3>
 
 
 
-
-
 <div class="space-y-4">
-
 
 
 @forelse($riwayatTerbaru as $item)
@@ -703,9 +784,9 @@ Aktivitas Terbaru
 
 
 <div class="
-border-l-4
-border-indigo-400
-pl-4
+border
+rounded-xl
+p-4
 ">
 
 
@@ -715,30 +796,22 @@ justify-between
 ">
 
 
-<p class="
+<b>
+
+{{ \Carbon\Carbon::parse($item->tanggal)->format('d M Y') }}
+
+</b>
+
+
+
+<span class="
+text-indigo-600
 font-semibold
-text-sm
 ">
 
-{{
+{{ $item->skor }}/100
 
-\Carbon\Carbon::parse($item->tanggal)
-->format('d M Y')
-
-}}
-
-</p>
-
-
-
-<p class="
-text-xs
-text-slate-500
-">
-
-{{ $item->belajar ? 'Belajar' : 'Tidak belajar' }}
-
-</p>
+</span>
 
 
 </div>
@@ -746,40 +819,77 @@ text-slate-500
 
 
 
+<p class="text-sm mt-2">
+
+Ibadah:
+
+{{
+
+$item->sholat_subuh+
+$item->sholat_dzuhur+
+$item->sholat_ashar+
+$item->sholat_magrib+
+$item->sholat_isya
+
+}}/5
+
+</p>
+
+
+
+
+<p class="text-sm">
+
+Belajar:
+
+{{ $item->belajar ? 'Ya':'Tidak' }}
+
+</p>
+
+
+
+
+<p class="text-sm">
+
+Tidur:
+
+{{ $item->tidur_malam ?? '-' }}
+
+</p>
+
+
+
+
+
+@if($item->alasan_tidak_sholat)
+
 
 <p class="
 text-sm
-text-slate-500
+text-red-600
 mt-2
 ">
 
-Ibadah :
+Keterangan:
 
-{{
-
-$item->sholat_subuh +
-$item->sholat_dzuhur +
-$item->sholat_ashar +
-$item->sholat_magrib +
-$item->sholat_isya
-
-}} / 5
+{{ $item->alasan_tidak_sholat }}
 
 </p>
 
 
+@endif
+
+
 
 </div>
+
 
 
 
 @empty
 
 
-<p class="
-text-sm
-text-slate-500
-">
+<p class="text-sm text-slate-500">
 
 Belum ada aktivitas.
 
@@ -793,14 +903,16 @@ Belum ada aktivitas.
 </div>
 
 
+
+</div>
+
+
+
+
+
 </div>
 
 
-
-
-
-
-</div>
 
 
 
@@ -812,129 +924,77 @@ Belum ada aktivitas.
 <script>
 
 
-const chart = document.getElementById(
-    'perkembanganChart'
-);
-
-
-if(chart)
+new Chart(
+document.getElementById('perkembanganChart'),
 {
 
+type:'line',
 
-    new Chart(chart, {
+data:{
 
 
-        type:'line',
+labels:@json($grafikTanggal),
 
 
-        data:{
+datasets:[
 
+{
 
-            labels:@json($grafikTanggal ?? []),
+label:'Skor',
 
+data:@json($grafikSkor),
 
+borderWidth:3,
 
-            datasets:[
+tension:.3
 
+},
 
-                {
 
+{
 
-                    label:'Skor Aktivitas',
+label:'Ibadah %',
 
+data:@json($grafikIbadah),
 
-                    data:@json($grafikSkor ?? []),
+borderWidth:2,
 
+borderDash:[5,5],
 
-                    borderWidth:3,
+tension:.3
 
+}
 
-                    tension:0.3
+]
 
 
+},
 
-                },
 
+options:{
 
+responsive:true,
 
-                {
 
+scales:{
 
-                 
-                    label:'Ibadah (%)',
+y:{
 
-                    data:@json($grafikIbadah ?? []),
+beginAtZero:true,
 
-                    borderWidth:1,
+max:100
 
-                    borderDash:[5,5],
+}
 
-                    tension:0.3
-                
-
-
-
-                }
-
-
-
-            ]
-
-
-
-        },
-
-
-
-        options:{
-
-
-            responsive:true,
-
-
-            plugins:{
-
-
-                legend:{
-
-
-                    position:'top'
-
-
-                }
-
-
-            },
-
-
-            scales:{
-
-
-                y:{
-
-
-                    beginAtZero:true,
-
-
-                    max:100
-
-
-                }
-
-
-            }
-
-
-
-        }
-
-
-
-    });
+}
 
 
 }
 
+
+}
+
+);
 
 
 </script>

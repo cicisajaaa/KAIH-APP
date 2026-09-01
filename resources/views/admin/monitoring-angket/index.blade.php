@@ -17,13 +17,14 @@
 
 
 
+
 {{-- HEADER --}}
 
 
 <div class="bg-white rounded-2xl border shadow-sm p-6">
 
 
-<div class="flex justify-between items-center">
+<div class="flex flex-col md:flex-row md:justify-between md:items-center gap-4">
 
 
 <div>
@@ -44,6 +45,7 @@ Pemantauan aktivitas dan kondisi harian siswa.
 
 
 </div>
+
 
 
 
@@ -87,15 +89,15 @@ Tanggal Monitoring
 <div class="bg-white border rounded-2xl shadow-sm p-6">
 
 
-<form method="GET"
+<form
+
+method="GET"
 
 action="{{ route('monitoring.angket') }}"
 
-class="grid md:grid-cols-4 gap-5 items-end">
+class="grid md:grid-cols-4 gap-5 items-end"
 
-
-
-
+>
 
 
 <div>
@@ -122,7 +124,6 @@ class="w-full mt-2 border rounded-xl px-4 py-3"
 
 
 </div>
-
 
 
 
@@ -168,7 +169,9 @@ value="{{ $item->id }}"
 
 >
 
+
 {{ $item->nama_kelas }}
+
 
 </option>
 
@@ -218,7 +221,7 @@ Semua Kondisi
 
 <option value="Baik"
 
-{{ $kategori == 'Baik' ? 'selected':'' }}
+{{ $kategori=='Baik'?'selected':'' }}
 
 >
 
@@ -230,7 +233,7 @@ Baik
 
 <option value="Perlu Perhatian"
 
-{{ $kategori == 'Perlu Perhatian' ? 'selected':'' }}
+{{ $kategori=='Perlu Perhatian'?'selected':'' }}
 
 >
 
@@ -240,17 +243,15 @@ Perlu Perhatian
 
 
 
-
 <option value="Perlu Pendampingan"
 
-{{ $kategori == 'Perlu Pendampingan' ? 'selected':'' }}
+{{ $kategori=='Perlu Pendampingan'?'selected':'' }}
 
 >
 
 Perlu Pendampingan
 
 </option>
-
 
 
 </select>
@@ -264,25 +265,30 @@ Perlu Pendampingan
 
 
 
-
 <div>
 
 
 <button
 
-class="bg-indigo-600 hover:bg-indigo-700 text-white px-6 py-3 rounded-xl font-semibold w-full"
+class="
+bg-indigo-600
+hover:bg-indigo-700
+text-white
+px-6
+py-3
+rounded-xl
+font-semibold
+w-full
+"
 
 >
 
-
 🔍 Tampilkan
-
 
 </button>
 
 
 </div>
-
 
 
 
@@ -302,7 +308,6 @@ class="bg-indigo-600 hover:bg-indigo-700 text-white px-6 py-3 rounded-xl font-se
 {{-- STATISTIK --}}
 
 
-
 <div class="grid md:grid-cols-4 gap-5">
 
 
@@ -317,7 +322,7 @@ Total Siswa
 
 </p>
 
-<h3 class="text-3xl font-bold text-gray-800 mt-2">
+<h3 class="text-3xl font-bold mt-2">
 
 {{ $totalSiswa }}
 
@@ -393,8 +398,6 @@ Persentase
 
 
 
-
-
 </div>
 
 
@@ -405,16 +408,16 @@ Persentase
 
 
 
+{{-- KATEGORI --}}
+
+
 <div class="grid md:grid-cols-3 gap-5">
-
-
 
 
 
 <div class="bg-green-50 border border-green-100 rounded-2xl p-5">
 
-
-<p class="text-sm text-green-700">
+<p class="text-green-700 text-sm">
 
 Kondisi Baik
 
@@ -427,10 +430,7 @@ Kondisi Baik
 
 </h3>
 
-
 </div>
-
-
 
 
 
@@ -440,7 +440,7 @@ Kondisi Baik
 <div class="bg-yellow-50 border border-yellow-100 rounded-2xl p-5">
 
 
-<p class="text-sm text-yellow-700">
+<p class="text-yellow-700 text-sm">
 
 Perlu Perhatian
 
@@ -461,12 +461,10 @@ Perlu Perhatian
 
 
 
-
-
 <div class="bg-red-50 border border-red-100 rounded-2xl p-5">
 
 
-<p class="text-sm text-red-700">
+<p class="text-red-700 text-sm">
 
 Perlu Pendampingan
 
@@ -484,7 +482,6 @@ Perlu Pendampingan
 
 
 
-
 </div>
 
 
@@ -499,7 +496,6 @@ Perlu Pendampingan
 
 
 <div class="bg-white border rounded-2xl shadow-sm overflow-hidden">
-
 
 
 <div class="px-6 py-5 border-b">
@@ -525,7 +521,6 @@ Data Monitoring Siswa
 
 
 <table class="w-full">
-
 
 
 <thead class="bg-gray-50">
@@ -576,22 +571,14 @@ Kategori
 </th>
 
 
-<th class="
-px-6
-py-4
-text-left
-text-xs
-uppercase
-text-gray-500
-w-32
-">
+<th class="px-6 py-4 text-left text-xs uppercase text-gray-500">
 
 Status
 
 </th>
 
 
-<th class="px-6 py-4 text-left text-xs uppercase text-gray-500">
+<th class="px-6 py-4 text-center text-xs uppercase text-gray-500">
 
 Aksi
 
@@ -608,16 +595,19 @@ Aksi
 
 
 
+
+
 <tbody class="divide-y">
 
 
-@foreach($siswas as $siswa)
+
+@forelse($siswas as $siswa)
+
+
 
 @php
 
 $angket = $siswa->angketHarian->first();
-
-$sudahMengisi = $angket !== null;
 
 $wali = $siswa->orangTua->first();
 
@@ -627,15 +617,20 @@ $wali = $siswa->orangTua->first();
 
 
 
-<tr class="hover:bg-gray-50">
+<tr class="hover:bg-gray-50 transition">
+
+
 
 
 
 <td class="px-6 py-4">
 
-{{ $loop->iteration }}
+{{ $siswas->firstItem()+$loop->index }}
 
 </td>
+
+
+
 
 
 
@@ -650,9 +645,9 @@ $wali = $siswa->orangTua->first();
 </p>
 
 
-<p class="text-sm text-gray-500">
+<p class="text-xs text-gray-500">
 
-NIS: {{ $siswa->nis }}
+NIS : {{ $siswa->nis }}
 
 </p>
 
@@ -667,10 +662,8 @@ NIS: {{ $siswa->nis }}
 
 <td class="px-6 py-4">
 
-
 {{ $siswa->kelas->nama_kelas ?? '-' }}
 
-
 </td>
 
 
@@ -681,17 +674,7 @@ NIS: {{ $siswa->nis }}
 
 <td class="px-6 py-4">
 
-
-@if($wali)
-
-{{ $wali->nama_orang_tua }}
-
-@else
-
--
-
-@endif
-
+{{ $wali->nama_orang_tua ?? '-' }}
 
 </td>
 
@@ -701,15 +684,11 @@ NIS: {{ $siswa->nis }}
 
 
 
-
-<td class="px-6 py-4">
-
+<td class="px-6 py-4 font-bold">
 
 {{ $angket->skor ?? '-' }}
 
-
 </td>
-
 
 
 
@@ -723,7 +702,6 @@ NIS: {{ $siswa->nis }}
 @if($angket)
 
 
-
 @if($angket->kategori == 'Baik')
 
 
@@ -732,7 +710,6 @@ NIS: {{ $siswa->nis }}
 Baik
 
 </span>
-
 
 
 @elseif($angket->kategori == 'Perlu Perhatian')
@@ -745,7 +722,6 @@ Perhatian
 </span>
 
 
-
 @else
 
 
@@ -756,9 +732,7 @@ Pendampingan
 </span>
 
 
-
 @endif
-
 
 
 @else
@@ -778,30 +752,21 @@ Pendampingan
 
 <td class="px-6 py-4">
 
-    
-@if($sudahMengisi)
+
+@if($angket)
 
 
 @if(
-    \Carbon\Carbon::parse($angket->tanggal)
-    ->format('Y-m-d')
-    ==
-    \Carbon\Carbon::parse($angket->tanggal_pengisian)
-    ->format('Y-m-d')
+$angket->tanggal_pengisian &&
+\Carbon\Carbon::parse($angket->tanggal)
+->format('Y-m-d')
+==
+\Carbon\Carbon::parse($angket->tanggal_pengisian)
+->format('Y-m-d')
 )
 
 
-<span class="
-inline-flex
-items-center
-px-3
-py-1.5
-rounded-full
-text-xs
-font-semibold
-bg-green-100
-text-green-700
-">
+<span class="px-3 py-1 rounded-full text-xs bg-green-100 text-green-700">
 
 ✓ Tepat Waktu
 
@@ -811,17 +776,7 @@ text-green-700
 @else
 
 
-<span class="
-inline-flex
-items-center
-px-3
-py-1.5
-rounded-full
-text-xs
-font-semibold
-bg-yellow-100
-text-yellow-700
-">
+<span class="px-3 py-1 rounded-full text-xs bg-yellow-100 text-yellow-700">
 
 ⚠ Telat Isi
 
@@ -831,21 +786,10 @@ text-yellow-700
 @endif
 
 
-
 @else
 
 
-<span class="
-inline-flex
-items-center
-px-3
-py-1.5
-rounded-full
-text-xs
-font-semibold
-bg-gray-100
-text-gray-600
-">
+<span class="px-3 py-1 rounded-full text-xs bg-gray-100 text-gray-600">
 
 Belum Isi
 
@@ -853,6 +797,7 @@ Belum Isi
 
 
 @endif
+
 
 </td>
 
@@ -863,15 +808,23 @@ Belum Isi
 
 
 
-<td class="px-6 py-4">
+<td class="px-6 py-4 text-center">
 
 
-<a href="{{ route(
-'monitoring.angket.detail',
-$siswa->id
-) }}"
+<a
 
-class="bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2 rounded-lg text-xs"
+href="{{ route('monitoring.angket.detail',$siswa->id) }}"
+
+class="
+bg-indigo-600
+hover:bg-indigo-700
+text-white
+px-4
+py-2
+rounded-lg
+text-xs
+font-semibold
+"
 
 >
 
@@ -884,11 +837,38 @@ Detail
 
 
 
+
+
 </tr>
 
 
 
-@endforeach
+
+@empty
+
+
+
+<tr>
+
+
+<td colspan="8"
+
+class="text-center py-12 text-gray-500"
+
+>
+
+
+Belum ada data siswa.
+
+
+</td>
+
+
+</tr>
+
+
+
+@endforelse
 
 
 
@@ -900,6 +880,21 @@ Detail
 
 
 </div>
+
+
+
+
+
+
+
+<div class="px-6 py-5 border-t">
+
+
+{{ $siswas->links() }}
+
+
+</div>
+
 
 
 </div>

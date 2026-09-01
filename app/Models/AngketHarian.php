@@ -38,6 +38,8 @@ class AngketHarian extends Model
 
         'sholat_isya',
 
+        'alasan_tidak_sholat',
+
         'kegiatan_membantu',
 
         'belajar',

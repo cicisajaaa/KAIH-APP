@@ -18,7 +18,6 @@
 
 {{-- HEADER --}}
 
-
 <div class="
 bg-white
 rounded-2xl
@@ -33,9 +32,7 @@ gap-5
 ">
 
 
-
 <div>
-
 
 <h2 class="
 text-2xl
@@ -48,13 +45,12 @@ Manajemen Akun Orang Tua
 </h2>
 
 
-
 <p class="
 text-slate-500
 mt-2
 ">
 
-Kelola akun login orang tua berdasarkan data siswa yang telah diinput.
+Kelola akun login orang tua berdasarkan data siswa.
 
 </p>
 
@@ -64,22 +60,15 @@ Kelola akun login orang tua berdasarkan data siswa yang telah diinput.
 
 
 
+
 <div class="flex gap-3">
 
 
 <a href="{{ route('admin.generate.orangtua') }}"
 
-onclick="
-return confirm(
-'Generate akun orang tua untuk semua siswa?'
-)
-"
-
+onclick="return confirm('Generate akun orang tua untuk semua siswa?')"
 
 class="
-inline-flex
-items-center
-gap-2
 bg-indigo-600
 hover:bg-indigo-700
 text-white
@@ -88,21 +77,19 @@ py-3
 rounded-xl
 font-semibold
 text-sm
-transition
 ">
 
-
 ⚡ Generate Akun
-
 
 </a>
 
 
 
 
-
-<form action="{{ route('admin.akun.orangtua.reset.semua') }}"
-method="POST">
+<form 
+action="{{ route('admin.akun.orangtua.reset.semua') }}"
+method="POST"
+>
 
 
 @csrf
@@ -110,16 +97,9 @@ method="POST">
 
 <button
 
-onclick="
-return confirm(
-'Reset password SEMUA akun orang tua?'
-)
-"
+onclick="return confirm('Reset semua password akun orang tua?')"
 
 class="
-inline-flex
-items-center
-gap-2
 bg-red-600
 hover:bg-red-700
 text-white
@@ -128,10 +108,9 @@ py-3
 rounded-xl
 font-semibold
 text-sm
-transition
 ">
 
-🔑 Reset Semua Password
+🔑 Reset Semua
 
 </button>
 
@@ -139,13 +118,11 @@ transition
 </form>
 
 
-
 </div>
 
 
-
-
 </div>
+
 
 
 
@@ -166,9 +143,6 @@ gap-5
 ">
 
 
-
-
-
 <div class="
 bg-white
 rounded-2xl
@@ -177,12 +151,9 @@ p-6
 ">
 
 
-<p class="
-text-sm
-text-slate-500
-">
+<p class="text-sm text-slate-500">
 
-Total Akun Orang Tua
+Total Akun
 
 </p>
 
@@ -194,20 +165,9 @@ text-indigo-600
 mt-3
 ">
 
-{{ $users->count() }}
+{{ $users->total() }}
 
 </h3>
-
-
-<p class="
-text-xs
-text-slate-400
-mt-2
-">
-
-Akun login tersedia
-
-</p>
 
 
 </div>
@@ -226,10 +186,7 @@ p-6
 ">
 
 
-<p class="
-text-sm
-text-slate-500
-">
+<p class="text-sm text-slate-500">
 
 Role
 
@@ -248,17 +205,6 @@ Orang Tua
 </h3>
 
 
-<p class="
-text-xs
-text-slate-400
-mt-2
-">
-
-Hak akses monitoring siswa
-
-</p>
-
-
 </div>
 
 
@@ -275,10 +221,7 @@ p-6
 ">
 
 
-<p class="
-text-sm
-text-slate-500
-">
+<p class="text-sm text-slate-500">
 
 Password Awal
 
@@ -292,25 +235,201 @@ text-orange-500
 mt-4
 ">
 
-NIS Siswa
+Kaih#NIS
 
 </h3>
-
-
-<p class="
-text-xs
-text-slate-400
-mt-2
-">
-
-Dapat direset oleh admin
-
-</p>
 
 
 </div>
 
 
+</div>
+
+
+
+
+
+
+
+
+
+{{-- FILTER --}}
+
+
+<div class="
+bg-white
+rounded-2xl
+border
+p-6
+">
+
+
+<form method="GET">
+
+
+<div class="
+grid
+md:grid-cols-3
+gap-4
+">
+
+
+
+<div>
+
+
+<label class="
+text-sm
+font-semibold
+text-slate-700
+">
+
+Cari Akun
+
+</label>
+
+
+<input
+
+type="text"
+
+name="search"
+
+value="{{ request('search') }}"
+
+placeholder="Nama orang tua / siswa / NIS"
+
+class="
+w-full
+mt-2
+border
+rounded-xl
+px-4
+py-3
+"
+
+>
+
+
+</div>
+
+
+
+
+
+
+
+<div>
+
+
+<label class="
+text-sm
+font-semibold
+text-slate-700
+">
+
+Kelas
+
+</label>
+
+
+<select
+
+name="kelas_id"
+
+class="
+w-full
+mt-2
+border
+rounded-xl
+px-4
+py-3
+"
+
+>
+
+
+<option value="">
+Semua Kelas
+</option>
+
+
+@foreach($kelas as $item)
+
+
+<option
+
+value="{{ $item->id }}"
+
+{{ request('kelas_id')==$item->id?'selected':'' }}
+
+>
+
+{{ $item->nama_kelas }}
+
+</option>
+
+
+@endforeach
+
+
+</select>
+
+
+</div>
+
+
+
+
+
+
+
+<div class="
+flex
+items-end
+gap-3
+">
+
+
+<button
+
+class="
+bg-indigo-600
+hover:bg-indigo-700
+text-white
+px-6
+py-3
+rounded-xl
+font-semibold
+">
+
+🔍 Cari
+
+</button>
+
+
+
+<a href="{{ route('admin.akun.orangtua') }}"
+
+class="
+bg-gray-100
+px-6
+py-3
+rounded-xl
+">
+
+Reset
+
+</a>
+
+
+</div>
+
+
+</div>
+
+
+</form>
 
 
 </div>
@@ -326,15 +445,12 @@ Dapat direset oleh admin
 {{-- TABLE --}}
 
 
-
 <div class="
 bg-white
 rounded-2xl
 border
 overflow-hidden
 ">
-
-
 
 
 
@@ -359,7 +475,6 @@ Daftar Login Orang Tua
 <p class="
 text-sm
 text-slate-500
-mt-1
 ">
 
 Data akun yang terhubung dengan siswa.
@@ -375,11 +490,11 @@ Data akun yang terhubung dengan siswa.
 
 
 
+
 <div class="overflow-x-auto">
 
 
 <table class="w-full">
-
 
 
 <thead class="bg-slate-50">
@@ -388,124 +503,39 @@ Data akun yang terhubung dengan siswa.
 <tr>
 
 
-<th class="
-px-6
-py-4
-text-left
-text-xs
-uppercase
-tracking-wider
-text-slate-500
-">
-
+<th class="px-6 py-4 text-left text-xs uppercase text-slate-500">
 No
-
 </th>
 
 
-
-<th class="
-px-6
-py-4
-text-left
-text-xs
-uppercase
-tracking-wider
-text-slate-500
-">
-
+<th class="px-6 py-4 text-left text-xs uppercase text-slate-500">
 Orang Tua
-
 </th>
 
 
-
-
-<th class="
-px-6
-py-4
-text-left
-text-xs
-uppercase
-tracking-wider
-text-slate-500
-">
-
+<th class="px-6 py-4 text-left text-xs uppercase text-slate-500">
 Siswa
-
 </th>
 
 
-
-
-
-<th class="
-px-6
-py-4
-text-left
-text-xs
-uppercase
-tracking-wider
-text-slate-500
-">
-
+<th class="px-6 py-4 text-left text-xs uppercase text-slate-500">
 Kelas
-
 </th>
 
 
-
-
-
-<th class="
-px-6
-py-4
-text-left
-text-xs
-uppercase
-tracking-wider
-text-slate-500
-">
-
-Email Login
-
+<th class="px-6 py-4 text-left text-xs uppercase text-slate-500">
+Email
 </th>
 
 
-
-
-
-<th class="
-px-6
-py-4
-text-center
-text-xs
-uppercase
-tracking-wider
-text-slate-500
-">
-
+<th class="px-6 py-4 text-center text-xs uppercase text-slate-500">
 Status
-
 </th>
 
 
-
-
-<th class="
-px-6
-py-4
-text-center
-text-xs
-uppercase
-tracking-wider
-text-slate-500
-">
-
+<th class="px-6 py-4 text-center text-xs uppercase text-slate-500">
 Aksi
-
 </th>
-
 
 
 </tr>
@@ -517,122 +547,59 @@ Aksi
 
 
 
-
-
-
 <tbody class="divide-y">
-
 
 
 @forelse($users as $user)
 
 
-
-<tr class="
-hover:bg-slate-50
-transition
-">
+<tr class="hover:bg-slate-50">
 
 
+<td class="px-6 py-4">
 
-
-
-<td class="
-px-6
-py-4
-text-sm
-text-slate-500
-">
-
-{{ $loop->iteration }}
+{{ $users->firstItem()+$loop->index }}
 
 </td>
 
 
 
+<td class="px-6 py-4">
 
-
-
-
-<td class="
-px-6
-py-4
-">
-
-
-<p class="
-font-semibold
-text-slate-800
-">
+<p class="font-semibold">
 
 {{ $user->name }}
 
 </p>
 
+</td>
 
-<p class="
-text-xs
-text-slate-400
-">
 
-Orang Tua
 
-</p>
 
+<td class="px-6 py-4">
+
+{{ $user->orangTua->siswa->nama_siswa ?? '-' }}
 
 </td>
 
 
 
 
-
-
-
-
-<td class="
-px-6
-py-4
-">
-
-
-{{ 
-$user->orangTua->siswa->nama_siswa ?? '-'
-}}
-
-
-</td>
-
-
-
-
-
-
-
-
-<td class="
-px-6
-py-4
-">
-
+<td class="px-6 py-4">
 
 <span class="
 px-3
 py-1
 rounded-full
 text-xs
-font-semibold
 bg-indigo-50
 text-indigo-700
 ">
 
-
-{{ 
-$user->orangTua->siswa->kelas->nama_kelas ?? '-'
-}}
-
+{{ $user->orangTua->siswa->kelas->nama_kelas ?? '-' }}
 
 </span>
-
 
 </td>
 
@@ -640,59 +607,56 @@ $user->orangTua->siswa->kelas->nama_kelas ?? '-'
 
 
 
-
-
-
-
-<td class="
-px-6
-py-4
-">
-
-
-<span class="
-text-sm
-text-slate-700
-">
+<td class="px-6 py-4">
 
 {{ $user->email }}
 
-</span>
-
-
 </td>
 
 
 
 
 
+<td class="px-6 py-4 text-center">
 
 
-
-
-<td class="
-px-6
-py-4
-text-center
-">
+@if($user->must_change_password)
 
 
 <span class="
-inline-flex
 px-3
 py-1
 rounded-full
 text-xs
+bg-yellow-50
+text-yellow-700
 font-semibold
-bg-emerald-50
-text-emerald-700
 ">
 
+Belum Ganti Password
+
+</span>
+
+
+@else
+
+
+<span class="
+px-3
+py-1
+rounded-full
+text-xs
+bg-green-50
+text-green-700
+font-semibold
+">
 
 Aktif
 
-
 </span>
+
+
+@endif
 
 
 </td>
@@ -702,30 +666,14 @@ Aktif
 
 
 
-
-
-
-<td class="
-px-6
-py-4
-">
-
-
-<div class="
-flex
-justify-center
-">
-
+<td class="px-6 py-4">
 
 
 <form
 
 method="POST"
 
-action="{{ route(
-'admin.akun.orangtua.reset',
-$user->id
-) }}"
+action="{{ route('admin.akun.orangtua.reset',$user->id) }}"
 
 >
 
@@ -733,15 +681,9 @@ $user->id
 @csrf
 
 
-
 <button
 
-onclick="
-return confirm(
-'Reset password akun ini?'
-)
-"
-
+onclick="return confirm('Reset password akun ini?')"
 
 class="
 bg-orange-500
@@ -751,68 +693,43 @@ px-4
 py-2
 rounded-lg
 text-sm
-font-semibold
-transition
 ">
 
-
-Reset Password
-
+Reset
 
 </button>
-
 
 
 </form>
 
 
-</div>
-
-
 </td>
 
 
-
-
-
 </tr>
-
-
 
 
 @empty
 
 
-
 <tr>
-
 
 <td colspan="7"
 
-class="
-text-center
-py-14
-text-slate-500
-">
-
+class="text-center py-12 text-gray-500"
+>
 
 Belum ada akun orang tua.
 
 </td>
 
-
 </tr>
-
-
 
 
 @endforelse
 
 
-
-
 </tbody>
-
 
 
 </table>
@@ -821,16 +738,24 @@ Belum ada akun orang tua.
 </div>
 
 
+
+
+
+<div class="px-7 py-5 border-t">
+
+{{ $users->links() }}
+
+</div>
+
+
+
 </div>
 
 
 
 
 
-
-
 </div>
-
 
 
 @endsection

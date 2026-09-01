@@ -15,10 +15,7 @@
 
 
 
-
-
 {{-- HEADER --}}
-
 
 <div class="
 bg-white
@@ -60,7 +57,6 @@ Catat aktivitas harian anak.
 
 
 
-
 <a href="{{ route('orangtua.angket.index') }}"
 
 class="
@@ -76,7 +72,6 @@ text-sm
 ← Kembali
 
 </a>
-
 
 
 </div>
@@ -124,17 +119,9 @@ text-xl
 font-bold
 ">
 
-
-{{ strtoupper(substr(
-$siswa->nama_siswa,
-0,
-1
-)) }}
-
+{{ strtoupper(substr($siswa->nama_siswa,0,1)) }}
 
 </div>
-
-
 
 
 
@@ -152,23 +139,16 @@ text-indigo-900
 </h3>
 
 
-<p class="
-text-sm
-text-indigo-700
-">
+<p class="text-sm text-indigo-700">
 
-NIS:
-{{ $siswa->nis }}
+NIS : {{ $siswa->nis }}
 
 </p>
 
 
-<p class="
-text-sm
-text-indigo-700
-">
+<p class="text-sm text-indigo-700">
 
-Kelas:
+Kelas :
 {{ $siswa->kelas->nama_kelas ?? '-' }}
 
 </p>
@@ -193,14 +173,12 @@ Kelas:
 {{-- FORM --}}
 
 
-
 <div class="
 bg-white
 rounded-2xl
 border
 p-6
 ">
-
 
 
 <form
@@ -210,6 +188,12 @@ action="{{ route('orangtua.angket.store') }}"
 method="POST"
 
 >
+
+
+@csrf
+
+
+
 @if(session('success'))
 
 <div class="
@@ -230,6 +214,7 @@ mb-5
 
 
 
+
 @if(session('error'))
 
 <div class="
@@ -247,9 +232,6 @@ mb-5
 </div>
 
 @endif
-
-@csrf
-
 
 
 
@@ -274,13 +256,9 @@ mb-5
 
 @foreach($errors->all() as $error)
 
-
 <li>
-
 {{ $error }}
-
 </li>
-
 
 @endforeach
 
@@ -318,9 +296,7 @@ $tanggalInput != $tanggalHariIni;
 
 
 
-
 @if($statusTelat)
-
 
 <div class="
 bg-yellow-50
@@ -342,8 +318,7 @@ mb-5
 
 <br>
 
-
-Akan tercatat sebagai:
+Tercatat sebagai:
 
 <b>
 Telat Isi
@@ -351,7 +326,6 @@ Telat Isi
 
 
 </div>
-
 
 
 @else
@@ -367,9 +341,7 @@ p-4
 mb-5
 ">
 
-
 ℹ️ Angket dapat diisi hari ini atau maksimal satu hari sebelumnya.
-
 
 </div>
 
@@ -382,8 +354,9 @@ mb-5
 
 
 
-{{-- TANGGAL DAN WAKTU --}}
 
+
+{{-- TANGGAL --}}
 
 
 <div class="
@@ -406,7 +379,6 @@ text-slate-700
 Tanggal Aktivitas
 
 </label>
-
 
 
 <input
@@ -439,10 +411,6 @@ py-3
 
 
 
-
-
-
-
 <div>
 
 
@@ -455,7 +423,6 @@ text-slate-700
 Bangun Pagi
 
 </label>
-
 
 
 <input
@@ -481,9 +448,7 @@ py-3
 </div>
 
 
-
 </div>
-
 
 
 
@@ -511,15 +476,11 @@ Ibadah Harian
 
 
 
-
 <div class="
 grid
 md:grid-cols-5
 gap-3
 ">
-
-
-
 
 
 @php
@@ -538,9 +499,7 @@ $ibadah = [
 
 ];
 
-
 @endphp
-
 
 
 
@@ -569,12 +528,9 @@ name="{{ $key }}"
 
 value="1"
 
-{{ old($key) ? 'checked':'' }}
+class="sholat-check rounded text-indigo-600"
 
-class="
-rounded
-text-indigo-600
-"
+{{ old($key) ? 'checked':'' }}
 
 >
 
@@ -589,10 +545,75 @@ text-indigo-600
 </label>
 
 
-
 @endforeach
 
 
+</div>
+
+
+
+
+
+
+
+{{-- ALASAN TIDAK SHOLAT --}}
+
+
+<div
+
+id="boxAlasan"
+
+class="
+mt-5
+{{ old('alasan_tidak_sholat') ? '' : 'hidden' }}
+"
+
+>
+
+
+<label class="
+text-sm
+font-semibold
+text-slate-700
+">
+
+Alasan Tidak Sholat
+
+</label>
+
+
+
+<p class="
+text-xs
+text-slate-500
+mt-1
+">
+
+Isi alasan apabila terdapat sholat yang tidak dilakukan.
+
+</p>
+
+
+
+<textarea
+
+name="alasan_tidak_sholat"
+
+rows="3"
+
+class="
+mt-3
+w-full
+border
+rounded-xl
+px-4
+py-3
+"
+
+placeholder="Contoh: sakit, bepergian, kondisi tertentu"
+
+>{{ old('alasan_tidak_sholat') }}</textarea>
+
 
 </div>
 
@@ -606,9 +627,7 @@ text-indigo-600
 
 
 
-
-{{-- AKTIVITAS --}}
-
+{{-- AKTIVITAS ANAK --}}
 
 
 <div class="mt-6">
@@ -623,8 +642,6 @@ mb-4
 Aktivitas Anak
 
 </h3>
-
-
 
 
 
@@ -647,11 +664,7 @@ mt-3
 ">
 
 
-<label class="
-flex
-items-center
-gap-2
-">
+<label class="flex items-center gap-2">
 
 
 <input
@@ -666,21 +679,14 @@ value="1"
 
 >
 
-
 Ya
-
 
 </label>
 
 
 
 
-
-<label class="
-flex
-items-center
-gap-2
-">
+<label class="flex items-center gap-2">
 
 
 <input
@@ -695,9 +701,7 @@ value="0"
 
 >
 
-
 Tidak
-
 
 </label>
 
@@ -705,8 +709,7 @@ Tidak
 
 </div>
 
-
-
+</div>
 
 
 
@@ -742,13 +745,12 @@ px-4
 py-3
 "
 
-placeholder="Contoh: membantu membersihkan rumah"
+placeholder="Contoh: membantu membersihkan rumah, membantu orang tua"
 
 >{{ old('kegiatan_membantu') }}</textarea>
 
 
 </div>
-
 
 
 
@@ -788,7 +790,6 @@ px-4
 py-3
 "
 
-
 >
 
 
@@ -796,7 +797,6 @@ py-3
 
 
 
-
 </div>
 
 
@@ -805,6 +805,9 @@ py-3
 
 
 
+
+
+{{-- BUTTON --}}
 
 
 <div class="
@@ -831,7 +834,6 @@ Batal
 
 
 
-
 <button
 
 type="submit"
@@ -844,7 +846,9 @@ px-6
 py-3
 rounded-xl
 font-semibold
-">
+"
+
+>
 
 Simpan Angket
 
@@ -853,8 +857,6 @@ Simpan Angket
 
 
 </div>
-
-
 
 
 
@@ -873,7 +875,6 @@ Simpan Angket
 
 
 {{-- RIWAYAT TERAKHIR --}}
-
 
 
 <div class="
@@ -916,8 +917,6 @@ $riwayat = $siswa
 
 
 
-
-
 @if($riwayat->count())
 
 
@@ -931,7 +930,6 @@ $riwayat = $siswa
 
 
 @php
-
 
 $tanggalAktivitas =
 \Carbon\Carbon::parse(
@@ -992,11 +990,15 @@ Diisi:
 {{
 
 $item->tanggal_pengisian
+
 ?
+
 \Carbon\Carbon::parse(
 $item->tanggal_pengisian
 )->format('d-m-Y H:i')
+
 :
+
 '-'
 
 }}
@@ -1005,6 +1007,8 @@ $item->tanggal_pengisian
 
 
 </div>
+
+
 
 
 
@@ -1026,6 +1030,7 @@ text-xs
 </span>
 
 
+
 @else
 
 
@@ -1043,11 +1048,15 @@ text-xs
 </span>
 
 
+
 @endif
 
 
 
 </div>
+
+
+
 
 
 
@@ -1069,10 +1078,14 @@ text-sm
 Belajar:
 
 <b>
-{{ $item->belajar == 1 ? 'Ya' : 'Tidak' }}
+
+{{ $item->belajar ? 'Ya':'Tidak' }}
+
 </b>
 
 </div>
+
+
 
 
 
@@ -1084,17 +1097,19 @@ Ibadah:
 
 {{
 
-$item->sholat_subuh+
-$item->sholat_dzuhur+
-$item->sholat_ashar+
-$item->sholat_magrib+
+$item->sholat_subuh +
+$item->sholat_dzuhur +
+$item->sholat_ashar +
+$item->sholat_magrib +
 $item->sholat_isya
 
-}}/5
+}} / 5
 
 </b>
 
 </div>
+
+
 
 
 
@@ -1116,7 +1131,95 @@ Tidur:
 
 
 
+
+
+
+
+
+@if($item->alasan_tidak_sholat)
+
+
+<div class="
+mt-4
+bg-red-50
+border
+border-red-100
+rounded-xl
+p-3
+text-sm
+">
+
+
+<p class="
+font-semibold
+text-red-700
+">
+
+Keterangan Tidak Sholat
+
+</p>
+
+
+
+<p class="
+text-red-600
+mt-1
+">
+
+{{ $item->alasan_tidak_sholat }}
+
+</p>
+
+
 </div>
+
+
+@endif
+
+
+
+
+
+
+
+
+@if($item->kegiatan_membantu)
+
+
+<div class="
+mt-4
+bg-slate-50
+rounded-xl
+p-3
+text-sm
+">
+
+
+<p class="font-semibold">
+
+Kegiatan Membantu
+
+</p>
+
+
+<p class="mt-1">
+
+{{ $item->kegiatan_membantu }}
+
+</p>
+
+
+</div>
+
+
+@endif
+
+
+
+
+
+</div>
+
 
 
 
@@ -1125,6 +1228,7 @@ Tidur:
 
 
 </div>
+
 
 
 
@@ -1148,43 +1252,178 @@ Belum ada riwayat angket.
 
 
 
-
 </div>
+
+
+
+
+
+
+
 
 
 <script>
 
-document.addEventListener('DOMContentLoaded', function(){
-
-    const form = document.querySelector(
-        'form[action="{{ route('orangtua.angket.store') }}"]'
-    );
+document.addEventListener(
+'DOMContentLoaded',
+function(){
 
 
-    if(form)
-    {
-
-        const button = form.querySelector(
-            'button[type="submit"]'
-        );
+const form = document.querySelector(
+'form[action="{{ route('orangtua.angket.store') }}"]'
+);
 
 
-        form.addEventListener(
-            'submit',
-            function(){
 
-                button.disabled = true;
+if(form)
+{
 
-                button.innerHTML = 'Menyimpan...';
 
-            }
-        );
+const button =
+form.querySelector(
+'button[type="submit"]'
+);
 
-    }
+
+
+form.addEventListener(
+'submit',
+function(){
+
+
+button.disabled = true;
+
+
+button.innerHTML =
+'Menyimpan...';
+
+
+}
+
+);
+
+
+}
+
 
 
 });
 
 </script>
+
+
+
+
+
+
+
+
+
+<script>
+
+
+document.addEventListener(
+'DOMContentLoaded',
+function(){
+
+
+
+const sholat =
+document.querySelectorAll('.sholat-check');
+
+
+
+const alasan =
+document.getElementById('boxAlasan');
+
+
+
+
+
+function cekSholat()
+{
+
+
+let adaTidak = false;
+
+
+
+sholat.forEach(
+function(item)
+{
+
+
+if(!item.checked)
+{
+
+adaTidak = true;
+
+}
+
+
+});
+
+
+
+
+
+if(adaTidak)
+{
+
+
+alasan.classList.remove(
+'hidden'
+);
+
+
+}
+
+else
+{
+
+
+alasan.classList.add(
+'hidden'
+);
+
+
+}
+
+
+
+}
+
+
+
+
+
+
+
+sholat.forEach(
+function(item)
+{
+
+
+item.addEventListener(
+'change',
+cekSholat
+);
+
+
+});
+
+
+
+cekSholat();
+
+
+
+});
+
+</script>
+
+
+
+
 
 @endsection

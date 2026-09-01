@@ -7,7 +7,8 @@ use Illuminate\Support\Facades\Auth;
 use App\Http\Controllers\ProfileController;
 
 
-// ADMIN
+// ================= ADMIN =================
+
 use App\Http\Controllers\Admin\DashboardController as AdminDashboardController;
 use App\Http\Controllers\Admin\JurusanController;
 use App\Http\Controllers\Admin\KelasController;
@@ -19,12 +20,16 @@ use App\Http\Controllers\Admin\AkunOrangTuaController;
 use App\Http\Controllers\Admin\MonitoringAngketController;
 
 
-// ORANG TUA
+
+// ================= ORANG TUA =================
+
 use App\Http\Controllers\OrangTua\DashboardController as OrangTuaDashboardController;
 use App\Http\Controllers\OrangTua\AngketController;
 use App\Http\Controllers\OrangTua\DataAnakController;
 use App\Http\Controllers\OrangTua\PasswordController;
 use App\Http\Controllers\OrangTua\RiwayatAngketController;
+
+
 
 
 
@@ -34,11 +39,15 @@ use App\Http\Controllers\OrangTua\RiwayatAngketController;
 |--------------------------------------------------------------------------
 */
 
-Route::get('/', function () {
 
-    return redirect()->route('login');
+Route::get('/', function(){
+
+    return redirect()
+        ->route('login');
 
 });
+
+
 
 
 
@@ -50,7 +59,8 @@ Route::get('/', function () {
 |--------------------------------------------------------------------------
 */
 
-Route::get('/dashboard', function () {
+
+Route::get('/dashboard', function(){
 
 
     $user = Auth::user();
@@ -82,8 +92,13 @@ Route::get('/dashboard', function () {
 
 
 })
-->middleware(['auth','verified'])
+->middleware([
+    'auth',
+    'verified'
+])
 ->name('dashboard');
+
+
 
 
 
@@ -97,7 +112,8 @@ Route::get('/dashboard', function () {
 |--------------------------------------------------------------------------
 */
 
-Route::post('/logout', function () {
+
+Route::post('/logout', function(){
 
 
     Auth::logout();
@@ -133,7 +149,7 @@ Route::post('/logout', function () {
 
 /*
 |--------------------------------------------------------------------------
-| ADMIN
+| ADMIN AREA
 |--------------------------------------------------------------------------
 */
 
@@ -143,7 +159,9 @@ Route::middleware([
     'role:admin'
 ])
 ->prefix('admin')
-->group(function () {
+->group(function(){
+
+
 
 
 
@@ -162,6 +180,45 @@ Route::middleware([
         ]
     )
     ->name('admin.dashboard');
+
+
+
+
+
+
+
+
+
+    /*
+    |--------------------------------------------------------------------------
+    | Monitoring Angket
+    |--------------------------------------------------------------------------
+    */
+
+
+    Route::get(
+        '/monitoring-angket',
+        [
+            MonitoringAngketController::class,
+            'index'
+        ]
+    )
+    ->name('monitoring.angket');
+
+
+
+    Route::get(
+        '/monitoring-angket/{siswa}',
+        [
+            MonitoringAngketController::class,
+            'detail'
+        ]
+    )
+    ->name('monitoring.angket.detail');
+
+
+
+
 
 
 
@@ -194,39 +251,58 @@ Route::middleware([
     )
     ->name('laporan.export');
 
-Route::get(
-    '/laporan/pdf',
-    [
-        LaporanController::class,
-        'pdf'
-    ]
-)
-->name('laporan.pdf');
-
-/*
-|--------------------------------------------------------------------------
-| Monitoring Angket
-|--------------------------------------------------------------------------
-*/
 
 
-Route::get(
-    '/monitoring-angket',
-    [
-        MonitoringAngketController::class,
-        'index'
-    ]
-)
-->name('monitoring.angket');
+    Route::get(
+        '/laporan/pdf',
+        [
+            LaporanController::class,
+            'pdf'
+        ]
+    )
+    ->name('laporan.pdf');
 
-Route::get(
-    '/monitoring-angket/{siswa}',
-    [
-        MonitoringAngketController::class,
-        'detail'
-    ]
-)
-->name('monitoring.angket.detail');
+
+
+
+
+
+
+
+
+    /*
+    |--------------------------------------------------------------------------
+    | Angket Admin
+    |--------------------------------------------------------------------------
+    */
+
+
+    Route::get(
+        '/angket',
+        [
+            AdminAngketController::class,
+            'index'
+        ]
+    )
+    ->name('angket.index');
+
+
+
+    Route::get(
+        '/angket/{id}',
+        [
+            AdminAngketController::class,
+            'detail'
+        ]
+    )
+    ->name('admin.angket.detail');
+
+
+
+
+
+
+
 
 
     /*
@@ -247,7 +323,6 @@ Route::get(
 
 
 
-
     Route::get(
         '/akun-orangtua',
         [
@@ -256,7 +331,6 @@ Route::get(
         ]
     )
     ->name('admin.akun.orangtua');
-
 
 
 
@@ -269,40 +343,19 @@ Route::get(
     )
     ->name('admin.akun.orangtua.reset');
 
-Route::post(
-    '/akun-orangtua/reset-semua',
-    [
-        AkunOrangTuaController::class,
-        'resetSemuaPassword'
-    ]
-)
-->name('admin.akun.orangtua.reset.semua');
 
 
-    /*
-    |--------------------------------------------------------------------------
-    | Angket
-    |--------------------------------------------------------------------------
-    */
-
-
-    Route::get(
-        '/angket',
+    Route::post(
+        '/akun-orangtua/reset-semua',
         [
-            AdminAngketController::class,
-            'index'
+            AkunOrangTuaController::class,
+            'resetSemuaPassword'
         ]
     )
-    ->name('angket.index');
+    ->name('admin.akun.orangtua.reset.semua');
 
-Route::get(
-    '/angket/{id}',
-    [
-        AdminAngketController::class,
-        'detail'
-    ]
-)
-->name('admin.angket.detail');
+
+
 
 
 
@@ -311,10 +364,9 @@ Route::get(
 
     /*
     |--------------------------------------------------------------------------
-    | Master Data
+    | MASTER JURUSAN
     |--------------------------------------------------------------------------
     */
-
 
 
     Route::resource(
@@ -324,6 +376,18 @@ Route::get(
     ->names('jurusan');
 
 
+
+
+
+
+
+
+
+    /*
+    |--------------------------------------------------------------------------
+    | MASTER KELAS
+    |--------------------------------------------------------------------------
+    */
 
 
     Route::get(
@@ -360,19 +424,23 @@ Route::get(
 
 
 
+
+
     /*
     |--------------------------------------------------------------------------
-    | Siswa
+    | MASTER SISWA
     |--------------------------------------------------------------------------
     */
 
 
-
-    Route::resource(
-        '/siswa',
-        SiswaController::class
+    Route::get(
+        '/siswa/kelas/{id}',
+        [
+            SiswaController::class,
+            'kelas'
+        ]
     )
-    ->names('siswa');
+    ->name('siswa.kelas');
 
 
 
@@ -398,6 +466,15 @@ Route::get(
 
 
 
+    Route::resource(
+        '/siswa',
+        SiswaController::class
+    )
+    ->names('siswa');
+
+
+
+
 
 
 
@@ -405,9 +482,30 @@ Route::get(
 
     /*
     |--------------------------------------------------------------------------
-    | Orang Tua
+    | MASTER ORANG TUA
     |--------------------------------------------------------------------------
     */
+
+
+    Route::get(
+        '/orang-tua/kelas/{id}',
+        [
+            OrangTuaController::class,
+            'kelas'
+        ]
+    )
+    ->name('orangtua.kelas');
+
+
+
+    Route::post(
+        '/orang-tua/import',
+        [
+            OrangTuaController::class,
+            'import'
+        ]
+    )
+    ->name('orangtua.import');
 
 
 
@@ -417,14 +515,7 @@ Route::get(
     )
     ->names('orangtua');
 
-Route::post(
-    '/orang-tua/import',
-    [
-        OrangTuaController::class,
-        'import'
-    ]
-)
-->name('orangtua.import');
+
 
 });
 
@@ -438,7 +529,7 @@ Route::post(
 
 /*
 |--------------------------------------------------------------------------
-| ORANG TUA
+| ORANG TUA AREA
 |--------------------------------------------------------------------------
 */
 
@@ -449,46 +540,7 @@ Route::middleware([
     'password.change'
 ])
 ->prefix('orang-tua')
-->group(function () {
-
-Route::get(
-    '/riwayat-angket',
-    [
-        RiwayatAngketController::class,
-        'index'
-    ]
-)
-->name('orangtua.riwayat');
-
-
-    /*
-    |--------------------------------------------------------------------------
-    | Ganti Password Pertama
-    |--------------------------------------------------------------------------
-    */
-
-
-    Route::get(
-        '/ganti-password',
-        [
-            PasswordController::class,
-            'edit'
-        ]
-    )
-    ->name('orangtua.password.edit');
-
-
-
-
-    Route::post(
-        '/ganti-password',
-        [
-            PasswordController::class,
-            'update'
-        ]
-    )
-    ->name('orangtua.password.update');
-
+->group(function(){
 
 
 
@@ -510,6 +562,42 @@ Route::get(
         ]
     )
     ->name('orangtua.dashboard');
+
+
+
+
+
+
+
+
+    /*
+    |--------------------------------------------------------------------------
+    | Password
+    |--------------------------------------------------------------------------
+    */
+
+
+    Route::get(
+        '/ganti-password',
+        [
+            PasswordController::class,
+            'edit'
+        ]
+    )
+    ->name('orangtua.password.edit');
+
+
+
+    Route::post(
+        '/ganti-password',
+        [
+            PasswordController::class,
+            'update'
+        ]
+    )
+    ->name('orangtua.password.update');
+
+
 
 
 
@@ -539,6 +627,8 @@ Route::get(
 
 
 
+
+
     /*
     |--------------------------------------------------------------------------
     | Angket
@@ -557,7 +647,6 @@ Route::get(
 
 
 
-
     Route::get(
         '/angket/create',
         [
@@ -569,7 +658,6 @@ Route::get(
 
 
 
-
     Route::post(
         '/angket',
         [
@@ -578,6 +666,32 @@ Route::get(
         ]
     )
     ->name('orangtua.angket.store');
+
+
+
+
+
+
+
+
+
+    /*
+    |--------------------------------------------------------------------------
+    | Riwayat
+    |--------------------------------------------------------------------------
+    */
+
+
+    Route::get(
+        '/riwayat-angket',
+        [
+            RiwayatAngketController::class,
+            'index'
+        ]
+    )
+    ->name('orangtua.riwayat');
+
+
 
 
 
@@ -599,7 +713,7 @@ Route::get(
 
 
 Route::middleware('auth')
-->group(function () {
+->group(function(){
 
 
     Route::get(

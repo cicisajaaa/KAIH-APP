@@ -11,10 +11,7 @@
 
 
 
-
-
-{{-- HEADER DASHBOARD --}}
-
+{{-- HEADER --}}
 
 <div class="
 bg-white
@@ -28,7 +25,6 @@ items-center
 
 
 <div>
-
 
 <h2 class="
 text-2xl
@@ -67,7 +63,6 @@ text-sm
 font-semibold
 ">
 
-
 Monitoring Aktif
 
 </div>
@@ -83,23 +78,17 @@ Monitoring Aktif
 
 
 
-
 {{-- DATA MASTER --}}
 
 
 <div>
 
 
-<h3 class="
-text-lg
-font-semibold
-mb-4
-">
+<h3 class="text-lg font-semibold mb-4">
 
 Data Master
 
 </h3>
-
 
 
 
@@ -113,6 +102,45 @@ gap-5
 
 
 
+@php
+
+$master = [
+
+[
+'judul'=>'Jurusan',
+'value'=>$totalJurusan,
+'label'=>'Program',
+'color'=>'text-indigo-600'
+],
+
+[
+'judul'=>'Kelas',
+'value'=>$totalKelas,
+'label'=>'Rombel',
+'color'=>'text-emerald-600'
+],
+
+[
+'judul'=>'Siswa',
+'value'=>$totalSiswa,
+'label'=>'Peserta',
+'color'=>'text-blue-600'
+],
+
+[
+'judul'=>'Orang Tua',
+'value'=>$totalOrangTua,
+'label'=>'Akun',
+'color'=>'text-purple-600'
+]
+
+];
+
+@endphp
+
+
+
+@foreach($master as $item)
 
 
 <div class="
@@ -125,7 +153,7 @@ p-6
 
 <p class="text-sm text-slate-500">
 
-Jurusan
+{{ $item['judul'] }}
 
 </p>
 
@@ -136,10 +164,10 @@ Jurusan
 <h2 class="
 text-4xl
 font-bold
-text-indigo-600
+{{ $item['color'] }}
 ">
 
-{{ $totalJurusan }}
+{{ $item['value'] }}
 
 </h2>
 
@@ -149,7 +177,7 @@ text-xs
 text-slate-400
 ">
 
-Program
+{{ $item['label'] }}
 
 </span>
 
@@ -160,50 +188,8 @@ Program
 </div>
 
 
+@endforeach
 
-
-
-
-
-
-
-<div class="
-bg-white
-rounded-2xl
-border
-p-6
-">
-
-
-<p class="text-sm text-slate-500">
-
-Kelas
-
-</p>
-
-
-<div class="flex justify-between items-end mt-4">
-
-
-<h2 class="
-text-4xl
-font-bold
-text-emerald-600
-">
-
-{{ $totalKelas }}
-
-</h2>
-
-
-<span class="
-text-xs
-text-slate-400
-">
-
-Rombel
-
-</span>
 
 
 </div>
@@ -212,114 +198,6 @@ Rombel
 </div>
 
 
-
-
-
-
-
-
-
-<div class="
-bg-white
-rounded-2xl
-border
-p-6
-">
-
-
-<p class="text-sm text-slate-500">
-
-Siswa
-
-</p>
-
-
-<div class="flex justify-between items-end mt-4">
-
-
-<h2 class="
-text-4xl
-font-bold
-text-blue-600
-">
-
-{{ $totalSiswa }}
-
-</h2>
-
-
-<span class="
-text-xs
-text-slate-400
-">
-
-Peserta
-
-</span>
-
-
-</div>
-
-
-</div>
-
-
-
-
-
-
-
-
-<div class="
-bg-white
-rounded-2xl
-border
-p-6
-">
-
-
-<p class="text-sm text-slate-500">
-
-Orang Tua
-
-</p>
-
-
-<div class="flex justify-between items-end mt-4">
-
-
-<h2 class="
-text-4xl
-font-bold
-text-purple-600
-">
-
-{{ $totalOrangTua }}
-
-</h2>
-
-
-<span class="
-text-xs
-text-slate-400
-">
-
-Akun
-
-</span>
-
-
-</div>
-
-
-</div>
-
-
-
-</div>
-
-
-</div>
 
 
 
@@ -330,6 +208,7 @@ Akun
 {{-- KONDISI SISWA --}}
 
 
+
 <div>
 
 
@@ -337,12 +216,20 @@ Akun
 
 
 <h3 class="text-lg font-semibold">
+
 Kondisi Siswa
+
 </h3>
 
 
+
 <a href="{{ route('monitoring.angket') }}"
-class="text-sm text-indigo-600 hover:underline">
+
+class="
+text-sm
+text-indigo-600
+hover:underline
+">
 
 Lihat Monitoring →
 
@@ -353,18 +240,16 @@ Lihat Monitoring →
 
 
 
+
+
 <div class="
 grid
-grid-cols-1
 md:grid-cols-3
 gap-5
 ">
 
 
 
-
-
-{{-- BAIK --}}
 
 
 <div class="
@@ -376,20 +261,7 @@ p-6
 ">
 
 
-<div class="
-flex
-justify-between
-items-center
-">
-
-
-<div>
-
-
-<p class="
-text-sm
-text-emerald-700
-">
+<p class="text-sm text-emerald-700">
 
 Kondisi Baik
 
@@ -408,36 +280,9 @@ mt-3
 </h2>
 
 
-</div>
+<p class="text-xs text-emerald-600 mt-4">
 
-
-
-<div class="
-w-12
-h-12
-rounded-xl
-bg-emerald-100
-flex
-items-center
-justify-center
-text-xl
-">
-
-✓
-
-</div>
-
-
-</div>
-
-
-<p class="
-text-xs
-text-emerald-600
-mt-4
-">
-
-Siswa dengan perkembangan positif
+Perkembangan positif
 
 </p>
 
@@ -451,10 +296,6 @@ Siswa dengan perkembangan positif
 
 
 
-
-{{-- PERHATIAN --}}
-
-
 <div class="
 bg-yellow-50
 border
@@ -464,20 +305,7 @@ p-6
 ">
 
 
-<div class="
-flex
-justify-between
-items-center
-">
-
-
-<div>
-
-
-<p class="
-text-sm
-text-yellow-700
-">
+<p class="text-sm text-yellow-700">
 
 Perlu Perhatian
 
@@ -496,34 +324,7 @@ mt-3
 </h2>
 
 
-</div>
-
-
-
-<div class="
-w-12
-h-12
-rounded-xl
-bg-yellow-100
-flex
-items-center
-justify-center
-text-xl
-">
-
-!
-
-</div>
-
-
-</div>
-
-
-<p class="
-text-xs
-text-yellow-600
-mt-4
-">
+<p class="text-xs text-yellow-600 mt-4">
 
 Perlu pemantauan rutin
 
@@ -539,10 +340,6 @@ Perlu pemantauan rutin
 
 
 
-
-{{-- PENDAMPINGAN --}}
-
-
 <div class="
 bg-red-50
 border
@@ -552,20 +349,7 @@ p-6
 ">
 
 
-<div class="
-flex
-justify-between
-items-center
-">
-
-
-<div>
-
-
-<p class="
-text-sm
-text-red-700
-">
+<p class="text-sm text-red-700">
 
 Perlu Pendampingan
 
@@ -584,36 +368,9 @@ mt-3
 </h2>
 
 
-</div>
+<p class="text-xs text-red-600 mt-4">
 
-
-
-<div class="
-w-12
-h-12
-rounded-xl
-bg-red-100
-flex
-items-center
-justify-center
-text-xl
-">
-
-⚠
-
-</div>
-
-
-</div>
-
-
-<p class="
-text-xs
-text-red-600
-mt-4
-">
-
-Membutuhkan perhatian khusus
+Membutuhkan tindakan
 
 </p>
 
@@ -623,25 +380,26 @@ Membutuhkan perhatian khusus
 
 
 
-
-
 </div>
 
 
 </div>
 
-{{-- MONITORING --}}
 
+
+
+
+
+
+
+
+{{-- MONITORING ANGKET --}}
 
 
 <div>
 
 
-<h3 class="
-text-lg
-font-semibold
-mb-4
-">
+<h3 class="text-lg font-semibold mb-4">
 
 Monitoring Angket Hari Ini
 
@@ -649,10 +407,8 @@ Monitoring Angket Hari Ini
 
 
 
-
 <div class="
 grid
-grid-cols-1
 md:grid-cols-3
 gap-5
 ">
@@ -661,14 +417,12 @@ gap-5
 
 
 
-
 <div class="
 bg-white
-rounded-2xl
 border
+rounded-2xl
 p-6
 ">
-
 
 <p class="text-sm text-slate-500">
 
@@ -689,19 +443,7 @@ mt-3
 </h2>
 
 
-<p class="
-text-xs
-text-slate-400
-mt-2
-">
-
-Siswa mengirim laporan hari ini
-
-</p>
-
-
 </div>
-
 
 
 
@@ -711,11 +453,10 @@ Siswa mengirim laporan hari ini
 
 <div class="
 bg-white
-rounded-2xl
 border
+rounded-2xl
 p-6
 ">
-
 
 <p class="text-sm text-slate-500">
 
@@ -736,20 +477,7 @@ mt-3
 </h2>
 
 
-<p class="
-text-xs
-text-slate-400
-mt-2
-">
-
-Perlu tindak lanjut
-
-</p>
-
-
 </div>
-
-
 
 
 
@@ -759,8 +487,8 @@ Perlu tindak lanjut
 
 <div class="
 bg-white
-rounded-2xl
 border
+rounded-2xl
 p-6
 ">
 
@@ -784,7 +512,6 @@ mt-3
 </h2>
 
 
-
 <div class="
 mt-4
 h-2
@@ -794,16 +521,14 @@ overflow-hidden
 ">
 
 
-<div
-
-class="
-h-full
+<div class="
 bg-indigo-600
+h-full
 rounded-full
 "
 
 style="
-width: {{ $persentaseAngket }}%
+width:{{ $persentaseAngket }}%
 ">
 
 </div>
@@ -817,8 +542,6 @@ width: {{ $persentaseAngket }}%
 
 
 
-
-
 </div>
 
 
@@ -832,41 +555,33 @@ width: {{ $persentaseAngket }}%
 
 
 
+{{-- SISWA PERHATIAN --}}
 
-
-
-
-
-
-
-
-{{-- SISWA PERLU PERHATIAN --}}
 
 
 <div class="
 bg-white
-rounded-2xl
 border
+rounded-2xl
 p-6
 ">
 
 
+<div class="mb-5">
 
-<div class="
-flex
-justify-between
-items-center
-mb-5
-">
 
-<h3 class="
-font-semibold
-text-lg
-">
+<h3 class="font-semibold text-lg">
 
 Siswa Perlu Perhatian
 
 </h3>
+
+
+<p class="text-sm text-slate-400">
+
+Data monitoring terakhir
+
+</p>
 
 
 </div>
@@ -877,8 +592,6 @@ Siswa Perlu Perhatian
 
 
 @if($siswaPerhatian->count())
-
-
 
 <div class="overflow-x-auto">
 
@@ -897,22 +610,30 @@ text-slate-500
 
 
 <th class="text-left py-3">
+
 Nama
+
 </th>
 
 
 <th class="text-left py-3">
+
 Kelas
+
 </th>
 
 
 <th class="text-left py-3">
+
 Skor
+
 </th>
 
 
 <th class="text-left py-3">
+
 Kategori
+
 </th>
 
 
@@ -927,8 +648,7 @@ Kategori
 <tbody>
 
 
-@foreach($siswaPerhatian as $angket)
-
+@foreach($siswaPerhatian as $item)
 
 
 <tr class="border-b">
@@ -936,33 +656,26 @@ Kategori
 
 <td class="py-3">
 
-{{ $angket->siswa->nama_siswa ?? '-' }}
+{{ $item->siswa->nama_siswa ?? '-' }}
 
 </td>
 
 
-
 <td class="py-3">
 
-{{ $angket->siswa->kelas->nama_kelas ?? '-' }}
+{{ $item->siswa->kelas->nama_kelas ?? '-' }}
 
 </td>
 
 
-
 <td class="py-3">
 
-{{ $angket->skor }}
+{{ $item->skor }}
 
 </td>
 
 
-
-
 <td class="py-3">
-
-
-@if($angket->kategori == 'Perlu Perhatian')
 
 
 <span class="
@@ -970,58 +683,36 @@ px-3
 py-1
 rounded-full
 text-xs
-bg-yellow-50
-text-yellow-600
+{{ 
+$item->kategori == 'Perlu Perhatian'
+?
+'bg-yellow-100 text-yellow-700'
+:
+'bg-red-100 text-red-700'
+}}
 ">
 
-Perlu Perhatian
+{{ $item->kategori }}
 
 </span>
-
-
-@else
-
-
-<span class="
-px-3
-py-1
-rounded-full
-text-xs
-bg-red-50
-text-red-600
-">
-
-Perlu Pendampingan
-
-</span>
-
-
-@endif
-
 
 
 </td>
-
 
 
 </tr>
 
 
-
 @endforeach
 
 
-
 </tbody>
-
 
 
 </table>
 
 
 </div>
-
-
 
 
 @else
@@ -1031,7 +722,6 @@ Perlu Pendampingan
 text-center
 py-8
 text-emerald-600
-font-medium
 ">
 
 Tidak ada siswa yang membutuhkan perhatian.
@@ -1039,12 +729,17 @@ Tidak ada siswa yang membutuhkan perhatian.
 </div>
 
 
-
 @endif
 
 
-
 </div>
+
+
+
+
+
+
+
 
 
 {{-- GRAFIK --}}
@@ -1053,62 +748,20 @@ Tidak ada siswa yang membutuhkan perhatian.
 
 <div class="
 bg-white
-rounded-2xl
 border
+rounded-2xl
 p-6
 ">
 
 
-
-<div class="
-flex
-justify-between
-items-center
-mb-5
-">
-
-
-<div>
-
-<h3 class="
-font-semibold
-text-lg
-">
+<h3 class="font-semibold text-lg mb-5">
 
 Tren Pengisian Angket
 
 </h3>
 
 
-<p class="
-text-sm
-text-slate-400
-">
-
-7 hari terakhir
-
-</p>
-
-
-</div>
-
-
-</div>
-
-
-
-
-
-<div class="max-w-4xl mx-auto">
-
-
-<canvas id="angketChart"
-height="80">
-</canvas>
-
-
-</div>
-
+<canvas id="angketChart"></canvas>
 
 
 </div>
@@ -1127,54 +780,22 @@ height="80">
 
 <div class="
 bg-white
-rounded-2xl
 border
+rounded-2xl
 p-6
 ">
 
 
-
-<div class="
-flex
-justify-between
-items-center
-mb-5
-">
-
-
-<h3 class="
-font-semibold
-text-lg
-">
+<h3 class="font-semibold text-lg mb-5">
 
 Siswa Belum Mengisi
 
 </h3>
 
 
-<a href="{{ route('laporan.index') }}"
-
-class="
-text-sm
-text-indigo-600
-hover:underline
-">
-
-Lihat Laporan
-
-</a>
-
-
-</div>
-
-
-
-
-
 
 
 @if($siswaBelumIsi->count())
-
 
 
 <div class="overflow-x-auto">
@@ -1185,6 +806,7 @@ Lihat Laporan
 
 <thead>
 
+
 <tr class="
 border-b
 text-sm
@@ -1193,17 +815,23 @@ text-slate-500
 
 
 <th class="text-left py-3">
+
 Nama
+
 </th>
 
 
 <th class="text-left py-3">
+
 Kelas
+
 </th>
 
 
 <th class="text-left py-3">
+
 Status
+
 </th>
 
 
@@ -1230,7 +858,6 @@ Status
 </td>
 
 
-
 <td class="py-3">
 
 {{ $siswa->kelas->nama_kelas ?? '-' }}
@@ -1238,17 +865,16 @@ Status
 </td>
 
 
-
 <td class="py-3">
 
 
 <span class="
+bg-red-100
+text-red-700
 px-3
 py-1
 rounded-full
 text-xs
-bg-red-50
-text-red-600
 ">
 
 Belum Isi
@@ -1263,7 +889,6 @@ Belum Isi
 
 
 @endforeach
-
 
 
 </tbody>
@@ -1283,21 +908,16 @@ Belum Isi
 text-center
 py-8
 text-emerald-600
-font-medium
 ">
 
-
-Semua siswa sudah mengisi angket hari ini.
-
+Semua siswa sudah mengisi angket.
 
 </div>
-
 
 
 @endif
 
 
-
 </div>
 
 
@@ -1305,12 +925,12 @@ Semua siswa sudah mengisi angket hari ini.
 
 
 
-
-
-
-
-
 </div>
+
+
+
+
+
 
 
 
@@ -1320,12 +940,14 @@ Semua siswa sudah mengisi angket hari ini.
 <script>
 
 
-const ctx =
-document.getElementById('angketChart');
+const ctx = document.getElementById('angketChart');
 
 
+if(ctx)
+{
 
-new Chart(ctx, {
+
+new Chart(ctx,{
 
 
 type:'line',
@@ -1339,24 +961,15 @@ labels:@json($grafikTanggal ?? []),
 
 datasets:[{
 
-
 label:'Jumlah Pengisian',
-
 
 data:@json($grafikJumlah ?? []),
 
-
 borderWidth:2,
-
 
 tension:0.35,
 
-
-pointRadius:3,
-
-
-fill:false
-
+pointRadius:4
 
 }]
 
@@ -1369,9 +982,6 @@ options:{
 
 
 responsive:true,
-
-
-maintainAspectRatio:true,
 
 
 plugins:{
@@ -1419,6 +1029,9 @@ stepSize:1
 
 
 });
+
+
+}
 
 
 </script>

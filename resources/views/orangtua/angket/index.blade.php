@@ -508,6 +508,26 @@ text-green-700
 @else
 
 
+@if($item->alasan_tidak_sholat)
+
+
+<span class="
+px-3
+py-1
+rounded-full
+text-xs
+bg-yellow-100
+text-yellow-700
+">
+
+⚠ {{ $nama }}
+
+</span>
+
+
+@else
+
+
 <span class="
 px-3
 py-1
@@ -520,6 +540,9 @@ text-gray-500
 ✕ {{ $nama }}
 
 </span>
+
+
+@endif
 
 
 
@@ -543,6 +566,81 @@ text-gray-500
 
 
 
+
+
+{{-- ALASAN TIDAK SHOLAT --}}
+
+
+@if($item->alasan_tidak_sholat)
+
+
+<div class="mt-5">
+
+
+<p class="
+text-sm
+font-semibold
+text-gray-700
+mb-2
+">
+
+Keterangan Ibadah
+
+</p>
+
+
+
+<div class="
+bg-yellow-50
+border
+border-yellow-200
+rounded-lg
+p-4
+">
+
+
+<p class="
+text-sm
+font-semibold
+text-yellow-700
+">
+
+⚠ Alasan Tidak Sholat
+
+</p>
+
+
+
+<p class="
+text-sm
+text-yellow-800
+mt-1
+">
+
+{{ $item->alasan_tidak_sholat }}
+
+</p>
+
+
+
+</div>
+
+
+</div>
+
+
+@endif
+
+
+
+
+
+
+
+
+
+
+{{-- KEGIATAN MEMBANTU --}}
 
 
 

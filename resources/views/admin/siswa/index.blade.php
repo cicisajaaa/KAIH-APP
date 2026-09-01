@@ -1,7 +1,12 @@
 @extends('admin.layouts.app')
 
-@section('title', 'Data Siswa')
-@section('page-title', 'Data Siswa')
+
+@section('title','Data Siswa')
+
+
+@section('page-title','Data Siswa')
+
+
 
 @section('content')
 
@@ -12,18 +17,38 @@
 
 {{-- HEADER --}}
 
-<div class="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-5">
+
+<div class="
+flex
+flex-col
+lg:flex-row
+lg:justify-between
+lg:items-center
+gap-5
+">
 
 
 <div>
 
-<h2 class="text-2xl font-bold text-slate-800">
+
+<h2 class="
+text-2xl
+font-bold
+text-slate-800
+">
+
 Data Siswa
+
 </h2>
 
 
-<p class="text-slate-500 mt-1">
+<p class="
+text-slate-500
+mt-1
+">
+
 Kelola data siswa, kelas, dan akun orang tua.
+
 </p>
 
 
@@ -33,36 +58,30 @@ Kelola data siswa, kelas, dan akun orang tua.
 
 
 
-<div class="flex flex-wrap gap-3">
+<div class="
+flex
+flex-wrap
+gap-3
+">
 
-
-
-{{-- GENERATE AKUN --}}
 
 <a href="{{ route('admin.generate.orangtua') }}"
 
-onclick="return confirm(
-'Generate akun orang tua untuk seluruh siswa?'
-)"
+onclick="return confirm('Generate akun orang tua untuk seluruh siswa?')"
 
 class="
-inline-flex
-items-center
-gap-2
 bg-purple-600
 hover:bg-purple-700
 text-white
-font-semibold
 px-5
 py-3
 rounded-xl
+font-semibold
 transition
 ">
 
 
-👨‍👩‍👧
-
-Generate Akun Orang Tua
+👨‍👩‍👧 Generate Akun
 
 
 </a>
@@ -70,32 +89,21 @@ Generate Akun Orang Tua
 
 
 
-
-
-
-
-{{-- EXPORT --}}
 
 <a href="{{ route('siswa.export') }}"
 
 class="
-inline-flex
-items-center
-gap-2
 bg-emerald-600
 hover:bg-emerald-700
 text-white
-font-semibold
 px-5
 py-3
 rounded-xl
+font-semibold
 transition
 ">
 
-
-📤
-
-Export Excel
+📤 Export
 
 
 </a>
@@ -103,35 +111,24 @@ Export Excel
 
 
 
-
-
-
-{{-- TAMBAH --}}
 
 <a href="{{ route('siswa.create') }}"
 
 class="
-inline-flex
-items-center
-gap-2
 bg-indigo-600
 hover:bg-indigo-700
 text-white
-font-semibold
 px-5
 py-3
 rounded-xl
+font-semibold
 transition
 ">
 
-
-+
-
-Tambah Siswa
++ Tambah Siswa
 
 
 </a>
-
 
 
 
@@ -153,8 +150,8 @@ Tambah Siswa
 
 <div class="
 bg-white
-rounded-2xl
 border
+rounded-2xl
 p-6
 ">
 
@@ -163,25 +160,32 @@ p-6
 flex
 flex-col
 xl:flex-row
-xl:items-center
 xl:justify-between
+xl:items-center
 gap-5
 ">
 
 
-
 <div>
 
-<h3 class="font-semibold text-slate-800">
+
+<h3 class="
+font-semibold
+text-slate-800
+">
 
 Import Data Siswa
 
 </h3>
 
 
-<p class="text-sm text-slate-500 mt-1">
+<p class="
+text-sm
+text-slate-500
+mt-1
+">
 
-Upload file Excel data siswa.
+Upload file Excel siswa berdasarkan sheet kelas.
 
 </p>
 
@@ -202,9 +206,12 @@ method="POST"
 
 enctype="multipart/form-data"
 
-class="flex flex-col sm:flex-row gap-3"
-
->
+class="
+flex
+flex-col
+sm:flex-row
+gap-3
+">
 
 
 @csrf
@@ -225,14 +232,12 @@ class="
 border
 rounded-xl
 px-4
-py-2.5
+py-2
 text-sm
 "
 
 
 >
-
-
 
 
 
@@ -243,11 +248,10 @@ bg-indigo-600
 hover:bg-indigo-700
 text-white
 px-5
-py-2.5
+py-2
 rounded-xl
 font-semibold
 ">
-
 
 📥 Import Excel
 
@@ -256,12 +260,356 @@ font-semibold
 
 
 
-
 </form>
+
+
+</div>
+
+
+</div>
+
+
+
+
+
+{{-- DAFTAR KELAS --}}
+
+<div class="space-y-4">
+
+
+<div>
+
+<h3 class="
+text-lg
+font-bold
+text-slate-800
+">
+
+Daftar Kelas
+
+</h3>
+
+
+<p class="
+text-sm
+text-slate-500
+">
+
+Pilih kelas untuk melihat data siswa.
+
+</p>
+
+
+</div>
+
+
+
+
+
+<div class="
+grid
+grid-cols-1
+sm:grid-cols-2
+lg:grid-cols-4
+gap-4
+">
+
+
+@foreach($kelas as $item)
+
+
+<a href="{{ route('siswa.kelas',$item->id) }}"
+
+class="
+bg-white
+border
+rounded-2xl
+p-5
+hover:border-indigo-500
+hover:shadow-md
+transition
+">
+
+
+<div class="
+flex
+justify-between
+items-center
+">
+
+
+<div>
+
+
+<h4 class="
+font-bold
+text-slate-800
+">
+
+{{ $item->nama_kelas }}
+
+</h4>
+
+
+<p class="
+text-sm
+text-slate-500
+mt-1
+">
+
+{{ $item->jurusan->nama_jurusan ?? 'Tanpa Jurusan' }}
+
+</p>
+
+
+</div>
+
+
+
+
+<div class="
+w-12
+h-12
+rounded-xl
+bg-indigo-50
+text-indigo-600
+flex
+items-center
+justify-center
+font-bold
+">
+
+{{ $item->siswas_count }}
+
+</div>
+
+
+</div>
+
+
+
+<p class="
+text-xs
+text-gray-400
+mt-4
+">
+
+Jumlah Siswa
+
+</p>
+
+
+
+</a>
+
+
+
+@endforeach
+
+
+</div>
+
+
+</div>
+
+
+
+{{-- FILTER --}}
+
+
+<div class="
+bg-white
+border
+rounded-2xl
+p-6
+">
+
+
+<form method="GET" action="{{ route('siswa.index') }}">
+
+
+<div class="
+grid
+md:grid-cols-3
+gap-4
+">
+
+
+
+
+
+<div>
+
+
+<label class="
+text-sm
+font-semibold
+text-slate-700
+">
+
+Cari Siswa
+
+</label>
+
+
+<input
+
+type="text"
+
+name="search"
+
+value="{{ request('search') }}"
+
+placeholder="Cari NIS atau nama siswa"
+
+class="
+w-full
+mt-2
+border
+rounded-xl
+px-4
+py-3
+focus:ring-2
+focus:ring-indigo-500
+"
+
+
+>
+
+
+</div>
+
+
+
+
+
+
+
+
+<div>
+
+
+<label class="
+text-sm
+font-semibold
+text-slate-700
+">
+
+Kelas
+
+</label>
+
+
+<select
+
+name="kelas_id"
+
+class="
+w-full
+mt-2
+border
+rounded-xl
+px-4
+py-3
+"
+
+
+>
+
+
+<option value="">
+
+Semua Kelas
+
+</option>
+
+
+
+@foreach($kelas as $item)
+
+<option
+
+value="{{ $item->id }}"
+
+{{ request('kelas_id')==$item->id?'selected':'' }}
+
+>
+
+{{ $item->nama_kelas }}
+
+({{ $item->siswas_count }})
+
+</option>
+
+
+@endforeach
+
+
+</select>
+
+
+</div>
+
+
+
+
+
+
+
+
+<div class="
+flex
+items-end
+gap-3
+">
+
+
+<button
+
+class="
+bg-indigo-600
+hover:bg-indigo-700
+text-white
+px-6
+py-3
+rounded-xl
+font-semibold
+">
+
+
+🔍 Cari
+
+
+</button>
+
+
+
+
+<a href="{{ route('siswa.index') }}"
+
+class="
+bg-gray-100
+hover:bg-gray-200
+px-6
+py-3
+rounded-xl
+">
+
+
+Reset
+
+
+</a>
+
+
+</div>
 
 
 
 </div>
+
+
+</form>
 
 
 </div>
@@ -277,30 +625,39 @@ font-semibold
 {{-- TABLE --}}
 
 
+
 <div class="
 bg-white
-rounded-2xl
 border
+rounded-2xl
 overflow-hidden
 ">
 
 
 
+<div class="
+px-6
+py-5
+border-b
+">
 
 
-<div class="px-6 py-5 border-b">
-
-
-<h3 class="font-bold text-lg">
+<h3 class="
+font-bold
+text-lg
+">
 
 Daftar Siswa
 
 </h3>
 
 
-<p class="text-sm text-slate-500">
+<p class="
+text-sm
+text-slate-500
+">
 
-Total {{ $siswas->count() }} siswa
+Total {{ $siswas->total() }} siswa
 
 </p>
 
@@ -320,44 +677,43 @@ Total {{ $siswas->count() }} siswa
 <table class="w-full">
 
 
-
 <thead class="bg-slate-50">
 
 
 <tr>
 
 
-<th class="px-6 py-4 text-left text-xs text-slate-500 uppercase">
+<th class="px-6 py-4 text-left text-xs uppercase text-slate-500">
 No
 </th>
 
 
-<th class="px-6 py-4 text-left text-xs text-slate-500 uppercase">
+<th class="px-6 py-4 text-left text-xs uppercase text-slate-500">
 NIS
 </th>
 
 
-<th class="px-6 py-4 text-left text-xs text-slate-500 uppercase">
+<th class="px-6 py-4 text-left text-xs uppercase text-slate-500">
 Nama
 </th>
 
 
-<th class="px-6 py-4 text-left text-xs text-slate-500 uppercase">
+<th class="px-6 py-4 text-left text-xs uppercase text-slate-500">
 JK
 </th>
 
 
-<th class="px-6 py-4 text-left text-xs text-slate-500 uppercase">
+<th class="px-6 py-4 text-left text-xs uppercase text-slate-500">
 Kelas
 </th>
 
 
-<th class="px-6 py-4 text-left text-xs text-slate-500 uppercase">
+<th class="px-6 py-4 text-left text-xs uppercase text-slate-500">
 Status Akun
 </th>
 
 
-<th class="px-6 py-4 text-center text-xs text-slate-500 uppercase">
+<th class="px-6 py-4 text-center text-xs uppercase text-slate-500">
 Aksi
 </th>
 
@@ -373,9 +729,8 @@ Aksi
 
 
 
+
 <tbody class="divide-y">
-
-
 
 
 
@@ -383,7 +738,10 @@ Aksi
 
 
 
-<tr class="hover:bg-slate-50">
+<tr class="
+hover:bg-slate-50
+transition
+">
 
 
 
@@ -391,9 +749,12 @@ Aksi
 
 <td class="px-6 py-4">
 
-{{ $loop->iteration }}
+
+{{ $siswas->firstItem()+$loop->index }}
+
 
 </td>
+
 
 
 
@@ -401,22 +762,12 @@ Aksi
 
 <td class="px-6 py-4 font-medium">
 
+
 {{ $siswa->nis }}
 
-</td>
-
-
-
-
-
-
-<td class="px-6 py-4 font-semibold">
-
-
-{{ $siswa->nama_siswa }}
-
 
 </td>
+
 
 
 
@@ -426,11 +777,38 @@ Aksi
 <td class="px-6 py-4">
 
 
-@if($siswa->jenis_kelamin == 'L')
+<p class="font-semibold">
+
+{{ $siswa->nama_siswa }}
+
+</p>
+
+
+<p class="text-xs text-gray-400">
+
+{{ $siswa->kelas->nama_kelas ?? '-' }}
+
+</p>
+
+
+</td>
+
+
+
+
+
+
+
+
+<td class="px-6 py-4">
+
+
+@if($siswa->jenis_kelamin=='L')
 
 
 <span class="
-px-3 py-1
+px-3
+py-1
 rounded-full
 text-xs
 bg-blue-50
@@ -446,7 +824,8 @@ Laki-laki
 
 
 <span class="
-px-3 py-1
+px-3
+py-1
 rounded-full
 text-xs
 bg-pink-50
@@ -473,27 +852,20 @@ Perempuan
 <td class="px-6 py-4">
 
 
-@if($siswa->kelas)
-
-
 <span class="
-px-3 py-1
+px-3
+py-1
 rounded-full
 text-xs
 bg-indigo-50
 text-indigo-700
 ">
 
-{{ $siswa->kelas->nama_kelas }}
+
+{{ $siswa->kelas->nama_kelas ?? '-' }}
+
 
 </span>
-
-
-@else
-
--
-
-@endif
 
 
 </td>
@@ -505,30 +877,27 @@ text-indigo-700
 
 
 
-{{-- STATUS AKUN --}}
-
 <td class="px-6 py-4">
 
 
-@if(
-$siswa->orangTua->contains(function($ortu){
+@if($siswa->orangTua->contains(function($ortu){
 
 return $ortu->user;
 
-})
-)
+}))
 
 
 <span class="
-px-3 py-1
+px-3
+py-1
 rounded-full
 text-xs
+bg-green-50
+text-green-700
 font-semibold
-bg-emerald-50
-text-emerald-700
 ">
 
-✓ Sudah Ada
+✓ Aktif
 
 </span>
 
@@ -537,12 +906,13 @@ text-emerald-700
 
 
 <span class="
-px-3 py-1
+px-3
+py-1
 rounded-full
 text-xs
-font-semibold
 bg-yellow-50
 text-yellow-700
+font-semibold
 ">
 
 Belum Ada
@@ -565,8 +935,11 @@ Belum Ada
 <td class="px-6 py-4">
 
 
-<div class="flex justify-center gap-2">
-
+<div class="
+flex
+justify-center
+gap-2
+">
 
 
 <a href="{{ route('siswa.edit',$siswa->id) }}"
@@ -578,14 +951,12 @@ text-white
 px-3
 py-2
 rounded-lg
-text-sm
+text-xs
 ">
 
-✏️ Edit
+Edit
 
 </a>
-
-
 
 
 
@@ -597,6 +968,7 @@ action="{{ route('siswa.destroy',$siswa->id) }}"
 method="POST"
 
 onsubmit="return confirm('Hapus siswa ini?')"
+
 
 >
 
@@ -615,18 +987,32 @@ text-white
 px-3
 py-2
 rounded-lg
-text-sm
+text-xs
 ">
 
 
-🗑 Hapus
+Hapus
 
 
 </button>
 
 
-</form>
+<a href="{{ route('siswa.kelas',$siswa->kelas_id) }}"
+class="
+bg-indigo-600
+hover:bg-indigo-700
+text-white
+px-3
+py-2
+rounded-lg
+text-xs
+">
 
+Lihat Kelas
+
+</a>
+
+</form>
 
 
 </div>
@@ -646,8 +1032,6 @@ text-sm
 @empty
 
 
-
-
 <tr>
 
 
@@ -656,11 +1040,11 @@ text-sm
 class="
 text-center
 py-12
-text-slate-500
+text-gray-500
 ">
 
 
-Belum ada data siswa.
+Data siswa belum tersedia.
 
 
 </td>
@@ -674,21 +1058,38 @@ Belum ada data siswa.
 
 
 
-
 </tbody>
 
 
 </table>
 
 
-
 </div>
 
 
 
 
+
+
+
+{{-- PAGINATION --}}
+
+
+<div class="
+px-6
+py-5
+border-t
+">
+
+
+{{ $siswas->links() }}
+
+
 </div>
 
+
+
+</div>
 
 
 

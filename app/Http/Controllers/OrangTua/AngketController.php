@@ -19,22 +19,25 @@ use Carbon\Carbon;
 
 
 
-
 class AngketController extends Controller
 {
 
 
+    /**
+     * Riwayat angket
+     */
     public function index()
     {
 
 
-$orangTua = Auth::user()
-    ->orangTua()
-    ->with([
-        'siswa.kelas.jurusan',
-        'siswa.angketHarian'
-    ])
-    ->first();
+        $orangTua = Auth::user()
+            ->orangTua()
+            ->with([
+                'siswa.kelas.jurusan',
+                'siswa.angketHarian'
+            ])
+            ->first();
+
 
 
         if(!$orangTua)
@@ -49,6 +52,8 @@ $orangTua = Auth::user()
 
 
 
+
+
         $angketHarian = AngketHarian::where(
                 'orang_tua_id',
                 $orangTua->id
@@ -58,6 +63,9 @@ $orangTua = Auth::user()
                 'desc'
             )
             ->get();
+
+
+
 
 
 
@@ -79,6 +87,10 @@ $orangTua = Auth::user()
 
 
 
+
+    /**
+     * Form isi angket
+     */
     public function create()
     {
 
@@ -102,12 +114,16 @@ $orangTua = Auth::user()
 
 
 
+
         $siswa = $orangTua->siswa;
+
 
 
 
         $tanggalHariIni = Carbon::today()
             ->format('Y-m-d');
+
+
 
 
 
@@ -132,6 +148,9 @@ $orangTua = Auth::user()
 
 
 
+    /**
+     * Simpan angket
+     */
     public function store(
         Request $request,
         AngketService $service
@@ -143,6 +162,7 @@ $orangTua = Auth::user()
             ->orangTua()
             ->with('siswa')
             ->first();
+
 
 
 
@@ -159,6 +179,8 @@ $orangTua = Auth::user()
 
 
 
+
+
         $siswaId = $orangTua->siswa->id;
 
 
@@ -166,25 +188,80 @@ $orangTua = Auth::user()
 
 
 
-$request->validate([
 
-    'tanggal'=>'required|date',
 
-    'sholat_subuh'=>'nullable|boolean',
-    'sholat_dzuhur'=>'nullable|boolean',
-    'sholat_ashar'=>'nullable|boolean',
-    'sholat_magrib'=>'nullable|boolean',
-    'sholat_isya'=>'nullable|boolean',
+        $request->validate([
 
-    'belajar'=>'nullable|boolean',
 
-    'bangun_pagi'=>'nullable',
+            'tanggal'
+            =>
+            'required|date',
 
-    'tidur_malam'=>'nullable',
 
-    'kegiatan_membantu'=>'nullable|string',
 
-]);
+            'sholat_subuh'
+            =>
+            'nullable|boolean',
+
+
+
+            'sholat_dzuhur'
+            =>
+            'nullable|boolean',
+
+
+
+            'sholat_ashar'
+            =>
+            'nullable|boolean',
+
+
+
+            'sholat_magrib'
+            =>
+            'nullable|boolean',
+
+
+
+            'sholat_isya'
+            =>
+            'nullable|boolean',
+
+
+
+            'belajar'
+            =>
+            'nullable|boolean',
+
+
+
+'bangun_pagi'
+=>
+'nullable|date_format:H:i',
+
+
+'tidur_malam'
+=>
+'nullable|date_format:H:i',
+
+
+
+            'kegiatan_membantu'
+            =>
+            'nullable|string',
+
+
+
+
+            'alasan_tidak_sholat'
+            =>
+            'nullable|string|max:500',
+
+
+        ]);
+
+
+
 
 
 
@@ -196,38 +273,57 @@ $request->validate([
         );
 
 
+
         $hariIni = Carbon::today();
 
 
 
 
 
-if($tanggal->gt($hariIni))
-{
-
-    return back()
-        ->withInput()
-        ->with(
-            'error',
-            'Tanggal tidak boleh lebih dari hari ini.'
-        );
-
-}
 
 
-if($tanggal->lt(
-    $hariIni->copy()->subDay()
-))
-{
 
-    return back()
-        ->withInput()
-        ->with(
-            'error',
-            'Pengisian maksimal satu hari sebelumnya.'
-        );
+        if($tanggal->gt($hariIni))
+        {
 
-}
+            return back()
+
+                ->withInput()
+
+                ->with(
+                    'error',
+                    'Tanggal tidak boleh lebih dari hari ini.'
+                );
+
+        }
+
+
+
+
+
+
+
+
+        if(
+            $tanggal->lt(
+                $hariIni->copy()->subDay()
+            )
+        )
+        {
+
+            return back()
+
+                ->withInput()
+
+                ->with(
+                    'error',
+                    'Pengisian maksimal satu hari sebelumnya.'
+                );
+
+        }
+
+
+
 
 
 
@@ -238,27 +334,33 @@ if($tanggal->lt(
                 'siswa_id',
                 $siswaId
             )
+
             ->whereDate(
                 'tanggal',
                 $request->tanggal
             )
+
             ->exists();
 
 
 
 
 
-if($cek)
-{
 
-    return back()
-        ->withInput()
-        ->with(
-            'error',
-            'Angket tanggal tersebut sudah ada.'
-        );
 
-}
+        if($cek)
+        {
+
+            return back()
+
+                ->withInput()
+
+                ->with(
+                    'error',
+                    'Angket tanggal tersebut sudah ada.'
+                );
+
+        }
 
 
 
@@ -269,7 +371,6 @@ if($cek)
 
 
         $skor = $service->hitungSkor([
-
 
 
             'sholat_subuh'
@@ -388,9 +489,12 @@ if($cek)
 
 
 
+
                     'bangun_pagi'
                     =>
                     $request->bangun_pagi,
+
+
 
 
 
@@ -400,9 +504,11 @@ if($cek)
 
 
 
+
                     'sholat_dzuhur'
                     =>
                     $request->boolean('sholat_dzuhur'),
+
 
 
 
@@ -412,9 +518,11 @@ if($cek)
 
 
 
+
                     'sholat_magrib'
                     =>
                     $request->boolean('sholat_magrib'),
+
 
 
 
@@ -424,9 +532,24 @@ if($cek)
 
 
 
+
+
+
+                    // TAMBAHAN BARU
+                    'alasan_tidak_sholat'
+                    =>
+                    $request->alasan_tidak_sholat,
+
+
+
+
+
+
                     'belajar'
                     =>
                     $request->boolean('belajar'),
+
+
 
 
 
@@ -436,9 +559,13 @@ if($cek)
 
 
 
+
+
                     'tidur_malam'
                     =>
                     $request->tidur_malam,
+
+
 
 
 
@@ -448,9 +575,12 @@ if($cek)
 
 
 
+
+
                     'kategori'
                     =>
                     $kategori,
+
 
 
                 ]);
@@ -463,17 +593,23 @@ if($cek)
 
 
         }
-catch(\Exception $e)
-{
+        catch(\Exception $e)
+        {
 
-    return back()
-        ->withInput()
-        ->with(
-            'error',
-            'Terjadi kesalahan saat menyimpan angket.'
-        );
 
-}
+            return back()
+
+                ->withInput()
+
+                ->with(
+                    'error',
+                    'Terjadi kesalahan saat menyimpan angket.'
+                );
+
+
+        }
+
+
 
 
 

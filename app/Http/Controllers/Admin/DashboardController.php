@@ -51,7 +51,7 @@ class DashboardController extends Controller
 
         /*
         |--------------------------------------------------------------------------
-        | TANGGAL HARI INI
+        | TANGGAL
         |--------------------------------------------------------------------------
         */
 
@@ -64,11 +64,9 @@ class DashboardController extends Controller
 
 
 
-
-
         /*
         |--------------------------------------------------------------------------
-        | STATISTIK ANGKET HARI INI
+        | ANGKET HARI INI
         |--------------------------------------------------------------------------
         */
 
@@ -87,7 +85,9 @@ class DashboardController extends Controller
 
 
         $belumIsiAngket = Siswa::whereDoesntHave(
+
                 'angketHarian',
+
                 function($query) use($hariIni){
 
                     $query->whereDate(
@@ -96,7 +96,9 @@ class DashboardController extends Controller
                     );
 
                 }
+
             )
+
             ->count();
 
 
@@ -106,75 +108,22 @@ class DashboardController extends Controller
 
 
 
-        if($totalSiswa > 0)
-        {
+        $persentaseAngket = $totalSiswa > 0
 
+            ?
 
-            $persentaseAngket = round(
-
+            round(
                 ($angketHariIni / $totalSiswa) * 100,
-
                 1
+            )
 
-            );
+            :
 
-
-        }
-        else
-        {
-
-
-            $persentaseAngket = 0;
-
-
-        }
+            0;
 
 
 
 
-
-/*
-|--------------------------------------------------------------------------
-| KONDISI SISWA TERAKHIR
-|--------------------------------------------------------------------------
-*/
-$tanggalTerakhir = AngketHarian::max('tanggal') ?? Carbon::today();
-
-
-
-$jumlahBaik = AngketHarian::whereDate(
-        'tanggal',
-        $tanggalTerakhir
-    )
-    ->where(
-        'kategori',
-        'Baik'
-    )
-    ->count();
-
-
-
-$jumlahPerhatian = AngketHarian::whereDate(
-        'tanggal',
-        $tanggalTerakhir
-    )
-    ->where(
-        'kategori',
-        'Perlu Perhatian'
-    )
-    ->count();
-
-
-
-$jumlahPendampingan = AngketHarian::whereDate(
-        'tanggal',
-        $tanggalTerakhir
-    )
-    ->where(
-        'kategori',
-        'Perlu Pendampingan'
-    )
-    ->count();
 
 
 
@@ -182,30 +131,89 @@ $jumlahPendampingan = AngketHarian::whereDate(
 
         /*
         |--------------------------------------------------------------------------
-        | SISWA PERLU PERHATIAN
+        | KONDISI SISWA TERBARU
         |--------------------------------------------------------------------------
         */
-$siswaPerhatian = AngketHarian::with([
 
-    'siswa.kelas'
 
-])
-->whereIn(
+        $tanggalTerakhir = AngketHarian::max(
+            'tanggal'
+        );
 
-    'kategori',
 
-    [
-        'Perlu Perhatian',
-        'Perlu Pendampingan'
-    ]
 
-)
-->whereDate(
-    'tanggal',
-    $tanggalTerakhir
-)
-->limit(10)
-->get();
+        if(!$tanggalTerakhir)
+        {
+
+            $tanggalTerakhir = $hariIni;
+
+        }
+
+
+
+
+
+
+
+        $jumlahBaik = AngketHarian::whereDate(
+
+                'tanggal',
+
+                $tanggalTerakhir
+
+            )
+
+            ->where(
+                'kategori',
+                'Baik'
+            )
+
+            ->count();
+
+
+
+
+
+
+
+        $jumlahPerhatian = AngketHarian::whereDate(
+
+                'tanggal',
+
+                $tanggalTerakhir
+
+            )
+
+            ->where(
+                'kategori',
+                'Perlu Perhatian'
+            )
+
+            ->count();
+
+
+
+
+
+
+
+        $jumlahPendampingan = AngketHarian::whereDate(
+
+                'tanggal',
+
+                $tanggalTerakhir
+
+            )
+
+            ->where(
+                'kategori',
+                'Perlu Pendampingan'
+            )
+
+            ->count();
+
+
+
 
 
 
@@ -214,7 +222,59 @@ $siswaPerhatian = AngketHarian::with([
 
         /*
         |--------------------------------------------------------------------------
-        | GRAFIK 7 HARI TERAKHIR
+        | SISWA PERLU MONITORING
+        |--------------------------------------------------------------------------
+        */
+
+
+        $siswaPerhatian = AngketHarian::with([
+
+                'siswa.kelas'
+
+            ])
+
+            ->whereDate(
+
+                'tanggal',
+
+                $tanggalTerakhir
+
+            )
+
+            ->whereIn(
+
+                'kategori',
+
+                [
+
+                    'Perlu Perhatian',
+
+                    'Perlu Pendampingan'
+
+                ]
+
+            )
+
+            ->orderBy(
+                'skor',
+                'asc'
+            )
+
+            ->limit(10)
+
+            ->get();
+
+
+
+
+
+
+
+
+
+        /*
+        |--------------------------------------------------------------------------
+        | GRAFIK 7 HARI
         |--------------------------------------------------------------------------
         */
 
@@ -238,18 +298,14 @@ $siswaPerhatian = AngketHarian::with([
 
 
 
-
             $grafikTanggal[] =
-
                 $tanggal->format('d M');
 
 
 
 
 
-
             $grafikJumlah[] =
-
                 AngketHarian::whereDate(
 
                     'tanggal',
@@ -274,12 +330,18 @@ $siswaPerhatian = AngketHarian::with([
 
         /*
         |--------------------------------------------------------------------------
-        | SISWA BELUM ISI HARI INI
+        | SISWA BELUM ISI ANGKET
         |--------------------------------------------------------------------------
         */
 
 
-        $siswaBelumIsi = Siswa::whereDoesntHave(
+        $siswaBelumIsi = Siswa::with([
+
+                'kelas'
+
+            ])
+
+            ->whereDoesntHave(
 
                 'angketHarian',
 
@@ -299,16 +361,8 @@ $siswaPerhatian = AngketHarian::with([
 
             )
 
-            ->with([
-
-                'kelas'
-
-            ])
-
             ->orderBy(
-
                 'nama_siswa'
-
             )
 
             ->limit(10)
@@ -321,9 +375,11 @@ $siswaPerhatian = AngketHarian::with([
 
 
 
+
+
         /*
         |--------------------------------------------------------------------------
-        | RETURN VIEW
+        | VIEW
         |--------------------------------------------------------------------------
         */
 
@@ -334,9 +390,7 @@ $siswaPerhatian = AngketHarian::with([
 
             compact(
 
-                /*
-                DATA MASTER
-                */
+                // MASTER
 
                 'totalJurusan',
 
@@ -349,9 +403,7 @@ $siswaPerhatian = AngketHarian::with([
 
 
 
-                /*
-                ANGKET
-                */
+                // ANGKET
 
                 'angketHariIni',
 
@@ -361,9 +413,8 @@ $siswaPerhatian = AngketHarian::with([
 
 
 
-                /*
-                KONDISI SISWA
-                */
+
+                // KONDISI
 
                 'jumlahBaik',
 
@@ -376,9 +427,7 @@ $siswaPerhatian = AngketHarian::with([
 
 
 
-                /*
-                GRAFIK
-                */
+                // GRAFIK
 
                 'grafikTanggal',
 
@@ -387,13 +436,9 @@ $siswaPerhatian = AngketHarian::with([
 
 
 
-                /*
-                BELUM ISI
-                */
+                // BELUM ISI
 
-                'siswaBelumIsi',
-
-               
+                'siswaBelumIsi'
 
 
             )

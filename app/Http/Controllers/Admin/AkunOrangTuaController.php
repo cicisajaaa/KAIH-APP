@@ -5,10 +5,11 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 
+use Illuminate\Http\Request;
 
 use App\Models\Siswa;
 use App\Models\User;
-
+use App\Models\Kelas;
 
 use Illuminate\Support\Facades\Hash;
 
@@ -21,136 +22,173 @@ class AkunOrangTuaController extends Controller
     /**
      * Generate akun orang tua
      */
-   public function generate()
-{
-
-    $siswas = Siswa::with('orangTua')
-        ->get();
-
-
-    $dibuat = 0;
-    $diupdate = 0;
-    $tidakAdaOrtu = 0;
-
-
-
-    foreach($siswas as $siswa)
+    public function generate()
     {
 
 
-        /*
-        |--------------------------------------------------------------------------
-        | Ambil wali utama
-        |--------------------------------------------------------------------------
-        */
+        $siswas = Siswa::with('orangTua')
+            ->get();
 
-        $orangTua = $siswa->orangTua
-            ->where('hubungan','Ayah')
+
+
+        $dibuat = 0;
+        $diupdate = 0;
+        $tidakAdaOrtu = 0;
+
+
+
+
+
+        foreach($siswas as $siswa)
+        {
+
+
+
+            /*
+            |--------------------------------------------------------------------------
+            | Ambil orang tua utama
+            |--------------------------------------------------------------------------
+            */
+
+
+            $orangTua = $siswa->orangTua
+                ->where('hubungan','Ayah')
+                ->first();
+
+
+
+            if(!$orangTua)
+            {
+
+                $orangTua = $siswa->orangTua->first();
+
+            }
+
+
+
+
+
+            if(!$orangTua)
+            {
+
+                $tidakAdaOrtu++;
+
+                continue;
+
+            }
+
+
+
+
+
+            /*
+            |--------------------------------------------------------------------------
+            | Password default
+            |--------------------------------------------------------------------------
+            */
+
+
+            $passwordDefault = 'Kaih#'.$siswa->nis;
+
+
+
+
+
+
+
+
+            /*
+            |--------------------------------------------------------------------------
+            | Cek akun
+            |--------------------------------------------------------------------------
+            */
+
+
+            $user = User::where(
+                'orang_tua_id',
+                $orangTua->id
+            )
             ->first();
 
 
 
-        if(!$orangTua)
-        {
-
-            $orangTua = $siswa->orangTua->first();
-
-        }
-
-
-
-        if(!$orangTua)
-        {
-
-            $tidakAdaOrtu++;
-
-            continue;
-
-        }
 
 
 
 
 
-
-        /*
-        |--------------------------------------------------------------------------
-        | Password default
-        |--------------------------------------------------------------------------
-        */
-
-        $passwordDefault = 'Kaih#'.$siswa->nis;
+            if(!$user)
+            {
 
 
+                User::create([
+
+
+                    'name'
+                    =>
+                    $orangTua->nama_orang_tua,
+
+
+                    'email'
+                    =>
+                    $siswa->nis.'@kaih.com',
+
+
+                    'password'
+                    =>
+                    Hash::make($passwordDefault),
+
+
+                    'role'
+                    =>
+                    'orang_tua',
+
+
+                    'orang_tua_id'
+                    =>
+                    $orangTua->id,
+
+
+                    'must_change_password'
+                    =>
+                    true,
+
+
+                ]);
 
 
 
-
-        /*
-        |--------------------------------------------------------------------------
-        | Cari akun
-        |--------------------------------------------------------------------------
-        */
-
-        $user = User::where(
-            'orang_tua_id',
-            $orangTua->id
-        )
-        ->first();
+                $dibuat++;
 
 
 
+            }
+            else
+            {
+
+
+                $user->update([
+
+
+                    'name'
+                    =>
+                    $orangTua->nama_orang_tua,
+
+
+                    'email'
+                    =>
+                    $siswa->nis.'@kaih.com',
+
+
+                ]);
 
 
 
-
-        /*
-        |--------------------------------------------------------------------------
-        | Jika akun belum ada
-        |--------------------------------------------------------------------------
-        */
-
-        if(!$user)
-        {
+                $diupdate++;
 
 
-            User::create([
+            }
 
-
-                'name'
-                =>
-                $orangTua->nama_orang_tua,
-
-
-                'email'
-                =>
-                $siswa->nis.'@kaih.com',
-
-
-                'password'
-                =>
-                Hash::make($passwordDefault),
-
-
-                'role'
-                =>
-                'orang_tua',
-
-
-                'orang_tua_id'
-                =>
-                $orangTua->id,
-
-
-                'must_change_password'
-                =>
-                true,
-
-
-            ]);
-
-
-            $dibuat++;
 
 
         }
@@ -161,50 +199,16 @@ class AkunOrangTuaController extends Controller
 
 
 
-        /*
-        |--------------------------------------------------------------------------
-        | Jika akun sudah ada
-        |--------------------------------------------------------------------------
-        */
-else
-{
+        return back()->with(
+
+            'success',
+
+            "Generate selesai. Dibuat: {$dibuat}, diperbarui: {$diupdate}, tanpa orang tua: {$tidakAdaOrtu}"
+
+        );
 
 
-    $user->update([
-
-
-        'name'
-        =>
-        $orangTua->nama_orang_tua,
-
-
-        'email'
-        =>
-        $siswa->nis.'@kaih.com',
-
-
-    ]);
-
-
-    $diupdate++;
-
-
-}
     }
-
-
-
-
-    return back()->with(
-
-        'success',
-
-        "Generate selesai. Dibuat: {$dibuat}, diperbarui: {$diupdate}, tanpa orang tua: {$tidakAdaOrtu}"
-
-    );
-
-
-}
 
 
 
@@ -217,31 +221,192 @@ else
     /**
      * Daftar akun orang tua
      */
-    public function index()
+    public function index(Request $request)
     {
 
 
-        $users = User::where(
+        $query = User::where(
+            'role',
+            'orang_tua'
+        )
 
-                'role',
+        ->with([
 
-                'orang_tua'
+            'orangTua.siswa.kelas.jurusan'
 
-            )
+        ]);
 
-            ->with([
 
-                'orangTua.siswa.kelas'
 
-            ])
+
+
+
+
+
+        /*
+        |--------------------------------------------------------------------------
+        | Search
+        |--------------------------------------------------------------------------
+        */
+
+
+        if($request->filled('search'))
+        {
+
+
+            $search = $request->search;
+
+
+
+            $query->where(function($q) use ($search){
+
+
+                $q->where(
+                    'name',
+                    'like',
+                    "%{$search}%"
+                )
+
+
+                ->orWhere(
+                    'email',
+                    'like',
+                    "%{$search}%"
+                )
+
+
+                ->orWhereHas(
+                    'orangTua',
+                    function($ortu) use ($search){
+
+
+                        $ortu->where(
+                            'nama_orang_tua',
+                            'like',
+                            "%{$search}%"
+                        )
+
+
+                        ->orWhereHas(
+                            'siswa',
+                            function($siswa) use ($search){
+
+
+                                $siswa->where(
+                                    'nama_siswa',
+                                    'like',
+                                    "%{$search}%"
+                                )
+
+
+                                ->orWhere(
+                                    'nis',
+                                    'like',
+                                    "%{$search}%"
+                                );
+
+
+                            }
+                        );
+
+
+                    }
+                );
+
+
+            });
+
+
+        }
+
+
+
+
+
+
+
+
+
+        /*
+        |--------------------------------------------------------------------------
+        | Filter kelas
+        |--------------------------------------------------------------------------
+        */
+
+
+        if($request->filled('kelas_id'))
+        {
+
+
+            $query->whereHas(
+
+                'orangTua.siswa',
+
+                function($q) use ($request){
+
+
+                    $q->where(
+                        'kelas_id',
+                        $request->kelas_id
+                    );
+
+
+                }
+
+            );
+
+
+        }
+
+
+
+
+
+
+
+
+        /*
+        |--------------------------------------------------------------------------
+        | Pagination
+        |--------------------------------------------------------------------------
+        */
+
+
+        $users = $query
 
             ->orderBy(
-
                 'name'
+            )
 
+            ->paginate(20)
+
+            ->withQueryString();
+
+
+
+
+
+
+
+
+
+        /*
+        |--------------------------------------------------------------------------
+        | Data kelas
+        |--------------------------------------------------------------------------
+        */
+
+
+        $kelas = Kelas::withCount('siswas')
+
+            ->with('jurusan')
+
+            ->orderBy(
+                'nama_kelas'
             )
 
             ->get();
+
 
 
 
@@ -255,7 +420,9 @@ else
 
             compact(
 
-                'users'
+                'users',
+
+                'kelas'
 
             )
 
@@ -273,7 +440,7 @@ else
 
 
     /**
-     * Reset password akun orang tua
+     * Reset password satu akun
      */
     public function resetPassword($id)
     {
@@ -286,10 +453,7 @@ else
 
 
 
-
-        if(
-            $user->role !== 'orang_tua'
-        )
+        if($user->role !== 'orang_tua')
         {
 
             abort(403);
@@ -303,18 +467,12 @@ else
 
 
 
-        /*
-        |--------------------------------------------------------------------------
-        | Ambil NIS siswa
-        |--------------------------------------------------------------------------
-        */
-
-
         $nis = optional(
             $user->orangTua
         )
         ->siswa
         ->nis ?? null;
+
 
 
 
@@ -342,15 +500,7 @@ else
 
 
 
-        /*
-        |--------------------------------------------------------------------------
-        | Reset password
-        |--------------------------------------------------------------------------
-        */
-
-
         $user->update([
-
 
 
             'password'
@@ -361,11 +511,9 @@ else
 
 
 
-
             'must_change_password'
             =>
             true
-
 
 
         ]);
@@ -388,54 +536,109 @@ else
 
     }
 
-public function resetSemuaPassword()
-{
-
-    $users = User::where(
-        'role',
-        'orang_tua'
-    )
-    ->with('orangTua.siswa')
-    ->get();
 
 
-    $jumlah = 0;
 
 
-    foreach($users as $user)
+
+
+
+
+    /**
+     * Reset semua password akun orang tua
+     */
+    public function resetSemuaPassword()
     {
 
-        $nis = optional($user->orangTua)
-            ->siswa
-            ->nis;
+
+        $users = User::where(
+            'role',
+            'orang_tua'
+        )
+
+        ->with(
+            'orangTua.siswa'
+        )
+
+        ->get();
 
 
-        if($nis)
+
+
+
+        $jumlah = 0;
+
+
+
+
+
+
+
+        foreach($users as $user)
         {
 
-            $user->update([
 
-                'password'=>Hash::make(
-                    'Kaih#'.$nis
-                ),
+            $nis = optional($user->orangTua)
 
-                'must_change_password'=>true
+                ->siswa
 
-            ]);
+                ->nis;
 
 
-            $jumlah++;
+
+
+
+
+
+            if($nis)
+            {
+
+
+                $user->update([
+
+
+                    'password'
+                    =>
+                    Hash::make(
+                        'Kaih#'.$nis
+                    ),
+
+
+
+                    'must_change_password'
+                    =>
+                    true
+
+
+                ]);
+
+
+
+                $jumlah++;
+
+
+            }
+
 
         }
+
+
+
+
+
+
+
+
+        return back()->with(
+
+            'success',
+
+            "Berhasil reset {$jumlah} akun orang tua."
+
+        );
+
 
     }
 
 
-    return back()
-        ->with(
-            'success',
-            "Berhasil reset {$jumlah} akun orang tua."
-        );
-
-}
 }

@@ -2,15 +2,19 @@
 
 namespace App\Imports;
 
+
 use App\Models\Siswa;
 use App\Models\Kelas;
 use App\Models\OrangTua;
 
+
 use Illuminate\Support\Collection;
+
 
 use Maatwebsite\Excel\Concerns\ToCollection;
 use Maatwebsite\Excel\Concerns\WithHeadingRow;
 use Maatwebsite\Excel\Concerns\WithMultipleSheets;
+
 
 use PhpOffice\PhpSpreadsheet\IOFactory;
 
@@ -19,7 +23,9 @@ use PhpOffice\PhpSpreadsheet\IOFactory;
 class SiswaImport implements WithMultipleSheets
 {
 
+
     protected $file;
+
 
 
     public function __construct($file)
@@ -29,42 +35,73 @@ class SiswaImport implements WithMultipleSheets
 
 
 
+
+
+
+
     public function sheets(): array
     {
+
 
         $spreadsheet = IOFactory::load(
             $this->file->getPathname()
         );
 
 
+
         $sheets = [];
+
 
 
 
         foreach(
             $spreadsheet->getSheetNames()
             as $sheetName
-        ){
-
-            $namaSheet = strtoupper(trim($sheetName));
-
+        )
+        {
 
 
-            // Skip sheet bukan data siswa
+
+            $namaSheet = strtoupper(
+                trim($sheetName)
+            );
+
+
+
+
+            /*
+            |--------------------------------------------------------------------------
+            | Abaikan sheet bukan data
+            |--------------------------------------------------------------------------
+            */
+
 
             if(
                 in_array(
                     $namaSheet,
                     [
+
                         'DATA MBG',
-                        'MUTASI'
+
+                        'MUTASI',
+
+                        'README',
+
+                        'FORMAT',
+
+                        'KETERANGAN'
+
                     ]
                 )
-            ){
+            )
+            {
 
                 continue;
 
             }
+
+
+
 
 
 
@@ -73,15 +110,24 @@ class SiswaImport implements WithMultipleSheets
                     $sheetName
                 );
 
+
+
         }
+
 
 
 
         return $sheets;
 
+
+
     }
 
+
+
 }
+
+
 
 
 
@@ -97,6 +143,8 @@ class SiswaSheetImport implements ToCollection, WithHeadingRow
 
 
 
+
+
     public function __construct($sheetName)
     {
         $this->sheetName = $sheetName;
@@ -106,16 +154,24 @@ class SiswaSheetImport implements ToCollection, WithHeadingRow
 
 
 
+
+
+
     /*
     |--------------------------------------------------------------------------
-    | Header Excel
+    | Header Excel berada di baris 2
     |--------------------------------------------------------------------------
     */
+
 
     public function headingRow(): int
     {
         return 2;
     }
+
+
+
+
 
 
 
@@ -130,38 +186,97 @@ class SiswaSheetImport implements ToCollection, WithHeadingRow
         );
 
 
-        \Log::info(
-            "JUMLAH ROW : ".$rows->count()
-        );
+
 
 
 
 
         /*
         |--------------------------------------------------------------------------
-        | Buat kelas berdasarkan nama sheet
+        | Ambil nama kelas dari nama sheet
         |--------------------------------------------------------------------------
         */
 
 
-        $kelas = Kelas::firstOrCreate(
+        $namaKelas = strtoupper(
+            trim(
+                preg_replace(
+                    '/\s+/',
+                    ' ',
+                    str_replace(
+                        'NEW',
+                        '',
+                        $this->sheetName
+                    )
+                )
+            )
+        );
+
+
+
+
+
+
+
+
+
+        /*
+        |--------------------------------------------------------------------------
+        | Cari kelas fleksibel
+        |--------------------------------------------------------------------------
+        */
+
+
+        $kelas = Kelas::whereRaw(
+
+            'REPLACE(UPPER(nama_kelas)," ","") = ?',
 
             [
 
-'nama_kelas'=>preg_replace(
-    '/\s+/',
-    ' ',
-    trim(
-        str_replace(
-            'NEW',
-            '',
-            strtoupper($this->sheetName)
-        )
-    )
-)
+                str_replace(
+                    ' ',
+                    '',
+                    $namaKelas
+                )
+
             ]
 
+        )
+        ->first();
+
+
+
+
+
+
+
+
+        if(!$kelas)
+        {
+
+
+            throw new \Exception(
+
+                "Kelas {$namaKelas} belum tersedia di database."
+
+            );
+
+
+        }
+
+
+
+
+
+
+
+        \Log::info(
+
+            "KELAS DITEMUKAN : ".$kelas->nama_kelas
+
         );
+
+
 
 
 
@@ -173,9 +288,13 @@ class SiswaSheetImport implements ToCollection, WithHeadingRow
         {
 
 
+
+
+
+
             /*
             |--------------------------------------------------------------------------
-            | Data siswa
+            | Ambil data siswa
             |--------------------------------------------------------------------------
             */
 
@@ -193,6 +312,8 @@ class SiswaSheetImport implements ToCollection, WithHeadingRow
 
 
 
+
+
             $nama = trim(
 
                 $row['nama_lengkap']
@@ -204,6 +325,9 @@ class SiswaSheetImport implements ToCollection, WithHeadingRow
                 ''
 
             );
+
+
+
 
 
 
@@ -226,15 +350,28 @@ class SiswaSheetImport implements ToCollection, WithHeadingRow
 
 
 
+
+
+            /*
+            |--------------------------------------------------------------------------
+            | Skip data kosong
+            |--------------------------------------------------------------------------
+            */
+
+
             if(
                 empty($nis)
                 ||
                 empty($nama)
-            ){
+            )
+            {
 
                 continue;
 
             }
+
+
+
 
 
 
@@ -243,7 +380,7 @@ class SiswaSheetImport implements ToCollection, WithHeadingRow
 
             /*
             |--------------------------------------------------------------------------
-            | Normalisasi JK
+            | Normalisasi Jenis Kelamin
             |--------------------------------------------------------------------------
             */
 
@@ -252,39 +389,52 @@ class SiswaSheetImport implements ToCollection, WithHeadingRow
                 in_array(
                     $jk,
                     [
+
                         'L',
+
                         'LAKI-LAKI',
+
                         'LAKI LAKI'
+
                     ]
                 )
-            ){
+            )
+            {
 
-                $jk='L';
+                $jk = 'L';
 
             }
 
-            elseif(
 
+            elseif(
                 in_array(
                     $jk,
                     [
+
                         'P',
+
                         'PEREMPUAN',
+
                         'WANITA'
+
                     ]
                 )
+            )
+            {
 
-            ){
-
-                $jk='P';
+                $jk = 'P';
 
             }
 
-            else{
+
+            else
+            {
 
                 continue;
 
             }
+
+
 
 
 
@@ -296,28 +446,50 @@ class SiswaSheetImport implements ToCollection, WithHeadingRow
             |--------------------------------------------------------------------------
             | Simpan siswa
             |--------------------------------------------------------------------------
+            |
+            | Jika NIS sudah ada:
+            | tidak pindahkan kelas
+            |
             */
 
 
-            $siswa = Siswa::updateOrCreate(
+            $siswa = Siswa::firstOrNew([
 
-                [
+                'nis'=>$nis
 
-                    'nis'=>$nis
+            ]);
 
-                ],
 
-                [
 
-                    'nama_siswa'=>$nama,
 
-                    'jenis_kelamin'=>$jk,
 
-                    'kelas_id'=>$kelas->id
+            $siswa->nama_siswa =
+                $nama;
 
-                ]
 
-            );
+
+
+            $siswa->jenis_kelamin =
+                $jk;
+
+
+
+
+
+            if(!$siswa->exists)
+            {
+
+                $siswa->kelas_id =
+                    $kelas->id;
+
+            }
+
+
+
+
+
+            $siswa->save();
+
 
 
 
@@ -328,14 +500,16 @@ class SiswaSheetImport implements ToCollection, WithHeadingRow
 
             /*
             |--------------------------------------------------------------------------
-            | Ayah
+            | Simpan Orang Tua Ayah
             |--------------------------------------------------------------------------
             */
 
 
             if(
                 !empty($row['nama_ayah'])
-            ){
+            )
+            {
+
 
                 OrangTua::updateOrCreate(
 
@@ -347,28 +521,34 @@ class SiswaSheetImport implements ToCollection, WithHeadingRow
 
                     ],
 
+
                     [
 
                         'nama_orang_tua'=>
+
                             trim(
                                 $row['nama_ayah']
                             ),
 
 
                         'pekerjaan'=>
+
                             $row['pekerjaan_ayah']
                             ??
                             null,
 
 
                         'no_hp'=>
+
                             $row['no_hp_ayah']
                             ??
                             null
 
+
                     ]
 
                 );
+
 
             }
 
@@ -378,16 +558,20 @@ class SiswaSheetImport implements ToCollection, WithHeadingRow
 
 
 
+
+
             /*
             |--------------------------------------------------------------------------
-            | Ibu
+            | Simpan Orang Tua Ibu
             |--------------------------------------------------------------------------
             */
 
 
             if(
                 !empty($row['nama_ibu'])
-            ){
+            )
+            {
+
 
                 OrangTua::updateOrCreate(
 
@@ -399,42 +583,61 @@ class SiswaSheetImport implements ToCollection, WithHeadingRow
 
                     ],
 
+
                     [
 
                         'nama_orang_tua'=>
+
                             trim(
                                 $row['nama_ibu']
                             ),
 
 
+
                         'pekerjaan'=>
+
                             $row['pekerjaan_ibu']
                             ??
                             null,
 
 
+
                         'no_hp'=>
+
                             $row['no_hp_ibu']
                             ??
                             null
+
 
                     ]
 
                 );
 
+
             }
+
+
+
 
 
         }
 
 
 
+
+
+
+
         \Log::info(
-            "SELESAI SHEET : ".$this->sheetName
+
+            "SELESAI IMPORT KELAS : ".$kelas->nama_kelas
+
         );
 
 
+
     }
+
 
 
 }

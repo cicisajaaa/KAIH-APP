@@ -7,6 +7,8 @@ use App\Http\Controllers\Controller;
 
 use Illuminate\Http\Request;
 
+use Illuminate\Support\Facades\Log;
+
 use App\Models\Siswa;
 use App\Models\Kelas;
 
@@ -24,23 +26,108 @@ class SiswaController extends Controller
     /**
      * Menampilkan data siswa
      */
-    public function index()
+    public function index(Request $request)
     {
 
 
-        $siswas = Siswa::with([
+        $query = Siswa::with([
 
             'kelas.jurusan',
 
             'orangTua.user'
 
-        ])
+        ]);
 
-        ->orderBy(
-            'nama_siswa'
-        )
 
-        ->get();
+
+
+
+        /*
+        |--------------------------------------------------------------------------
+        | Search Nama / NIS
+        |--------------------------------------------------------------------------
+        */
+
+
+        if($request->filled('search')){
+
+
+            $search = $request->search;
+
+
+
+            $query->where(function($q) use ($search){
+
+
+                $q->where(
+                    'nis',
+                    'like',
+                    '%'.$search.'%'
+                )
+
+
+                ->orWhere(
+                    'nama_siswa',
+                    'like',
+                    '%'.$search.'%'
+                );
+
+
+            });
+
+
+        }
+
+
+
+
+
+        /*
+        |--------------------------------------------------------------------------
+        | Filter Kelas
+        |--------------------------------------------------------------------------
+        */
+
+
+        if($request->filled('kelas_id')){
+
+
+            $query->where(
+
+                'kelas_id',
+
+                $request->kelas_id
+
+            );
+
+
+        }
+
+
+
+
+
+        $siswas = $query
+
+            ->orderBy(
+                'nama_siswa'
+            )
+
+            ->paginate(20)
+
+            ->withQueryString();
+
+
+
+
+
+
+  $kelas = Kelas::withCount('siswas')
+    ->orderBy('nama_kelas')
+    ->get();
+
+
+
 
 
 
@@ -50,7 +137,11 @@ class SiswaController extends Controller
             'admin.siswa.index',
 
             compact(
-                'siswas'
+
+                'siswas',
+
+                'kelas'
+
             )
 
         );
@@ -63,7 +154,38 @@ class SiswaController extends Controller
 
 
 
+public function kelas($id)
+{
 
+    $kelas = Kelas::with('jurusan')
+        ->findOrFail($id);
+
+
+
+    $siswas = Siswa::with([
+        'orangTua',
+        'kelas'
+    ])
+    ->where(
+        'kelas_id',
+        $id
+    )
+    ->orderBy(
+        'nama_siswa'
+    )
+    ->paginate(20);
+
+
+
+    return view(
+        'admin.siswa.kelas',
+        compact(
+            'kelas',
+            'siswas'
+        )
+    );
+
+}
     /**
      * Form tambah siswa
      */
@@ -82,12 +204,15 @@ class SiswaController extends Controller
 
 
 
+
         return view(
 
             'admin.siswa.create',
 
             compact(
+
                 'kelas'
+
             )
 
         );
@@ -102,14 +227,16 @@ class SiswaController extends Controller
 
 
 
+
     /**
-     * Menyimpan siswa baru
+     * Simpan siswa baru
      */
     public function store(Request $request)
     {
 
 
         $validated = $request->validate([
+
 
 
             'nis'
@@ -144,11 +271,9 @@ class SiswaController extends Controller
             'NIS wajib diisi.',
 
 
-
             'nis.unique'
             =>
-            'NIS tersebut sudah terdaftar.',
-
+            'NIS sudah terdaftar.',
 
 
             'nama_siswa.required'
@@ -156,28 +281,14 @@ class SiswaController extends Controller
             'Nama siswa wajib diisi.',
 
 
-
             'jenis_kelamin.required'
             =>
             'Jenis kelamin wajib dipilih.',
 
 
-
-            'jenis_kelamin.in'
-            =>
-            'Jenis kelamin harus L atau P.',
-
-
-
             'kelas_id.required'
             =>
             'Kelas wajib dipilih.',
-
-
-
-            'kelas_id.exists'
-            =>
-            'Kelas tidak ditemukan.',
 
 
         ]);
@@ -229,7 +340,7 @@ class SiswaController extends Controller
 
             'file'
             =>
-            'required|mimes:xlsx,xls',
+            'required|mimes:xlsx,xls|max:5120',
 
 
 
@@ -241,10 +352,14 @@ class SiswaController extends Controller
             'File Excel wajib dipilih.',
 
 
-
             'file.mimes'
             =>
-            'File harus berformat XLS atau XLSX.',
+            'File harus XLS atau XLSX.',
+
+
+            'file.max'
+            =>
+            'Ukuran file maksimal 5MB.',
 
 
         ]);
@@ -255,33 +370,78 @@ class SiswaController extends Controller
 
 
 
-        Excel::import(
+        try {
 
-            new SiswaImport(
+
+
+            Excel::import(
+
+
+                new SiswaImport(
+
+                    $request->file('file')
+
+                ),
+
+
                 $request->file('file')
-            ),
 
-            $request->file('file')
-
-        );
-
-
-
-
-
-
-
-        return redirect()
-
-            ->route('siswa.index')
-
-            ->with(
-
-                'success',
-
-                'Data siswa berhasil diimport.'
 
             );
+
+
+
+
+
+
+
+            return redirect()
+
+                ->route('siswa.index')
+
+                ->with(
+
+                    'success',
+
+                    'Data siswa berhasil diimport.'
+
+                );
+
+
+
+
+
+
+        }
+
+        catch(\Exception $e){
+
+
+
+            Log::error(
+
+                $e->getMessage()
+
+            );
+
+
+
+
+
+            return redirect()
+
+                ->route('siswa.index')
+
+                ->with(
+
+                    'error',
+
+                    $e->getMessage()
+
+                );
+
+
+        }
 
 
     }
@@ -303,9 +463,12 @@ class SiswaController extends Controller
 
         return Excel::download(
 
+
             new SiswaExport,
 
+
             'data-siswa.xlsx'
+
 
         );
 
@@ -321,7 +484,7 @@ class SiswaController extends Controller
 
 
     /**
-     * Form edit siswa
+     * Edit siswa
      */
     public function edit($id)
     {
@@ -332,13 +495,17 @@ class SiswaController extends Controller
 
 
 
+
         $kelas = Kelas::with('jurusan')
 
             ->orderBy(
+
                 'nama_kelas'
+
             )
 
             ->get();
+
 
 
 
@@ -412,40 +579,6 @@ class SiswaController extends Controller
 
 
 
-        ],[
-
-
-
-            'nis.required'
-            =>
-            'NIS wajib diisi.',
-
-
-
-            'nis.unique'
-            =>
-            'NIS sudah digunakan siswa lain.',
-
-
-
-            'nama_siswa.required'
-            =>
-            'Nama siswa wajib diisi.',
-
-
-
-            'jenis_kelamin.required'
-            =>
-            'Jenis kelamin wajib dipilih.',
-
-
-
-            'kelas_id.required'
-            =>
-            'Kelas wajib dipilih.',
-
-
-
         ]);
 
 
@@ -454,8 +587,11 @@ class SiswaController extends Controller
 
 
 
+        $siswa->update(
 
-        $siswa->update($validated);
+            $validated
+
+        );
 
 
 
@@ -497,7 +633,9 @@ class SiswaController extends Controller
 
 
 
+
         $siswa->delete();
+
 
 
 
